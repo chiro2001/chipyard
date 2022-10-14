@@ -173,8 +173,30 @@
 [submodule "generators/ibex"]
 	path = generators/ibex
 	url = https://github.com/ucb-bar/ibex-wrapper
-        shallow = true
+  shallow = true
 [submodule "generators/fft-generator"]
 	path = generators/fft-generator
 	url = https://github.com/ucb-bar/FFTGenerator.git
 	shallow = true
+[submodule "tools/chisel3"]
+	path = tools/chisel3
+	url = https://github.com/chipsalliance/chisel3
+	shallow = true
+[submodule "tools/firrtl"]
+	path = tools/firrtl
+	url = https://github.com/chipsalliance/firrtl
+	shallow = true
+[submodule "tools/treadle"]
+	path = tools/treadle
+	url = https://github.com/chipsalliance/treadle
+	shallow = true
+[submodule "tools/firrtl-interpreter"]
+	path = tools/firrtl-interpreter
+	url = https://github.com/freechipsproject/firrtl-interpreter
+	shallow = true
+[submodule "verilator"]
+	path = verilator
+	url = https://github.com/verilator/verilator
+	shallow = true
+
+
