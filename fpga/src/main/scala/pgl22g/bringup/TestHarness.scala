@@ -19,7 +19,7 @@ import sifive.blocks.devices.gpio._
 
 import testchipip.{HasPeripheryTSIHostWidget, PeripheryTSIHostKey, TSIHostWidgetIO, TLSinkSetter}
 
-import chipyard.fpga.pgl22g.{PGL22GFPGATestHarness, PGL22GFPGATestHarnessImp, DDR2PGL22GShellPlacer, SysClock2PGL22GShellPlacer}
+import chipyard.fpga.pgl22g.{PGL22GFPGATestHarness, PGL22GFPGATestHarnessImp}
 
 import chipyard.{ChipTop}
 

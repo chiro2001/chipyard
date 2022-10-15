@@ -18,7 +18,7 @@ import testchipip.{PeripheryTSIHostKey, TSIHostParams, TSIHostSerdesParams}
 
 import chipyard.{BuildSystem}
 
-import chipyard.fpga.pgl22g.{WithPGL22GTweaks, WithFPGAFrequency, PGL22GDDR2Size}
+import chipyard.fpga.pgl22g.{WithPGL22GTweaks, WithFPGAFrequency}
 import sifive.fpgashells.shell.pango.pgl22gshell.{PGL22GDDRSize, PGL22GShellPMOD}
 
 class WithBringupPeripherals extends Config((site, here, up) => {
@@ -64,7 +64,7 @@ class WithBringupPeripherals extends Config((site, here, up) => {
           beatBytes = 8)),
       targetMasterPortParams = MasterPortParams(
         base = BigInt("80000000", 16),
-        size = site(PGL22GDDR2Size),
+        size = site(PGL22GDDRSize),
         beatBytes = 8, // comes from test chip
         idBits = 4) // comes from PGL22G idBits in XilinxPGL22GMIG
       ))

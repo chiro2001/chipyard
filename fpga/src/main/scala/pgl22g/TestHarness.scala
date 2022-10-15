@@ -16,7 +16,7 @@ import sifive.blocks.devices.gpio._
 import chipyard.{BuildTop, CanHaveMasterTLMemPort, ChipTop, DefaultClockFrequencyKey, ExtTLMem, HasHarnessSignalReferences}
 import chipyard.iobinders.HasIOBinders
 import chipyard.harness.ApplyHarnessBinders
-import sifive.fpgashells.shell.pango.pgl22gshell.{PGL22GShellBasicOverlays, PGL22GShellPMOD, UARTPGL22GShellPlacer}
+import sifive.fpgashells.shell.pango.pgl22gshell.{ChipLinkPGL22GPlacedOverlay, PGL22GShellBasicOverlays, PGL22GShellPMOD, UARTPGL22GShellPlacer}
 
 class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
 
@@ -33,8 +33,8 @@ class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GS
   // val jtagBScan = Overlay(JTAGDebugBScanOverlayKey, new JTAGDebugBScanPGL22GShellPlacer(this, JTAGDebugBScanShellInput()))
   // val fmc       = Overlay(PCIeOverlayKey, new PCIePGL22GFMCShellPlacer(this, PCIeShellInput()))
   // val edge      = Overlay(PCIeOverlayKey, new PCIePGL22GEdgeShellPlacer(this, PCIeShellInput()))
-  val sys_clock2 = Overlay(ClockInputOverlayKey, new SysClock2PGL22GShellPlacer(this, ClockInputShellInput()))
-  val ddr2       = Overlay(DDROverlayKey, new DDR2PGL22GShellPlacer(this, DDRShellInput()))
+  // val sys_clock2 = Overlay(ClockInputOverlayKey, new SysClock2PGL22GShellPlacer(this, ClockInputShellInput()))
+  // val ddr2       = Overlay(DDROverlayKey, new DDR2PGL22GShellPlacer(this, DDRShellInput()))
 
   val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
 
@@ -106,11 +106,11 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
   val powerOnReset: Bool = PowerOnResetFPGAOnly(sysclk)
   _outer.sdc.addAsyncPath(Seq(powerOnReset))
 
-  // val ereset: Bool = _outer.chiplink.get() match {
-  //   case Some(x: ChipLinkPGL22GPlacedOverlay) => !x.ereset_n
-  //   case _ => false.B
-  // }
-  val ereset: Bool = false.B
+  val ereset: Bool = _outer.chiplink.get() match {
+    case Some(x: ChipLinkPGL22GPlacedOverlay) => !x.ereset_n
+    case _ => false.B
+  }
+  // val ereset: Bool = false.B
 
   _outer.pllReset := (resetIBUF.io.O || powerOnReset || ereset)
 
