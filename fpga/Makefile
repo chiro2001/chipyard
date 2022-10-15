@@ -16,6 +16,20 @@ sim_name := none
 #########################################################################################
 SUB_PROJECT ?= vcu118
 
+ifeq ($(SUB_PROJECT),pgl22g)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= PGL22GFPGATestHarness
+	VLOG_MODEL        ?= PGL22GFPGATestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
+	CONFIG            ?= RocketPGL22GConfig
+	CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= xilinx
+endif
+
 ifeq ($(SUB_PROJECT),vcu118)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= VCU118FPGATestHarness
