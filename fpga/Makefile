@@ -128,8 +128,14 @@ tcl_files: $(tcl_files_source)
 	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
+
+.PHONY: $(build_dir)/mem.v
+$(build_dir)/mem.v: $(build_dir)/$(long_name).top.mems.v
+	cp $(fpga_dir)/common/vsrc/mem.v $(build_dir)/mem.v
+	sed -i 's/module split_data_arrays_0_ext/module split_data_arrays_0_del/g' $(build_dir)/$(long_name).top.mems.v
+
 ifneq ($(FPGA_BRAND),xilinx)
-synth_list_f_req := $(sim_common_files) $(all_vsrcs) tcl_files fdc_files
+synth_list_f_req := $(sim_common_files) tcl_files fdc_files $(build_dir)/mem.v $(all_vsrcs)
 else
 synth_list_f_req := $(sim_common_files) $(all_vsrcs)
 endif
@@ -140,7 +146,8 @@ $(synth_list_f): $(synth_list_f_req)
 ifneq ($(FPGA_BRAND),xilinx)
 BIT_FILE := $(build_dir)/obj/$(MODEL).sbit
 EDA := pds_shell
-EDA_ARGS := -f bitstream.tcl
+EDA_ARGS := -f bitstream.tcl -project_name $(MODEL) -work_dir $(build_dir)
+# EDA_ARGS := -f create_project.tcl -project_name $(long_name) -work_dir $(build_dir)
 EDA_ARGS_DEBUG := $(EDA_ARGS)
 else
 BIT_FILE := $(build_dir)/obj/$(MODEL).bit
@@ -179,3 +186,7 @@ clean:
 
 .PHONY: test
 test: tcl_files
+
+.PHONY: show
+show:
+	python scripts/show_graph.py $(abspath $(build_dir)/$(long_name).graphml)
