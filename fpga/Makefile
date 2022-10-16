@@ -129,7 +129,7 @@ tcl_files: $(tcl_files_source)
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
 ifneq ($(FPGA_BRAND),xilinx)
-synth_list_f_req := $(sim_common_files) tcl_files fdc_files
+synth_list_f_req := $(sim_common_files) $(all_vsrcs) tcl_files fdc_files
 else
 synth_list_f_req := $(sim_common_files) $(all_vsrcs)
 endif
