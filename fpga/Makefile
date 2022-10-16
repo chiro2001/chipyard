@@ -27,7 +27,7 @@ ifeq ($(SUB_PROJECT),pgl22g)
 	TB                ?= none # unused
 	TOP               ?= ChipTop
 	BOARD             ?= pgl22g
-	FPGA_BRAND        ?= xilinx
+	FPGA_BRAND        ?= pango
 endif
 
 ifeq ($(SUB_PROJECT),vcu118)
@@ -120,34 +120,55 @@ all_vsrcs := \
 #########################################################################################
 # combine all sources into single .f
 synth_list_f := $(build_dir)/$(long_name).vsrcs.f
-$(synth_list_f): $(sim_common_files) $(all_vsrcs)
+.PHONY: tcl_files
+tcl_files: $(tcl_files_source)
+	cp $(fpga_common_script_dir)/*.tcl $(build_dir)/
+	cp $(fpga_dir)/$(BOARD)/tcl/*.tcl $(build_dir)/
+	cd $(build_dir) && sed -i 's/\%top\%/ChipTop/g' *.tcl
+	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
+fdc_files:
+	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
+ifneq ($(FPGA_BRAND),xilinx)
+synth_list_f_req := $(sim_common_files) tcl_files fdc_files
+else
+synth_list_f_req := $(sim_common_files) $(all_vsrcs)
+endif
+$(synth_list_f): $(synth_list_f_req)
 	$(foreach file,$(all_vsrcs),echo "$(file)" >> $@;)
 	cat $(sim_common_files) >> $@
 
+ifneq ($(FPGA_BRAND),xilinx)
+BIT_FILE := $(build_dir)/obj/$(MODEL).sbit
+EDA := pds_shell
+EDA_ARGS := -f bitstream.tcl
+EDA_ARGS_DEBUG := $(EDA_ARGS)
+else
 BIT_FILE := $(build_dir)/obj/$(MODEL).bit
-$(BIT_FILE): $(synth_list_f)
-	cd $(build_dir); vivado \
-		-nojournal -mode batch \
+EDA := vivado
+EDA_ARGS := -nojournal -mode batch \
 		-source $(fpga_common_script_dir)/vivado.tcl \
 		-tclargs \
 			-top-module "$(MODEL)" \
 			-F "$(synth_list_f)" \
 			-board "$(BOARD)" \
 			-ip-vivado-tcls "$(shell find '$(build_dir)' -name '*.vivado.tcl')"
-
-.PHONY: bitstream
-bitstream: $(BIT_FILE)
-
-.PHONY: debug-bitstream
-debug-bitstream: $(build_dir)/obj/post_synth.dcp
-	cd $(build_dir); vivado \
-		-nojournal -mode batch \
+EDA_ARGS_DEBUG := -nojournal -mode batch \
 		-source $(sim_dir)/scripts/run_impl_bitstream.tcl \
 		-tclargs \
 			$(build_dir)/obj/post_synth.dcp \
 			$(BOARD) \
 			$(build_dir)/debug_obj \
 			$(fpga_common_script_dir)
+endif
+$(BIT_FILE): $(synth_list_f)
+	cd $(build_dir) && $(EDA) $(EDA_ARGS)
+
+.PHONY: bitstream
+bitstream: $(BIT_FILE)
+
+.PHONY: debug-bitstream
+debug-bitstream: $(build_dir)/obj/post_synth.dcp
+	cd $(build_dir); $(EDA) $(EDA_ARGS_DEBUG)
 
 #########################################################################################
 # general cleanup rules
@@ -155,3 +176,6 @@ debug-bitstream: $(build_dir)/obj/post_synth.dcp
 .PHONY: clean
 clean:
 	rm -rf $(gen_dir)
+
+.PHONY: test
+test: tcl_files
