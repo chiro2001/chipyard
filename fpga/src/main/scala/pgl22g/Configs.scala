@@ -33,6 +33,7 @@ class WithPGL22GTweaks extends Config(
   new WithPGL22GResetHarnessBinder ++
   new WithDebugResetPassthrough ++
   new WithDefaultPeripherals ++
+  new freechips.rocketchip.subsystem.WithoutTLMonitors ++
   new freechips.rocketchip.subsystem.WithNBreakpoints(2))
 
 class TinyRocketPGL22GConfig extends Config(
