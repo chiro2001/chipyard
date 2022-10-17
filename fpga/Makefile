@@ -30,6 +30,20 @@ ifeq ($(SUB_PROJECT),pgl22g)
 	FPGA_BRAND        ?= pango
 endif
 
+ifeq ($(SUB_PROJECT),pgl22g-xilinx)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= PGL22GFPGATestHarness
+	VLOG_MODEL        ?= PGL22GFPGATestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
+	CONFIG            ?= TinyRocketPGL22GConfig
+	CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= xilinx
+endif
+
 ifeq ($(SUB_PROJECT),vcu118)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= VCU118FPGATestHarness
@@ -137,7 +151,7 @@ $(build_dir)/mem.v: $(build_dir)/$(long_name).top.mems.v
 ifneq ($(FPGA_BRAND),xilinx)
 synth_list_f_req := $(sim_common_files) tcl_files fdc_files $(build_dir)/mem.v
 else
-synth_list_f_req := $(sim_common_files) $(all_vsrcs)
+synth_list_f_req := $(sim_common_files) #$(all_vsrcs)
 endif
 $(synth_list_f): $(synth_list_f_req)
 	$(foreach file,$(all_vsrcs),echo "$(file)" >> $@;)
