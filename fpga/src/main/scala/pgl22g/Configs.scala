@@ -86,7 +86,7 @@ class PGL22GRocketConfig extends Config(
     new WithL1DCacheWays(1) ++
     new WithL1DCacheSets(64) ++
     new WithoutFPU ++
-    new WithoutMulDiv ++
+    // new WithoutMulDiv ++
     new WithNoMemPort ++ // remove backing memory
     new With1TinyCore ++ // single tiny rocket-core
     new WithRV32 ++ // set RocketTiles to be 32-bit
