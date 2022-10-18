@@ -14,7 +14,7 @@ class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GS
 
   // Convert harness resets from Bool to Reset type.
   val hReset = Wire(Reset())
-  hReset := resetP
+  hReset := ck_rst
 
   val dReset = Wire(AsyncReset())
   dReset := reset_core.asAsyncReset

@@ -19,7 +19,7 @@ class WithPGL22GResetHarnessBinder extends ComposeHarnessBinder({
   (system: HasPeripheryDebugModuleImp, th: PGL22GFPGATestHarness, ports: Seq[Bool]) => {
     require(ports.size == 2)
 
-    withClockAndReset(th.clock_32MHz, th.resetP) {
+    withClockAndReset(th.clock_32MHz, th.ck_rst) {
       // // Debug module reset
       // th.dut_ndreset := ports(0)
       //
@@ -71,7 +71,7 @@ class WithPGL22GJTAGHarnessBinder extends OverrideHarnessBinder({
 
 class WithPGL22GUARTHarnessBinder extends OverrideHarnessBinder({
   (system: HasPeripheryUARTModuleImp, th: PGL22GFPGATestHarness, ports: Seq[UARTPortIO]) => {
-    withClockAndReset(th.clock_32MHz, th.resetP) {
+    withClockAndReset(th.clock_32MHz, th.ck_rst) {
       GTP_IOBUF(th.uart_rxd_out,  ports.head.txd)
       ports.head.rxd := GTP_IOBUF(th.uart_txd_in)
     }
