@@ -138,7 +138,7 @@ synth_list_f := $(build_dir)/$(long_name).vsrcs.f
 tcl_files: $(tcl_files_source)
 	cp $(fpga_common_script_dir)/*.tcl $(build_dir)/
 	cp $(fpga_dir)/$(BOARD)/tcl/*.tcl $(build_dir)/
-	cd $(build_dir) && sed -i 's/\%top\%/ChipTopWrapper/g' *.tcl
+	cd $(build_dir) && sed -i 's/\%top\%/$(MODEL)/g' *.tcl
 	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
