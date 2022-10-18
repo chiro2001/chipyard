@@ -140,6 +140,7 @@ tcl_files: $(tcl_files_source)
 	cp $(fpga_dir)/$(BOARD)/tcl/*.tcl $(build_dir)/
 	cd $(build_dir) && sed -i 's/\%top\%/$(MODEL)/g' *.tcl
 	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
+	cd $(build_dir) && sed -i 's#\%fpga_dir\%#$(fpga_dir)#g' *.tcl
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
 pds_ip_cores:
@@ -150,11 +151,11 @@ $(build_dir)/mem.v: $(build_dir)/$(long_name).top.mems.v
 	cp $(fpga_dir)/common/vsrc/mem.v $(build_dir)/mem.v
 	sed -i 's/module split_data_arrays_0_ext/module split_data_arrays_0_del/g' $(build_dir)/$(long_name).top.mems.v
 
-$(build_dir)/wrapper.v: $(fpga_dir)/common/vsrc/wrapper.v
-	cp $(fpga_dir)/common/vsrc/wrapper.v $(build_dir)/wrapper.v
+$(build_dir)/FPGAStart.v: $(fpga_dir)/common/vsrc/FPGAStart.v
+	cp $(fpga_dir)/common/vsrc/FPGAStart.v $(build_dir)/FPGAStart.v
 
 ifneq ($(FPGA_BRAND),xilinx)
-synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files fdc_files $(build_dir)/mem.v $(all_vsrcs)
+synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files $(build_dir)/mem.v $(build_dir)/FPGAStart.v $(all_vsrcs)
 else
 synth_list_f_req := $(sim_common_files) $(all_vsrcs)
 endif

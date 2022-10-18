@@ -31,7 +31,7 @@ class AbstractConfig extends Config(
   new chipyard.harness.WithUARTAdapter ++ // add UART adapter to display UART on stdout, if uart is present
     new chipyard.harness.WithBlackBoxSimMem ++ // add SimDRAM DRAM model for axi4 backing memory, if axi4 mem is enabled
     new chipyard.harness.WithSimSerial ++ // add external serial-adapter and RAM
-    // new chipyard.harness.WithSimDebug ++                          // add SimJTAG or SimDTM adapters if debug module is enabled
+    new chipyard.harness.WithSimDebug ++                          // add SimJTAG or SimDTM adapters if debug module is enabled
     new chipyard.harness.WithGPIOTiedOff ++ // tie-off chiptop GPIOs, if GPIOs are present
     new chipyard.harness.WithSimSPIFlashModel ++ // add simulated SPI flash memory, if SPI is enabled
     new chipyard.harness.WithSimAXIMMIO ++ // add SimAXIMem for axi4 mmio port, if enabled
@@ -54,14 +54,14 @@ class AbstractConfig extends Config(
     new chipyard.iobinders.WithSPIIOCells ++
     new chipyard.iobinders.WithTraceIOPunchthrough ++
     new chipyard.iobinders.WithExtInterruptIOCells ++
-    // new chipyard.iobinders.WithCustomBootPin ++
+    new chipyard.iobinders.WithCustomBootPin ++
     new chipyard.iobinders.WithDividerOnlyClockGenerator ++
 
     new testchipip.WithSerialTLWidth(32) ++ // fatten the serialTL interface to improve testing performance
     new testchipip.WithDefaultSerialTL ++ // use serialized tilelink port to external serialadapter/harnessRAM
     new chipyard.config.WithBootROM ++ // use default bootrom
     new chipyard.config.WithUART ++ // add a UART
-    // new chipyard.config.WithL2TLBs(1024) ++                           // use L2 TLBs
+    new chipyard.config.WithL2TLBs(1024) ++                           // use L2 TLBs
     new chipyard.config.WithNoSubsystemDrivenClocks ++ // drive the subsystem diplomatic clocks from ChipTop instead of using implicit clocks
     new chipyard.config.WithInheritBusFrequencyAssignments ++ // Unspecified clocks within a bus will receive the bus frequency if set
     new chipyard.config.WithPeripheryBusFrequencyAsDefault ++ // Unspecified frequencies with match the pbus frequency (which is always set)
@@ -77,6 +77,11 @@ class AbstractConfig extends Config(
     new freechips.rocketchip.system.BaseConfig) // "base" rocketchip system
 
 
+class WithFPGAFrequency(fMHz: Double) extends Config(
+  new chipyard.config.WithPeripheryBusFrequency(fMHz) ++ // assumes using PBUS as default freq.
+    new chipyard.config.WithMemoryBusFrequency(fMHz)
+)
+
 class PGL22GRocketConfig extends Config(
   new chipyard.config.WithTLSerialLocation(FBUS, PBUS) ++ // attach TL serial adapter to f/p busses
     new WithIncoherentBusTopology ++ // use incoherent bus topology
@@ -86,10 +91,13 @@ class PGL22GRocketConfig extends Config(
     // new WithL1DCacheWays(2) ++
     // new WithL1DCacheSets(128) ++
     new WithoutFPU ++
-    new WithoutMulDiv ++
-    new WithNoMemPort ++ // remove backing memory
+    new WithL2TLBs(0) ++
+    new WithDDRMem ++
+    // new WithoutMulDiv ++
+    // new WithNoMemPort ++ // remove backing memory
     new With1TinyCore ++ // single tiny rocket-core
     new WithRV32 ++ // set RocketTiles to be 32-bit
+    new WithFPGAFrequency(8) ++
     new AbstractConfig)
 
 class WithNoDebug extends Config((site, here, up) => {
@@ -101,7 +109,7 @@ class WithPGL22GTweaks extends Config(
   // new WithPGL22GJTAGHarnessBinder ++
   // new WithTimebase(32000000) ++ // 32Mhz CPU Clock default
   // new WithTimebase(50000000) ++ // 50Mhz CPU Clock default
-  new WithTimebase(8000000) ++ // 50Mhz CPU Clock default
+  new WithTimebase(8000000) ++ // 8Mhz CPU Clock default
     new WithPGL22GUARTHarnessBinder ++
     // new WithPGL22GResetHarnessBinder ++
     // new WithDebugResetPassthrough ++

@@ -1,19 +1,19 @@
 package chipyard.fpga.pgl22g
 
+import chipyard.{CanHaveMasterTLMemPort, HasHarnessSignalReferences}
 import chisel3._
-
 import freechips.rocketchip.devices.debug._
-import freechips.rocketchip.jtag.{JTAGIO}
+import freechips.rocketchip.jtag.JTAGIO
 import freechips.rocketchip.subsystem._
-
 import sifive.blocks.devices.uart._
 import sifive.blocks.devices.jtag._
 import sifive.blocks.devices.pinctrl._
-
-import sifive.fpgashells.ip.pango.{IBUFG, GTP_IOBUF, PULLUP, PowerOnResetFPGAOnly}
-
+import sifive.fpgashells.ip.pango.{GTP_IOBUF, IBUFG, PULLUP, FPGAStart}
 import chipyard.harness.{ComposeHarnessBinder, OverrideHarnessBinder}
 import chipyard.iobinders.JTAGChipIO
+import chisel3.experimental.BaseModule
+import freechips.rocketchip.tilelink.TLBundle
+import freechips.rocketchip.util.HeterogeneousBag
 
 class WithPGL22GResetHarnessBinder extends ComposeHarnessBinder({
   (system: HasPeripheryDebugModuleImp, th: PGL22GFPGATestHarness, ports: Seq[Bool]) => {
@@ -75,5 +75,21 @@ class WithPGL22GUARTHarnessBinder extends OverrideHarnessBinder({
       GTP_IOBUF(th.uart_rxd_out,  ports.head.txd)
       ports.head.rxd := GTP_IOBUF(th.uart_txd_in)
     }
+  }
+})
+
+
+
+/*** Experimental DDR ***/
+class WithDDRMem extends OverrideHarnessBinder({
+  (system: CanHaveMasterTLMemPort, th: BaseModule with HasHarnessSignalReferences, ports: Seq[HeterogeneousBag[TLBundle]]) => {
+    th match { case pgl22g: PGL22GFPGATestHarness => {
+      require(ports.size == 1)
+
+      val bundles = pgl22g.vcu118Outer.ddrClient.out.map(_._1)
+      val ddrClientBundle = Wire(new HeterogeneousBag(bundles.map(_.cloneType)))
+      bundles.zip(ddrClientBundle).foreach { case (bundle, io) => bundle <> io }
+      ddrClientBundle <> ports.head
+    } }
   }
 })
