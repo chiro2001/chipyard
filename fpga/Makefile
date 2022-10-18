@@ -143,10 +143,7 @@ tcl_files: $(tcl_files_source)
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
 pds_ip_cores:
-	-cp $(fpga_dir)/common/ipcores/*.idf $(build_dir)
-	-cp $(fpga_dir)/common/ipcores/*.v $(build_dir)
-	-cp $(fpga_dir)/common/ipcores/*.sv $(build_dir)
-	-cp $(fpga_dir)/common/ipcores/*.vhdl $(build_dir)
+	-cp -r $(fpga_dir)/common/ipcores $(build_dir)
 
 # .PHONY: $(build_dir)/mem.v
 $(build_dir)/mem.v: $(build_dir)/$(long_name).top.mems.v
@@ -157,7 +154,7 @@ $(build_dir)/wrapper.v: $(fpga_dir)/common/vsrc/wrapper.v
 	cp $(fpga_dir)/common/vsrc/wrapper.v $(build_dir)/wrapper.v
 
 ifneq ($(FPGA_BRAND),xilinx)
-synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files fdc_files $(build_dir)/mem.v $(build_dir)/wrapper.v $(all_vsrcs)
+synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files fdc_files $(build_dir)/mem.v $(all_vsrcs)
 else
 synth_list_f_req := $(sim_common_files) $(all_vsrcs)
 endif
@@ -166,9 +163,9 @@ $(synth_list_f): $(synth_list_f_req)
 	cat $(sim_common_files) >> $@
 
 ifneq ($(FPGA_BRAND),xilinx)
-BIT_FILE := $(build_dir)/generate_bitstream/ChipTopWrapper.sbit
+BIT_FILE := $(build_dir)/generate_bitstream/$(MODEL).sbit
 EDA := pds_shell
-EDA_ARGS := -f bitstream.tcl -project_name ChipTop -work_dir $(build_dir)
+EDA_ARGS := -f bitstream.tcl -project_name $(MODEL) -work_dir $(build_dir)
 # EDA_ARGS := -f run_synth.tcl -project_name $(long_name) -work_dir $(build_dir)
 EDA_ARGS_DEBUG := $(EDA_ARGS)
 else
@@ -207,7 +204,8 @@ clean:
 	rm -rf $(gen_dir)
 
 .PHONY: test
-test: tcl_files
+test:
+	echo $(MODEL)
 
 .PHONY: show
 show:
