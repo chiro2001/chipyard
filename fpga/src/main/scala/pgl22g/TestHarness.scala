@@ -19,7 +19,7 @@ class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GS
   val dReset = Wire(AsyncReset())
   dReset := reset_core.asAsyncReset
 
-  val clockUse = CLK50MHZ
+  val clockUse = clock_8MHz
 
   // default to 32MHz clock
   withClockAndReset(clockUse, hReset) {

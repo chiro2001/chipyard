@@ -138,20 +138,28 @@ synth_list_f := $(build_dir)/$(long_name).vsrcs.f
 tcl_files: $(tcl_files_source)
 	cp $(fpga_common_script_dir)/*.tcl $(build_dir)/
 	cp $(fpga_dir)/$(BOARD)/tcl/*.tcl $(build_dir)/
-	cd $(build_dir) && sed -i 's/\%top\%/ChipTop/g' *.tcl
+	cd $(build_dir) && sed -i 's/\%top\%/ChipTopWrapper/g' *.tcl
 	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
+pds_ip_cores:
+	-cp $(fpga_dir)/common/ipcores/*.idf $(build_dir)
+	-cp $(fpga_dir)/common/ipcores/*.v $(build_dir)
+	-cp $(fpga_dir)/common/ipcores/*.sv $(build_dir)
+	-cp $(fpga_dir)/common/ipcores/*.vhdl $(build_dir)
 
 # .PHONY: $(build_dir)/mem.v
 $(build_dir)/mem.v: $(build_dir)/$(long_name).top.mems.v
 	cp $(fpga_dir)/common/vsrc/mem.v $(build_dir)/mem.v
 	sed -i 's/module split_data_arrays_0_ext/module split_data_arrays_0_del/g' $(build_dir)/$(long_name).top.mems.v
 
+$(build_dir)/wrapper.v: $(fpga_dir)/common/vsrc/wrapper.v
+	cp $(fpga_dir)/common/vsrc/wrapper.v $(build_dir)/wrapper.v
+
 ifneq ($(FPGA_BRAND),xilinx)
-synth_list_f_req := $(sim_common_files) tcl_files fdc_files $(build_dir)/mem.v
+synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files fdc_files $(build_dir)/mem.v $(build_dir)/wrapper.v $(all_vsrcs)
 else
-synth_list_f_req := $(sim_common_files) #$(all_vsrcs)
+synth_list_f_req := $(sim_common_files) $(all_vsrcs)
 endif
 $(synth_list_f): $(synth_list_f_req)
 	$(foreach file,$(all_vsrcs),echo "$(file)" >> $@;)
@@ -160,8 +168,8 @@ $(synth_list_f): $(synth_list_f_req)
 ifneq ($(FPGA_BRAND),xilinx)
 BIT_FILE := $(build_dir)/obj/$(MODEL).sbit
 EDA := pds_shell
-# EDA_ARGS := -f bitstream.tcl -project_name $(long_name) -work_dir $(build_dir)
-EDA_ARGS := -f run_synth.tcl -project_name $(long_name) -work_dir $(build_dir)
+EDA_ARGS := -f bitstream.tcl -project_name $(long_name) -work_dir $(build_dir)
+# EDA_ARGS := -f run_synth.tcl -project_name $(long_name) -work_dir $(build_dir)
 EDA_ARGS_DEBUG := $(EDA_ARGS)
 else
 BIT_FILE := $(build_dir)/obj/$(MODEL).bit
