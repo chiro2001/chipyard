@@ -166,9 +166,9 @@ $(synth_list_f): $(synth_list_f_req)
 	cat $(sim_common_files) >> $@
 
 ifneq ($(FPGA_BRAND),xilinx)
-BIT_FILE := $(build_dir)/obj/$(MODEL).sbit
+BIT_FILE := $(build_dir)/generate_bitstream/ChipTopWrapper.sbit
 EDA := pds_shell
-EDA_ARGS := -f bitstream.tcl -project_name $(long_name) -work_dir $(build_dir)
+EDA_ARGS := -f bitstream.tcl -project_name ChipTop -work_dir $(build_dir)
 # EDA_ARGS := -f run_synth.tcl -project_name $(long_name) -work_dir $(build_dir)
 EDA_ARGS_DEBUG := $(EDA_ARGS)
 else
