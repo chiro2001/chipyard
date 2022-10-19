@@ -1,4 +1,4 @@
-packagechipyard.fpga.pgl22g
+package chipyard.fpga.pgl22g
 
 import chipyard.harness.ApplyHarnessBinders
 import chipyard.iobinders.HasIOBinders
