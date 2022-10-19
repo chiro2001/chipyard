@@ -1,19 +1,14 @@
 // See LICENSE for license details.
 package chipyard.fpga.pgl22g
 
+import chipyard.config.{AbstractConfig, WithL2TLBs}
 import freechips.rocketchip.config._
-import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
-import freechips.rocketchip.devices.tilelink._
-import freechips.rocketchip.diplomacy.{DTSModel, DTSTimebase}
-import freechips.rocketchip.system._
-import freechips.rocketchip.tile._
+import freechips.rocketchip.diplomacy.DTSTimebase
+import freechips.rocketchip.subsystem._
 import sifive.blocks.devices.uart._
-import testchipip.SerialTLKey
-import chipyard.{BuildSystem, DefaultClockFrequencyKey}
-import chipyard.config.WithL2TLBs
-import chipyard.fpga.vcu118.{WithTLIOPassthrough, WithUARTIOPassthrough}
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
+import testchipip.SerialTLKey
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
   // case PeripheryUARTKey => List(
@@ -43,55 +38,55 @@ class WithSystemModifications extends Config((site, here, up) => {
   case SerialTLKey => None // remove serialized tl port
 })
 
-class AbstractConfig extends Config(
-  // The HarnessBinders control generation of hardware in the TestHarness
-  new chipyard.harness.WithUARTAdapter ++ // add UART adapter to display UART on stdout, if uart is present
-    new chipyard.harness.WithBlackBoxSimMem ++ // add SimDRAM DRAM model for axi4 backing memory, if axi4 mem is enabled
-    new chipyard.harness.WithSimSerial ++ // add external serial-adapter and RAM
-    new chipyard.harness.WithSimDebug ++                          // add SimJTAG or SimDTM adapters if debug module is enabled
-    new chipyard.harness.WithGPIOTiedOff ++ // tie-off chiptop GPIOs, if GPIOs are present
-    new chipyard.harness.WithSimSPIFlashModel ++ // add simulated SPI flash memory, if SPI is enabled
-    new chipyard.harness.WithSimAXIMMIO ++ // add SimAXIMem for axi4 mmio port, if enabled
-    new chipyard.harness.WithTieOffInterrupts ++ // tie-off interrupt ports, if present
-    new chipyard.harness.WithTieOffL2FBusAXI ++ // tie-off external AXI4 master, if present
-    new chipyard.harness.WithCustomBootPinPlusArg ++
-    new chipyard.harness.WithClockAndResetFromHarness ++
-
-    // The IOBinders instantiate ChipTop IOs to match desired digital IOs
-    // IOCells are generated for "Chip-like" IOs, while simulation-only IOs are directly punched through
-    new chipyard.iobinders.WithAXI4MemPunchthrough ++
-    new chipyard.iobinders.WithAXI4MMIOPunchthrough ++
-    new chipyard.iobinders.WithL2FBusAXI4Punchthrough ++
-    new chipyard.iobinders.WithBlockDeviceIOPunchthrough ++
-    new chipyard.iobinders.WithNICIOPunchthrough ++
-    new chipyard.iobinders.WithSerialTLIOCells ++
-    new chipyard.iobinders.WithDebugIOCells ++
-    new chipyard.iobinders.WithUARTIOCells ++
-    new chipyard.iobinders.WithGPIOCells ++
-    new chipyard.iobinders.WithSPIIOCells ++
-    new chipyard.iobinders.WithTraceIOPunchthrough ++
-    new chipyard.iobinders.WithExtInterruptIOCells ++
-    new chipyard.iobinders.WithCustomBootPin ++
-    new chipyard.iobinders.WithDividerOnlyClockGenerator ++
-
-    new testchipip.WithSerialTLWidth(32) ++ // fatten the serialTL interface to improve testing performance
-    new testchipip.WithDefaultSerialTL ++ // use serialized tilelink port to external serialadapter/harnessRAM
-    new chipyard.config.WithBootROM ++ // use default bootrom
-    new chipyard.config.WithUART ++ // add a UART
-    new chipyard.config.WithL2TLBs(1024) ++                           // use L2 TLBs
-    new chipyard.config.WithNoSubsystemDrivenClocks ++ // drive the subsystem diplomatic clocks from ChipTop instead of using implicit clocks
-    new chipyard.config.WithInheritBusFrequencyAssignments ++ // Unspecified clocks within a bus will receive the bus frequency if set
-    new chipyard.config.WithPeripheryBusFrequencyAsDefault ++ // Unspecified frequencies with match the pbus frequency (which is always set)
-    new chipyard.config.WithMemoryBusFrequency(8.0) ++ // Default 100 MHz mbus
-    new chipyard.config.WithPeripheryBusFrequency(8.0) ++ // Default 100 MHz pbus
-    new freechips.rocketchip.subsystem.WithJtagDTM ++ // set the debug module to expose a JTAG port
-    new freechips.rocketchip.subsystem.WithNoMMIOPort ++ // no top-level MMIO master port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithNoSlavePort ++ // no top-level MMIO slave port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithInclusiveCache ++ // use Sifive L2 cache
-    new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
-    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++ // leave the bus clocks undriven by sbus
-    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++ // hierarchical buses including sbus/mbus/pbus/fbus/cbus/l2
-    new freechips.rocketchip.system.BaseConfig) // "base" rocketchip system
+// class AbstractConfig extends Config(
+//   // The HarnessBinders control generation of hardware in the TestHarness
+//   new chipyard.harness.WithUARTAdapter ++ // add UART adapter to display UART on stdout, if uart is present
+//     new chipyard.harness.WithBlackBoxSimMem ++ // add SimDRAM DRAM model for axi4 backing memory, if axi4 mem is enabled
+//     new chipyard.harness.WithSimSerial ++ // add external serial-adapter and RAM
+//     new chipyard.harness.WithSimDebug ++ // add SimJTAG or SimDTM adapters if debug module is enabled
+//     new chipyard.harness.WithGPIOTiedOff ++ // tie-off chiptop GPIOs, if GPIOs are present
+//     new chipyard.harness.WithSimSPIFlashModel ++ // add simulated SPI flash memory, if SPI is enabled
+//     new chipyard.harness.WithSimAXIMMIO ++ // add SimAXIMem for axi4 mmio port, if enabled
+//     new chipyard.harness.WithTieOffInterrupts ++ // tie-off interrupt ports, if present
+//     new chipyard.harness.WithTieOffL2FBusAXI ++ // tie-off external AXI4 master, if present
+//     new chipyard.harness.WithCustomBootPinPlusArg ++
+//     new chipyard.harness.WithClockAndResetFromHarness ++
+//
+//     // The IOBinders instantiate ChipTop IOs to match desired digital IOs
+//     // IOCells are generated for "Chip-like" IOs, while simulation-only IOs are directly punched through
+//     new chipyard.iobinders.WithAXI4MemPunchthrough ++
+//     new chipyard.iobinders.WithAXI4MMIOPunchthrough ++
+//     new chipyard.iobinders.WithL2FBusAXI4Punchthrough ++
+//     new chipyard.iobinders.WithBlockDeviceIOPunchthrough ++
+//     new chipyard.iobinders.WithNICIOPunchthrough ++
+//     new chipyard.iobinders.WithSerialTLIOCells ++
+//     new chipyard.iobinders.WithDebugIOCells ++
+//     new chipyard.iobinders.WithUARTIOCells ++
+//     new chipyard.iobinders.WithGPIOCells ++
+//     new chipyard.iobinders.WithSPIIOCells ++
+//     new chipyard.iobinders.WithTraceIOPunchthrough ++
+//     new chipyard.iobinders.WithExtInterruptIOCells ++
+//     new chipyard.iobinders.WithCustomBootPin ++
+//     new chipyard.iobinders.WithDividerOnlyClockGenerator ++
+//
+//     new testchipip.WithSerialTLWidth(32) ++ // fatten the serialTL interface to improve testing performance
+//     new testchipip.WithDefaultSerialTL ++ // use serialized tilelink port to external serialadapter/harnessRAM
+//     new chipyard.config.WithBootROM ++ // use default bootrom
+//     new chipyard.config.WithUART ++ // add a UART
+//     new chipyard.config.WithL2TLBs(1024) ++ // use L2 TLBs
+//     new chipyard.config.WithNoSubsystemDrivenClocks ++ // drive the subsystem diplomatic clocks from ChipTop instead of using implicit clocks
+//     new chipyard.config.WithInheritBusFrequencyAssignments ++ // Unspecified clocks within a bus will receive the bus frequency if set
+//     new chipyard.config.WithPeripheryBusFrequencyAsDefault ++ // Unspecified frequencies with match the pbus frequency (which is always set)
+//     new chipyard.config.WithMemoryBusFrequency(8.0) ++ // Default 100 MHz mbus
+//     new chipyard.config.WithPeripheryBusFrequency(8.0) ++ // Default 100 MHz pbus
+//     new freechips.rocketchip.subsystem.WithJtagDTM ++ // set the debug module to expose a JTAG port
+//     new freechips.rocketchip.subsystem.WithNoMMIOPort ++ // no top-level MMIO master port (overrides default set in rocketchip)
+//     new freechips.rocketchip.subsystem.WithNoSlavePort ++ // no top-level MMIO slave port (overrides default set in rocketchip)
+//     new freechips.rocketchip.subsystem.WithInclusiveCache ++ // use Sifive L2 cache
+//     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
+//     new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++ // leave the bus clocks undriven by sbus
+//     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++ // hierarchical buses including sbus/mbus/pbus/fbus/cbus/l2
+//     new freechips.rocketchip.system.BaseConfig) // "base" rocketchip system
 
 
 class WithFPGAFrequency(fMHz: Double) extends Config(
@@ -100,21 +95,11 @@ class WithFPGAFrequency(fMHz: Double) extends Config(
 )
 
 class PGL22GRocketConfig extends Config(
-  new chipyard.config.WithTLSerialLocation(FBUS, PBUS) ++ // attach TL serial adapter to f/p busses
-    new WithIncoherentBusTopology ++ // use incoherent bus topology
-    new WithNBanks(0) ++ // remove L2$
-    // new WithL1ICacheWays(2) ++
-    // new WithL1ICacheSets(128) ++
-    // new WithL1DCacheWays(2) ++
-    // new WithL1DCacheSets(128) ++
-    new WithoutFPU ++
-    new WithL2TLBs(0) ++
-    new WithDDRMem ++
-    // new WithoutMulDiv ++
-    // new WithNoMemPort ++ // remove backing memory
-    new With1TinyCore ++ // single tiny rocket-core
-    new WithRV32 ++ // set RocketTiles to be 32-bit
-    new WithFPGAFrequency(8) ++
+  // new chipyard.config.WithTLSerialLocation(FBUS, PBUS) ++ // attach TL serial adapter to f/p busses
+  //   new WithIncoherentBusTopology ++ // use incoherent bus topology
+  //   new WithNBanks(0) ++ // remove L2$
+  // new With1TinyCore ++ // single tiny rocket-core
+  new WithNSmallCores(1) ++
     new AbstractConfig)
 
 class WithNoDebug extends Config((site, here, up) => {
@@ -126,27 +111,31 @@ class WithPGL22GTweaks extends Config(
   // new WithPGL22GJTAGHarnessBinder ++
   // new WithTimebase(32000000) ++ // 32Mhz CPU Clock default
   // new WithTimebase(50000000) ++ // 50Mhz CPU Clock default
-  new WithTimebase(8000000) ++ // 8Mhz CPU Clock default
-    // harness binders
-    new WithUART ++
+  // new WithTimebase(8000000) ++ // 8Mhz CPU Clock default
+  // harness binders
+  new WithUART ++
     // new WithSPISDCard ++
     new WithDDRMem ++
     // io binders
     new WithUARTIOPassthrough ++
     // new WithSPIIOPassthrough ++
-    // new WithTLIOPassthrough ++
+    new WithTLIOPassthrough ++
     new WithDefaultPeripherals ++
-    new WithNoDebug ++
     new chipyard.config.WithTLBackingMemory ++ // use TL backing memory
     new WithSystemModifications ++ // setup busses, use sdboot bootrom, setup ext. mem. size
     new chipyard.config.WithNoDebug ++ // remove debug module
     new freechips.rocketchip.subsystem.WithoutTLMonitors ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
     new freechips.rocketchip.subsystem.WithNMemoryChannels(1) ++
-    new WithFPGAFrequency(8)
+    new WithFPGAFrequency(8) ++
+    new WithoutFPU ++
+    new WithL2TLBs(0) ++
+    new WithRV32 // set RocketTiles to be 32-bit
 )
 
 class TinyRocketPGL22GConfig extends Config(
   new WithPGL22GTweaks ++
-    new PGL22GRocketConfig)
+    new PGL22GRocketConfig
+  // new chipyard.RocketConfig
+)
 // DOC include end: AbstractPGL22G and Rocket
