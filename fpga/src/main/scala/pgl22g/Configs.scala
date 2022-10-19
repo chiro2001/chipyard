@@ -10,21 +10,38 @@ import freechips.rocketchip.system._
 import freechips.rocketchip.tile._
 import sifive.blocks.devices.uart._
 import testchipip.SerialTLKey
-import chipyard.BuildSystem
+import chipyard.{BuildSystem, DefaultClockFrequencyKey}
 import chipyard.config.WithL2TLBs
+import chipyard.fpga.vcu118.{WithTLIOPassthrough, WithUARTIOPassthrough}
+import sifive.fpgashells.shell.pango.PGL22GDDRSize
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
-  case PeripheryUARTKey => List(
-    UARTParams(address = 0x10013000))
-  case DTSTimebase => BigInt(32768)
-  case JtagDTMKey => new JtagDTMConfig(
-    idcodeVersion = 2,
-    idcodePartNum = 0x000,
-    idcodeManufId = 0x489,
-    debugIdleCycles = 5)
-  case SerialTLKey => None // remove serialized tl port
+  // case PeripheryUARTKey => List(
+  //   UARTParams(address = 0x10013000))
+  // case DTSTimebase => BigInt(32768)
+  // case JtagDTMKey => new JtagDTMConfig(
+  //   idcodeVersion = 2,
+  //   idcodePartNum = 0x000,
+  //   idcodeManufId = 0x489,
+  //   debugIdleCycles = 5)
+  // case SerialTLKey => None // remove serialized tl port
+  case PeripheryUARTKey => List(UARTParams(address = BigInt(0x64000000L)))
+  // case PeripherySPIKey => List(SPIParams(rAddress = BigInt(0x64001000L)))
+  // case VCU118ShellPMOD => "SDIO"
 })
 
+class WithSystemModifications extends Config((site, here, up) => {
+  case DTSTimebase => BigInt((1e6).toLong)
+  // case BootROMLocated(x) => up(BootROMLocated(x), site).map { p =>
+  //   // invoke makefile for sdboot
+  //   val freqMHz = (site(DefaultClockFrequencyKey) * 1e6).toLong
+  //   val make = s"make -C fpga/src/main/resources/vcu118/sdboot PBUS_CLK=${freqMHz} bin"
+  //   require (make.! == 0, "Failed to build bootrom")
+  //   p.copy(hang = 0x10000, contentFileName = s"./fpga/src/main/resources/vcu118/sdboot/build/sdboot.bin")
+  // }
+  case ExtMem => up(ExtMem, site).map(x => x.copy(master = x.master.copy(size = site(PGL22GDDRSize)))) // set extmem to DDR size
+  case SerialTLKey => None // remove serialized tl port
+})
 
 class AbstractConfig extends Config(
   // The HarnessBinders control generation of hardware in the TestHarness
@@ -110,13 +127,24 @@ class WithPGL22GTweaks extends Config(
   // new WithTimebase(32000000) ++ // 32Mhz CPU Clock default
   // new WithTimebase(50000000) ++ // 50Mhz CPU Clock default
   new WithTimebase(8000000) ++ // 8Mhz CPU Clock default
-    new WithPGL22GUARTHarnessBinder ++
-    // new WithPGL22GResetHarnessBinder ++
-    // new WithDebugResetPassthrough ++
+    // harness binders
+    new WithUART ++
+    // new WithSPISDCard ++
+    new WithDDRMem ++
+    // io binders
+    new WithUARTIOPassthrough ++
+    // new WithSPIIOPassthrough ++
+    // new WithTLIOPassthrough ++
     new WithDefaultPeripherals ++
     new WithNoDebug ++
+    new chipyard.config.WithTLBackingMemory ++ // use TL backing memory
+    new WithSystemModifications ++ // setup busses, use sdboot bootrom, setup ext. mem. size
+    new chipyard.config.WithNoDebug ++ // remove debug module
     new freechips.rocketchip.subsystem.WithoutTLMonitors ++
-    new freechips.rocketchip.subsystem.WithNBreakpoints(2))
+    new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
+    new freechips.rocketchip.subsystem.WithNMemoryChannels(1) ++
+    new WithFPGAFrequency(8)
+)
 
 class TinyRocketPGL22GConfig extends Config(
   new WithPGL22GTweaks ++

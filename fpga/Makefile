@@ -155,7 +155,7 @@ $(build_dir)/FPGAStart.v: $(fpga_dir)/common/vsrc/FPGAStart.v
 	cp $(fpga_dir)/common/vsrc/FPGAStart.v $(build_dir)/FPGAStart.v
 
 ifneq ($(FPGA_BRAND),xilinx)
-synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files $(build_dir)/mem.v $(build_dir)/FPGAStart.v $(all_vsrcs)
+synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files $(build_dir)/mem.v $(all_vsrcs)
 else
 synth_list_f_req := $(sim_common_files) $(all_vsrcs)
 endif
