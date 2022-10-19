@@ -153,8 +153,8 @@ $(build_dir)/mem.v:
 $(build_dir)/mem_split.v:
 	cp $(fpga_dir)/common/vsrc/mem_split.v $(build_dir)/mem_split.v
 
-$(build_dir)/FPGAStart.v: $(fpga_dir)/common/vsrc/FPGAStart.v
-	cp $(fpga_dir)/common/vsrc/FPGAStart.v $(build_dir)/FPGAStart.v
+# $(build_dir)/FPGAStart.v: $(fpga_dir)/common/vsrc/FPGAStart.v
+# 	cp $(fpga_dir)/common/vsrc/FPGAStart.v $(build_dir)/FPGAStart.v
 
 ifneq ($(FPGA_BRAND),xilinx)
 synth_list_f_req := tcl_files

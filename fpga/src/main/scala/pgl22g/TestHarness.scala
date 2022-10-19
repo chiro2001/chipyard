@@ -1,21 +1,16 @@
-package chipyard.fpga.pgl22g
+packagechipyard.fpga.pgl22g
 
-import chisel3._
-import chisel3.experimental.IO
-import freechips.rocketchip.diplomacy._
-import freechips.rocketchip.config._
-import freechips.rocketchip.subsystem._
-import freechips.rocketchip.tilelink._
-import sifive.fpgashells.shell.xilinx._
-import sifive.fpgashells.ip.xilinx._
-import sifive.fpgashells.shell._
-import sifive.fpgashells.clocks._
-import sifive.blocks.devices.uart._
-import sifive.blocks.devices.spi._
-import sifive.blocks.devices.gpio._
-import chipyard.{BuildTop, CanHaveMasterTLMemPort, ChipTop, DefaultClockFrequencyKey, ExtTLMem, HasHarnessSignalReferences}
-import chipyard.iobinders.HasIOBinders
 import chipyard.harness.ApplyHarnessBinders
+import chipyard.iobinders.HasIOBinders
+import chipyard._
+import chisel3._
+import freechips.rocketchip.config._
+import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.tilelink._
+import sifive.blocks.devices.uart._
+import sifive.fpgashells.clocks._
+import sifive.fpgashells.shell._
+import sifive.fpgashells.ip.pango._
 import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellBasicOverlays}
 
 class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
@@ -98,7 +93,7 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
   _outer.xdc.addPackagePin(reset, "L19")
   _outer.xdc.addIOStandard(reset, "LVCMOS12")
 
-  val resetIBUF = Module(new IBUF)
+  val resetIBUF = Module(new GTP_INBUF)
   resetIBUF.io.I := reset
 
   val sysclk: Clock = _outer.sysClkNode.out.head._1.clock
