@@ -150,7 +150,6 @@ pds_ip_cores:
 # .PHONY: $(build_dir)/mem.v
 $(build_dir)/mem.v: $(build_dir)/$(long_name).top.mems.v
 	cp $(fpga_dir)/common/vsrc/mem.v $(build_dir)/mem.v
-	sed -i 's/module split_data_arrays_0_ext/module split_data_arrays_0_del/g' $(build_dir)/$(long_name).top.mems.v
 
 $(build_dir)/FPGAStart.v: $(fpga_dir)/common/vsrc/FPGAStart.v
 	cp $(fpga_dir)/common/vsrc/FPGAStart.v $(build_dir)/FPGAStart.v
