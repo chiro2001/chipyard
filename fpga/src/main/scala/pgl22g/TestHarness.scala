@@ -89,12 +89,13 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
 
   val pgl22gOuter = _outer
 
+  // is resetN
   val reset = IO(Input(Bool()))
   _outer.xdc.addPackagePin(reset, "L19")
   _outer.xdc.addIOStandard(reset, "LVCMOS12")
 
   val resetIBUF = Module(new GTP_INBUF)
-  resetIBUF.io.I := reset
+  resetIBUF.io.I := !reset
 
   val sysclk: Clock = _outer.sysClkNode.out.head._1.clock
 
