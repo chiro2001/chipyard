@@ -1,6 +1,7 @@
 // See LICENSE for license details.
 package chipyard.fpga.pgl22g
 
+import chipyard.ExtTLMem
 import chipyard.config.{AbstractConfig, WithL2TLBs}
 import freechips.rocketchip.config._
 import freechips.rocketchip.devices.debug._
@@ -80,6 +81,7 @@ class PGL22GRocketConfig extends Config(
   // new chipyard.config.WithTLSerialLocation(FBUS, PBUS) ++ // attach TL serial adapter to f/p busses
   //   new WithIncoherentBusTopology ++ // use incoherent bus topology
   //   new WithNBanks(0) ++ // remove L2$
+  // new WithJustOneBus ++
   new WithPGL22GTinyCore ++ // single tiny rocket-core
     // new WithNSmallCores(1) ++
     new AbstractConfig)
@@ -87,6 +89,11 @@ class PGL22GRocketConfig extends Config(
 class WithNoDebug extends Config((site, here, up) => {
   case DebugModuleKey => None
 })
+
+// class WithMemory extends Config((site, here, up) => {
+//   // case ExtMem => None // disable AXI backing memory
+//   case ExtTLMem => None
+// })
 
 // DOC include start: AbstractPGL22G and Rocket
 class WithPGL22GTweaks extends Config(
@@ -109,9 +116,11 @@ class WithPGL22GTweaks extends Config(
     new WithoutFPU ++
     new WithL2TLBs(0) ++
     // new WithNBanks(0) ++
-    new WithL1ICacheSets(64) ++
-    new WithL1DCacheSets(64) ++
-    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16) ++
+    new WithL1ICacheSets(64 * 4) ++
+    new WithL1DCacheSets(64 * 4) ++
+    // new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16) ++
+    // Total 48 Kbit
+    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2) ++
     new WithRV32 // set RocketTiles to be 32-bit
 )
 
