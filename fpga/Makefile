@@ -144,6 +144,7 @@ tcl_files: $(tcl_files_source)
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
 pds_ip_cores:
+	-rm -rf $(build_dir)/ipcores
 	-cp -r $(fpga_dir)/common/ipcores $(build_dir)
 
 # .PHONY: $(build_dir)/mem.v
