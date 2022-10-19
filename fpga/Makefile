@@ -148,17 +148,25 @@ pds_ip_cores:
 	-cp -r $(fpga_dir)/common/ipcores $(build_dir)
 
 # .PHONY: $(build_dir)/mem.v
-$(build_dir)/mem.v: $(build_dir)/$(long_name).top.mems.v
+$(build_dir)/mem.v:
 	cp $(fpga_dir)/common/vsrc/mem.v $(build_dir)/mem.v
+$(build_dir)/mem_split.v:
+	cp $(fpga_dir)/common/vsrc/mem_split.v $(build_dir)/mem_split.v
 
 $(build_dir)/FPGAStart.v: $(fpga_dir)/common/vsrc/FPGAStart.v
 	cp $(fpga_dir)/common/vsrc/FPGAStart.v $(build_dir)/FPGAStart.v
 
 ifneq ($(FPGA_BRAND),xilinx)
-synth_list_f_req := $(sim_common_files) pds_ip_cores tcl_files $(build_dir)/mem.v $(all_vsrcs)
+synth_list_f_req := tcl_files
 else
-synth_list_f_req := $(sim_common_files) $(all_vsrcs)
+synth_list_f_req := 
 endif
+
+ifeq ($(IGNORE_VSRCS),)
+synth_list_f_req += $(all_vsrcs)
+synth_list_f_req += $(sim_common_files)
+endif
+
 $(synth_list_f): $(synth_list_f_req)
 	$(foreach file,$(all_vsrcs),echo "$(file)" >> $@;)
 	cat $(sim_common_files) >> $@
@@ -166,7 +174,8 @@ $(synth_list_f): $(synth_list_f_req)
 ifneq ($(FPGA_BRAND),xilinx)
 BIT_FILE := $(build_dir)/generate_bitstream/$(MODEL).sbit
 EDA := pds_shell
-EDA_ARGS := -f bitstream.tcl -project_name $(MODEL) -work_dir $(build_dir)
+EDA_ARGS := -f create_project.tcl -project_name $(MODEL) -work_dir $(build_dir)
+# EDA_ARGS := -f bitstream.tcl -project_name $(MODEL) -work_dir $(build_dir)
 # EDA_ARGS := -f run_synth.tcl -project_name $(long_name) -work_dir $(build_dir)
 EDA_ARGS_DEBUG := $(EDA_ARGS)
 else

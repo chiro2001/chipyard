@@ -130,6 +130,10 @@ class WithPGL22GTweaks extends Config(
     new WithFPGAFrequency(8) ++
     new WithoutFPU ++
     new WithL2TLBs(0) ++
+    // new WithNBanks(0) ++
+    new WithL1ICacheSets(64) ++
+    new WithL1DCacheSets(64) ++
+    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16) ++
     new WithRV32 // set RocketTiles to be 32-bit
 )
 
