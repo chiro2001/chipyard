@@ -2,7 +2,7 @@
 package chipyard.fpga.pgl22g
 
 import chipyard.ExtTLMem
-import chipyard.config.{AbstractConfig, WithL2TLBs}
+import chipyard.config.{AbstractConfig, WithL2TLBs, WithSystemBusWidth}
 import freechips.rocketchip.config._
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.diplomacy.{DTSTimebase, SynchronousCrossing}
@@ -95,18 +95,33 @@ class WithNoDebug extends Config((site, here, up) => {
 //   case ExtTLMem => None
 // })
 
+class WithMemoryBusWidth(bitWidth: Int) extends Config((site, here, up) => {
+  case MemoryBusKey => up(MemoryBusKey, site).copy(beatBytes = bitWidth / 8)
+})
+
+class WithPGL22GTLMem extends Config(
+  new WithTLIOPassthrough ++
+    new chipyard.config.WithTLBackingMemory ++ // use TL backing memory
+    new WithDDRMem ++
+    // Total 48 Kbit
+    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2))
+
+class WithPGL22GAXIMem extends Config(
+  new WithMemoryBusWidth(128) ++
+    new WithPGL22GMemPort ++
+    new WithNBanks(0) ++ // Disable L2 Cache
+    new WithBlackBoxDDRMem
+)
+
 // DOC include start: AbstractPGL22G and Rocket
 class WithPGL22GTweaks extends Config(
   // harness binders
   new WithUART ++
     // new WithSPISDCard ++
-    new WithDDRMem ++
     // io binders
     new WithUARTIOPassthrough ++
     // new WithSPIIOPassthrough ++
-    new WithTLIOPassthrough ++
     new WithDefaultPeripherals ++
-    new chipyard.config.WithTLBackingMemory ++ // use TL backing memory
     new WithSystemModifications ++ // setup busses, use sdboot bootrom, setup ext. mem. size
     new chipyard.config.WithNoDebug ++ // remove debug module
     new freechips.rocketchip.subsystem.WithoutTLMonitors ++
@@ -115,12 +130,8 @@ class WithPGL22GTweaks extends Config(
     new WithFPGAFrequency(8) ++
     new WithoutFPU ++
     new WithL2TLBs(0) ++
-    // new WithNBanks(0) ++
     new WithL1ICacheSets(64 * 4) ++
     new WithL1DCacheSets(64 * 4) ++
-    // new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16) ++
-    // Total 48 Kbit
-    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2) ++
     new WithRV32 // set RocketTiles to be 32-bit
 )
 
@@ -138,6 +149,13 @@ class WithPGL22GSimTweaks extends Config(
 
 class TinyRocketPGL22GConfig extends Config(
   new WithPGL22GTweaks ++
+    new WithPGL22GTLMem ++
+    new PGL22GRocketConfig
+  // new chipyard.RocketConfig
+)
+class PGL22GConfig extends Config(
+  new WithPGL22GTweaks ++
+    new WithPGL22GAXIMem ++
     new PGL22GRocketConfig
   // new chipyard.RocketConfig
 )
