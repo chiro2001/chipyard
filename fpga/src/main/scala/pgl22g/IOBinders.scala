@@ -6,6 +6,8 @@ import chisel3.experimental.{DataMirror, IO}
 import freechips.rocketchip.util._
 import freechips.rocketchip.devices.debug._
 import chipyard.iobinders.{ComposeIOBinder, OverrideIOBinder}
+import freechips.rocketchip.amba.axi4.AXI4Bundle
+import freechips.rocketchip.subsystem.CanHaveMasterAXI4MemPort
 import freechips.rocketchip.tilelink.TLBundle
 import sifive.blocks.devices.uart.HasPeripheryUARTModuleImp
 
@@ -29,6 +31,14 @@ class WithTLIOPassthrough extends OverrideIOBinder({
     val io_tl_mem_pins_temp = IO(DataMirror.internal.chiselTypeClone[HeterogeneousBag[TLBundle]](system.mem_tl)).suggestName("tl_slave")
     io_tl_mem_pins_temp <> system.mem_tl
     (Seq(io_tl_mem_pins_temp), Nil)
+  }
+})
+
+class WithAXIIOPassthrough extends OverrideIOBinder({
+  (system: CanHaveMasterAXI4MemPort) => {
+    val io_axi_mem_pins_temp = IO(DataMirror.internal.chiselTypeClone[HeterogeneousBag[AXI4Bundle]](system.mem_axi4))
+    io_axi_mem_pins_temp <> system.mem_axi4
+    (Seq(io_axi_mem_pins_temp), Nil)
   }
 })
 

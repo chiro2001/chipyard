@@ -3,6 +3,7 @@ package chipyard.fpga.pgl22g
 
 import chipyard.ExtTLMem
 import chipyard.config.{AbstractConfig, WithL2TLBs, WithSystemBusWidth}
+import chipyard.harness.WithSimAXIMem
 import freechips.rocketchip.config._
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.diplomacy.{DTSTimebase, SynchronousCrossing}
@@ -113,6 +114,13 @@ class WithPGL22GAXIMem extends Config(
     new WithBlackBoxDDRMem
 )
 
+class WithPGL22GAXIMemBare extends Config(
+  new WithMemoryBusWidth(128) ++
+    new WithPGL22GMemPort ++
+    new WithNBanks(0) ++
+    new WithAXIIOPassthrough
+)
+
 // DOC include start: AbstractPGL22G and Rocket
 class WithPGL22GTweaks extends Config(
   // harness binders
@@ -153,13 +161,26 @@ class TinyRocketPGL22GConfig extends Config(
     new PGL22GRocketConfig
   // new chipyard.RocketConfig
 )
-class PGL22GConfig extends Config(
+class PGL22GAXIMemConfig extends Config(
   new WithPGL22GTweaks ++
     new WithPGL22GAXIMem ++
     new PGL22GRocketConfig
   // new chipyard.RocketConfig
 )
-// DOC include end: AbstractPGL22G and Rocket
+
+class PGL22GBareConfig extends Config(
+  new WithPGL22GTweaks ++
+    new WithPGL22GAXIMemBare ++
+    new PGL22GRocketConfig
+  // new chipyard.RocketConfig
+)
+
+class PGL22GConfig extends Config(
+  new WithPGL22GTweaks ++
+    new WithPGL22GTLMem ++
+    new PGL22GRocketConfig
+  // new chipyard.RocketConfig
+)
 
 class SimTinyRocketPGL22GConfig extends Config(
   new WithPGL22GSimTweaks ++

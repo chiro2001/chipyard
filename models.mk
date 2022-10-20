@@ -1,9 +1,9 @@
 ifeq ($(SUB_PROJECT),pgl22g)
 	SBT_PROJECT       ?= fpga_platforms
-	MODEL             ?= PGL22GFPGATestHarness
-	VLOG_MODEL        ?= PGL22GFPGATestHarness
+	MODEL             ?= PGL22GTestHarness
+	VLOG_MODEL        ?= PGL22GTestHarness
 	MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
-	CONFIG            ?= TinyRocketPGL22GConfig
+	CONFIG            ?= PGL22GConfig
 	CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused

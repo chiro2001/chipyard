@@ -19,7 +19,7 @@ import testchipip.{ClockedAndResetIO, SimDRAM}
 class WithUART extends OverrideHarnessBinder({
   (system: HasPeripheryUARTModuleImp, th: BaseModule with HasHarnessSignalReferences, ports: Seq[UARTPortIO]) => {
     th match {
-      case pgl22gth: PGL22GFPGATestHarnessImp => {
+      case pgl22gth: PGL22GTestHarnessImp => {
         pgl22gth.pgl22gOuter.io_uart_bb.bundle <> ports.head
       }
     }
@@ -38,7 +38,7 @@ class WithUART extends OverrideHarnessBinder({
 /** * Experimental DDR ** */
 class WithDDRMem extends OverrideHarnessBinder({
   (system: CanHaveMasterTLMemPort, th: BaseModule with HasHarnessSignalReferences, ports: Seq[HeterogeneousBag[TLBundle]]) => {
-    th match { case pgl22gth: PGL22GFPGATestHarnessImp => {
+    th match { case pgl22gth: PGL22GTestHarnessImp => {
       require(ports.size == 1)
 
       val bundles = pgl22gth.pgl22gOuter.ddrClient.out.map(_._1)
