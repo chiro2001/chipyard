@@ -7,6 +7,7 @@ import chisel3._
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
+import shell.pango.{DDRDesignInputSysClk, DDROverlayKeySysClk}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.clocks._
 import sifive.fpgashells.shell._
@@ -70,7 +71,8 @@ class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GS
 
   /*** DDR ***/
 
-  val ddrNode = dp(DDROverlayKey).head.place(DDRDesignInput(dp(ExtTLMem).get.master.base, dutWrangler.node, harnessSysPLL)).overlayOutput.ddr
+  // val ddrNode = dp(DDROverlayKey).head.place(DDRDesignInput(dp(ExtTLMem).get.master.base, dutWrangler.node, harnessSysPLL)).overlayOutput.ddr
+  val ddrNode = dp(DDROverlayKeySysClk).head.place(DDRDesignInputSysClk(dp(ExtTLMem).get.master.base, dutWrangler.node, sysClkNode)).overlayOutput.ddr
 
   // connect 1 mem. channel to the FPGA DDR
   val inParams = topDesign match { case td: ChipTop =>
