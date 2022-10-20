@@ -136,6 +136,7 @@ all_vsrcs := \
 synth_list_f := $(build_dir)/$(long_name).vsrcs.f
 .PHONY: tcl_files
 tcl_files: $(tcl_files_source)
+	mkdir -p $(build_dir)
 	cp $(fpga_common_script_dir)/*.tcl $(build_dir)/
 	cp $(fpga_dir)/$(BOARD)/tcl/*.tcl $(build_dir)/
 	cd $(build_dir) && sed -i 's/\%top\%/$(MODEL)/g' *.tcl
