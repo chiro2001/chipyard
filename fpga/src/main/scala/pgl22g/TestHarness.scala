@@ -132,3 +132,6 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
   // non-exhaustive since you need all ChipTop clocks to equal the default
   require(getRefClockFreq == p(DefaultClockFrequencyKey))
 }
+
+import chipyard.TestHarness
+class PGL22GSimTestHarness(implicit p: Parameters) extends TestHarness

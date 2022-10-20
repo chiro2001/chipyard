@@ -1,3 +1,10 @@
+base_dir ?= $(abspath ../..)
+
+BINARY ?= $(RISCV)/riscv64-unknown-elf/share/riscv-tests/benchmarks/dhrystone.riscv
+SUB_PROJECT ?= pgl22g
+
+include $(base_dir)/models-sim.mk
+
 #########################################################################################
 # verilator makefile
 #########################################################################################
@@ -222,10 +229,25 @@ $(model_mk_debug): $(sim_vsrcs) $(sim_common_files) $(EXTRA_SIM_REQS)
 	$(VERILATOR) $(VERILATOR_OPTS) $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(TRACING_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
 	touch $@
 
+# SBT_PROJECT       ?= fpga_platforms
+# MODEL             ?= PGL22GFPGATestHarness
+# VLOG_MODEL        ?= PGL22GFPGATestHarness
+# MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
+# CONFIG            ?= TinyRocketPGL22GConfig
+# CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
+# GENERATOR_PACKAGE ?= chipyard
+# TB                ?= none # unused
+# TOP               ?= ChipTop
+# BOARD             ?= pgl22g
+# FPGA_BRAND        ?= pango
+
+debug_info:
+	@echo SBT_PROJECT=$(SBT_PROJECT) MODEL=$(MODEL) VLOG_MODEL=$(VLOG_MODEL) MODEL_PACKAGE=$(MODEL_PACKAGE) CONFIG=$(CONFIG) CONFIG_PACKAGE=$(CONFIG_PACKAGE) GENERATOR_PACKAGE=$(GENERATOR_PACKAGE) TB=$(TB) TOP=$(TOP) BOARD=$(BOARD) FPGA_BRAND=$(FPGA_BRAND)
+
 #########################################################################################
 # invoke make to make verilator sim rules
 #########################################################################################
-$(sim): $(model_mk) $(dramsim_lib)
+$(sim): debug_info $(model_mk) $(dramsim_lib)
 	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(VLOG_MODEL).mk
 
 $(sim_debug): $(model_mk_debug) $(dramsim_lib)

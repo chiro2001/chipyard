@@ -130,3 +130,10 @@ class TinyRocketPGL22GConfig extends Config(
   // new chipyard.RocketConfig
 )
 // DOC include end: AbstractPGL22G and Rocket
+
+class SimTinyRocketPGL22GConfig extends Config(
+  new PGL22GRocketConfig
+)
+// class SimTinyRocketPGL22GConfig extends Config(
+//   new freechips.rocketchip.subsystem.WithNBigCores(1) ++         // single rocket-core
+//     new chipyard.config.AbstractConfig)
