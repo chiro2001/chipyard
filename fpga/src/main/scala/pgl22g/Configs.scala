@@ -124,6 +124,18 @@ class WithPGL22GTweaks extends Config(
     new WithRV32 // set RocketTiles to be 32-bit
 )
 
+class WithPGL22GSimTweaks extends Config(
+  new freechips.rocketchip.subsystem.WithoutTLMonitors ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
+    new WithoutFPU ++
+    new WithL2TLBs(0) ++
+    new WithL1ICacheSets(64 * 4) ++
+    new WithL1DCacheSets(64 * 4) ++
+    // Total 48 Kbit
+    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2) ++
+    new WithRV32 // set RocketTiles to be 32-bit
+)
+
 class TinyRocketPGL22GConfig extends Config(
   new WithPGL22GTweaks ++
     new PGL22GRocketConfig
@@ -132,8 +144,6 @@ class TinyRocketPGL22GConfig extends Config(
 // DOC include end: AbstractPGL22G and Rocket
 
 class SimTinyRocketPGL22GConfig extends Config(
-  new PGL22GRocketConfig
+  new WithPGL22GSimTweaks ++
+    new PGL22GRocketConfig
 )
-// class SimTinyRocketPGL22GConfig extends Config(
-//   new freechips.rocketchip.subsystem.WithNBigCores(1) ++         // single rocket-core
-//     new chipyard.config.AbstractConfig)
