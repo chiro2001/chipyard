@@ -177,8 +177,8 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
           // attach(pgl22gth.ddrIO.pad_dq_ch0, mem.mio.pad_dq_ch0)
           // attach(pgl22gth.ddrIO.pad_dqsn_ch0, mem.mio.pad_dqsn_ch0)
           // attach(pgl22gth.ddrIO.pad_dqs_ch0, mem.mio.pad_dqs_ch0)
-          // val ddrWires = Wire(pgl22gth.ddrIO.cloneType)
-          val ddrWires = pgl22gth.ddrIO
+          // val ddr = Wire(pgl22gth.ddrIO.cloneType)
+          val ddr = pgl22gth.ddr
           // pgl22gth.ddrIO <> mem.mio
           // pgl22gth.ddrIO <> ddrWires
           def connectWires(a: Data, b: Data, name: String) = {
@@ -186,26 +186,26 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
             // BoringUtils.addSink(b, name)
             a <> b
           }
-          connectWires(mem.ddrIO.pad_addr_ch0, ddrWires.pad_addr_ch0, "pad_addr_ch0")
-          connectWires(mem.ddrIO.pad_ba_ch0, ddrWires.pad_ba_ch0, "pad_ba_ch0")
-          connectWires(mem.ddrIO.pad_rasn_ch0, ddrWires.pad_rasn_ch0, "pad_rasn_ch0")
-          connectWires(mem.ddrIO.pad_casn_ch0, ddrWires.pad_casn_ch0, "pad_casn_ch0")
-          connectWires(mem.ddrIO.pad_wen_ch0, ddrWires.pad_wen_ch0, "pad_wen_ch0")
-          connectWires(mem.ddrIO.pad_rstn_ch0, ddrWires.pad_rstn_ch0, "pad_rstn_ch0")
-          connectWires(mem.ddrIO.pad_ddr_clk_w, ddrWires.pad_ddr_clk_w, "pad_ddr_clk_w")
-          connectWires(mem.ddrIO.pad_ddr_clkn_w, ddrWires.pad_ddr_clkn_w, "pad_ddr_clkn_w")
-          connectWires(mem.ddrIO.pad_cke_ch0, ddrWires.pad_cke_ch0, "pad_cke_ch0")
-          connectWires(mem.ddrIO.pad_csn_ch0, ddrWires.pad_csn_ch0, "pad_csn_ch0")
-          connectWires(mem.ddrIO.pad_dm_rdqs_ch0, ddrWires.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
-          connectWires(mem.ddrIO.pad_odt_ch0, ddrWires.pad_odt_ch0, "pad_odt_ch0")
-          connectWires(ddrWires.pad_loop_in, mem.ddrIO.pad_loop_in, "pad_loop_in")
-          connectWires(ddrWires.pad_loop_in_h, mem.ddrIO.pad_loop_in_h, "pad_loop_in_h")
-          connectWires(mem.ddrIO.pad_loop_out, ddrWires.pad_loop_out, "pad_loop_out")
-          connectWires(mem.ddrIO.pad_loop_out_h, ddrWires.pad_loop_out_h, "pad_loop_out_h")
+          connectWires(mem.ddrIO.pad_addr_ch0, ddr.pad_addr_ch0, "pad_addr_ch0")
+          connectWires(mem.ddrIO.pad_ba_ch0, ddr.pad_ba_ch0, "pad_ba_ch0")
+          connectWires(mem.ddrIO.pad_rasn_ch0, ddr.pad_rasn_ch0, "pad_rasn_ch0")
+          connectWires(mem.ddrIO.pad_casn_ch0, ddr.pad_casn_ch0, "pad_casn_ch0")
+          connectWires(mem.ddrIO.pad_wen_ch0, ddr.pad_wen_ch0, "pad_wen_ch0")
+          connectWires(mem.ddrIO.pad_rstn_ch0, ddr.pad_rstn_ch0, "pad_rstn_ch0")
+          connectWires(mem.ddrIO.pad_ddr_clk_w, ddr.pad_ddr_clk_w, "pad_ddr_clk_w")
+          connectWires(mem.ddrIO.pad_ddr_clkn_w, ddr.pad_ddr_clkn_w, "pad_ddr_clkn_w")
+          connectWires(mem.ddrIO.pad_cke_ch0, ddr.pad_cke_ch0, "pad_cke_ch0")
+          connectWires(mem.ddrIO.pad_csn_ch0, ddr.pad_csn_ch0, "pad_csn_ch0")
+          connectWires(mem.ddrIO.pad_dm_rdqs_ch0, ddr.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
+          connectWires(mem.ddrIO.pad_odt_ch0, ddr.pad_odt_ch0, "pad_odt_ch0")
+          connectWires(ddr.pad_loop_in, mem.ddrIO.pad_loop_in, "pad_loop_in")
+          connectWires(ddr.pad_loop_in_h, mem.ddrIO.pad_loop_in_h, "pad_loop_in_h")
+          connectWires(mem.ddrIO.pad_loop_out, ddr.pad_loop_out, "pad_loop_out")
+          connectWires(mem.ddrIO.pad_loop_out_h, ddr.pad_loop_out_h, "pad_loop_out_h")
 
-          attach(ddrWires.pad_dq_ch0, mem.ddrIO.pad_dq_ch0)
-          attach(ddrWires.pad_dqsn_ch0, mem.ddrIO.pad_dqsn_ch0)
-          attach(ddrWires.pad_dqs_ch0, mem.ddrIO.pad_dqs_ch0)
+          attach(ddr.pad_dq_ch0, mem.ddrIO.pad_dq_ch0)
+          attach(ddr.pad_dqsn_ch0, mem.ddrIO.pad_dqsn_ch0)
+          attach(ddr.pad_dqs_ch0, mem.ddrIO.pad_dqs_ch0)
           
           // Bug in Chisel implementation. See https://github.com/chipsalliance/chisel3/pull/1781
           def Decoupled[T <: Data](irr: IrrevocableIO[T]): DecoupledIO[T] = {

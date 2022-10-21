@@ -257,7 +257,7 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness) extends LazyRawMod
   childClock := buildtopClock
   childReset := buildtopReset
 
-  val ddrIO = IO(new PGL22GMIGIODDRBase)
+  val ddr = IO(new PGL22GMIGIODDRBase)
 
   // harness binders are non-lazy
   _outer.topDesign match { case d: HasIOBinders =>
