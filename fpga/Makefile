@@ -106,10 +106,9 @@ $(synth_list_f): $(synth_list_f_req)
 ifneq ($(FPGA_BRAND),xilinx)
 BIT_FILE := $(build_dir)/generate_bitstream/$(MODEL).sbit
 EDA := pds_shell
-# EDA_ARGS := -f create_project.tcl -project_name $(MODEL) -work_dir $(build_dir)
-# EDA_ARGS := -f bitstream.tcl -project_name $(MODEL) -work_dir $(build_dir)
-EDA_ARGS := -f run_map.tcl -project_name $(long_name) -work_dir $(build_dir)
-# EDA_ARGS := -f run_synth.tcl -project_name $(long_name) -work_dir $(build_dir)
+RUN_PROC ?= synth
+RUN_TCL := run_$(RUN_PROC).tcl
+EDA_ARGS := -f $(RUN_TCL) -project_name $(MODEL) -work_dir $(build_dir)
 EDA_ARGS_DEBUG := $(EDA_ARGS)
 else
 BIT_FILE := $(build_dir)/obj/$(MODEL).bit
