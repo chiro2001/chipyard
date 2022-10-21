@@ -4,6 +4,8 @@ import chipyard.harness.ApplyHarnessBinders
 import chipyard.iobinders.HasIOBinders
 import chipyard._
 import chisel3._
+import chisel3.experimental.DataMirror
+import chisel3.util.experimental.BoringUtils
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
@@ -12,6 +14,7 @@ import sifive.blocks.devices.uart._
 import sifive.fpgashells.clocks._
 import sifive.fpgashells.shell._
 import sifive.fpgashells.ip.pango._
+import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksReset, PGL22GMIGIODDR, PGL22GMIGIODDRBase, PGL22GMIGIODDRIO}
 import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellBasicOverlays}
 
 class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
@@ -205,6 +208,8 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
 import chipyard.TestHarness
 class PGL22GSimTestHarness(implicit p: Parameters) extends TestHarness
 
+case object PGL22GBuildTop extends Field[Parameters => LazyModule]((p: Parameters) => new ChipTop()(p))
+
 class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
   def dp = designParameters
   val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
@@ -230,6 +235,7 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness) extends LazyRawMod
   _outer.xdc.addIOStandard(reset, "LVCMOS12")
   val resetIBUF = Module(new GTP_INBUF)
   resetIBUF.io.I := reset
+  val hardResetN = (!resetIBUF.io.O).asBool
   val sysclk: Clock = _outer.sysClkNode.out.head._1.clock
   val powerOnReset: Bool = PowerOnResetFPGAOnly(sysclk)
   _outer.sdc.addAsyncPath(Seq(powerOnReset))
@@ -238,7 +244,7 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness) extends LazyRawMod
     case _ => false.B
   }
   // used for
-  _outer.pllReset := ((!resetIBUF.io.O) || powerOnReset || ereset)
+  _outer.pllReset := (hardResetN || powerOnReset || ereset)
   // reset setup
   val hReset = Wire(Reset())
   hReset := _outer.dutClock.in.head._1.reset
@@ -255,6 +261,31 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness) extends LazyRawMod
   // check the top-level reference clock is equal to the default
   // non-exhaustive since you need all ChipTop clocks to equal the default
   require(getRefClockFreq == p(DefaultClockFrequencyKey))
+
+  val ddrIO = IO(new PGL22GMIGIODDRBase)
+  BoringUtils.addSink(ddrIO.pad_addr_ch0, "pad_addr_ch0")
+  BoringUtils.addSink(ddrIO.pad_ba_ch0, "pad_ba_ch0")
+  BoringUtils.addSink(ddrIO.pad_rasn_ch0, "pad_rasn_ch0")
+  BoringUtils.addSink(ddrIO.pad_casn_ch0, "pad_casn_ch0")
+  BoringUtils.addSink(ddrIO.pad_wen_ch0, "pad_wen_ch0")
+  BoringUtils.addSink(ddrIO.pad_rstn_ch0, "pad_rstn_ch0")
+  BoringUtils.addSink(ddrIO.pad_ddr_clk_w, "pad_ddr_clk_w")
+  BoringUtils.addSink(ddrIO.pad_ddr_clkn_w, "pad_ddr_clkn_w")
+  BoringUtils.addSink(ddrIO.pad_cke_ch0, "pad_cke_ch0")
+  BoringUtils.addSink(ddrIO.pad_csn_ch0, "pad_csn_ch0")
+  BoringUtils.addSink(ddrIO.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
+  BoringUtils.addSink(ddrIO.pad_odt_ch0, "pad_odt_ch0")
+  BoringUtils.addSource(ddrIO.pad_dq_ch0, "pad_dq_ch0")
+  BoringUtils.addSource(ddrIO.pad_dqsn_ch0, "pad_dqsn_ch0")
+  BoringUtils.addSource(ddrIO.pad_dqs_ch0, "pad_dqs_ch0")
+  BoringUtils.addSource(ddrIO.pad_loop_in, "pad_loop_in")
+  BoringUtils.addSource(ddrIO.pad_loop_in_h, "pad_loop_in_h")
+  BoringUtils.addSink(ddrIO.pad_loop_out, "pad_loop_out")
+  BoringUtils.addSink(ddrIO.pad_loop_out_h, "pad_loop_out_h")
+
+  BoringUtils.addSource(sysclk, "pll_refclk_in")
+  BoringUtils.addSource(hardResetN, "top_rst_n")
+  BoringUtils.addSource(hardResetN, "ddrc_rst")
 }
 
 class PGL22GTestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {

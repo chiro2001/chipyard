@@ -38,9 +38,11 @@ object ApplyHarnessBinders {
   def apply(th: HasHarnessSignalReferences, sys: LazyModule, portMap: Map[String, Seq[Data]])(implicit p: Parameters): Unit = {
     val pm = portMap.withDefaultValue(Nil)
     p(HarnessBinders).foreach { case (s, f) =>
+      println(s"s: $s")
       f(sys, th, pm(s))
       f(sys.module, th, pm(s))
     }
+    println("Done")
   }
 }
 
