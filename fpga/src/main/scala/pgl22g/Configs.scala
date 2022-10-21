@@ -162,6 +162,8 @@ class WithPGL22GAXIMem extends Config(
   new WithMemoryBusWidth(128) ++
     new WithPGL22GMemPort ++
     // new WithNBanks(0) ++ // Disable L2 Cache
+    // new WithNBanks(0) ++ // Disable L2 Cache
+    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2) ++
     new WithAXI4MemPunchthrough ++
     new WithBlackBoxDDRMem
 )
@@ -174,7 +176,7 @@ class WithPGL22GAXIMemBare extends Config(
 )
 
 // DOC include start: AbstractPGL22G and Rocket
-class WithPGL22GTweaks extends Config(
+class WithPGL22GTweaks(freq: Double = 8) extends Config(
   // harness binders
   new WithUART ++
     // new WithSPISDCard ++
@@ -187,7 +189,7 @@ class WithPGL22GTweaks extends Config(
     new freechips.rocketchip.subsystem.WithoutTLMonitors ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
     new freechips.rocketchip.subsystem.WithNMemoryChannels(1) ++
-    new WithFPGAFrequency(8) ++
+    new WithFPGAFrequency(freq) ++
     new WithoutFPU ++
     new WithL2TLBs(0) ++
     new WithL1ICacheSets(64 * 4) ++
