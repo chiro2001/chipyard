@@ -137,6 +137,10 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   //   }
   // })
 
+  AnalogUtils.add(mio.pad_dq_ch0, "pad_dq_ch0")
+  AnalogUtils.add(mio.pad_dqsn_ch0, "pad_dqsn_ch0")
+  AnalogUtils.add(mio.pad_dqs_ch0, "pad_dqs_ch0")
+
   axi.aw.bits.id <> mio.awid_0
   axi.aw.bits.addr <> mio.awaddr_0
   axi.aw.bits.len <> mio.awlen_0
@@ -169,6 +173,12 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   axi.r.bits.last <> mio.rlast_0
   axi.r.valid <> mio.rvalid_0
   // }
+  val pad_dq_ch0 = IO(Analog(16.W))
+  val pad_dqsn_ch0 = IO(Analog(2.W))
+  val pad_dqs_ch0 = IO(Analog(2.W))
+  attach(mio.pad_dq_ch0, pad_dq_ch0)
+  attach(mio.pad_dqsn_ch0, pad_dqsn_ch0)
+  attach(mio.pad_dqs_ch0, pad_dqs_ch0)
 }
 
 // object DDR3Mem {
@@ -229,9 +239,20 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
           connectWires(mem.mio.pad_loop_out, ddrWires.pad_loop_out, "pad_loop_out")
           connectWires(mem.mio.pad_loop_out_h, ddrWires.pad_loop_out_h, "pad_loop_out_h")
 
-          attach(ddrWires.pad_dq_ch0, mem.mio.pad_dq_ch0)
-          attach(ddrWires.pad_dqsn_ch0, mem.mio.pad_dqsn_ch0)
-          attach(ddrWires.pad_dqs_ch0, mem.mio.pad_dqs_ch0)
+          // def farAttach(a: Analog, b: Analog, name: String) = {
+          //   AnalogUtils.add(a, name)
+          //   AnalogUtils.add(b, name)
+          // }
+          // farAttach(ddrWires.pad_dq_ch0, mem.mio.pad_dq_ch0, "pad_dq_ch0")
+          // farAttach(ddrWires.pad_dqsn_ch0, mem.mio.pad_dqsn_ch0, "pad_dqsn_ch0")
+          // farAttach(ddrWires.pad_dqs_ch0, mem.mio.pad_dqs_ch0, "pad_dqs_ch0")
+          AnalogUtils.add(ddrWires.pad_dq_ch0, "pad_dq_ch0")
+          AnalogUtils.add(ddrWires.pad_dqsn_ch0, "pad_dqsn_ch0")
+          AnalogUtils.add(ddrWires.pad_dqs_ch0, "pad_dqs_ch0")
+
+          attach(ddrWires.pad_dq_ch0, mem.pad_dq_ch0)
+          attach(ddrWires.pad_dqsn_ch0, mem.pad_dqsn_ch0)
+          attach(ddrWires.pad_dqs_ch0, mem.pad_dqs_ch0)
           
           // Bug in Chisel implementation. See https://github.com/chipsalliance/chisel3/pull/1781
           def Decoupled[T <: Data](irr: IrrevocableIO[T]): DecoupledIO[T] = {
