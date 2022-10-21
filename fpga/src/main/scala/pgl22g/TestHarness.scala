@@ -5,7 +5,7 @@ import chipyard.iobinders.HasIOBinders
 import chipyard._
 import chisel3._
 import chisel3.experimental.DataMirror
-import chisel3.util.experimental.BoringUtils
+import chisel3.util.experimental.{AnalogUtils, BoringUtils}
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
@@ -215,13 +215,16 @@ class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GS
   val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
   require(dp(ClockInputOverlayKey).size >= 1)
   val sysClkNode = dp(ClockInputOverlayKey)(0).place(ClockInputDesignInput()).overlayOutput.node
-  val harnessSysPLL = dp(PLLFactoryKey)()
-  harnessSysPLL := sysClkNode
+  val migUIClock = PLLNode(feedback = false)
+  // val harnessSysPLL = dp(PLLFactoryKey)()
+  // harnessSysPLL := sysClkNode
+  migUIClock := sysClkNode
   println(s"PGL22G FPGA Base Clock Freq: ${dp(DefaultClockFrequencyKey)} MHz")
   val dutClock = ClockSinkNode(freqMHz = dp(DefaultClockFrequencyKey))
   val dutWrangler = LazyModule(new ResetWrangler)
   val dutGroup = ClockGroup()
-  dutClock := dutWrangler.node := dutGroup := harnessSysPLL
+  // dutClock := dutWrangler.node := dutGroup := harnessSysPLL
+  dutClock := dutWrangler.node := dutGroup := migUIClock
   val io_uart_bb = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
   dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
   override lazy val module = new PGL22GBareTestHarnessImp(this)
@@ -275,17 +278,31 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness) extends LazyRawMod
   BoringUtils.addSink(ddrIO.pad_csn_ch0, "pad_csn_ch0")
   BoringUtils.addSink(ddrIO.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
   BoringUtils.addSink(ddrIO.pad_odt_ch0, "pad_odt_ch0")
-  BoringUtils.addSource(ddrIO.pad_dq_ch0, "pad_dq_ch0")
-  BoringUtils.addSource(ddrIO.pad_dqsn_ch0, "pad_dqsn_ch0")
-  BoringUtils.addSource(ddrIO.pad_dqs_ch0, "pad_dqs_ch0")
   BoringUtils.addSource(ddrIO.pad_loop_in, "pad_loop_in")
   BoringUtils.addSource(ddrIO.pad_loop_in_h, "pad_loop_in_h")
   BoringUtils.addSink(ddrIO.pad_loop_out, "pad_loop_out")
   BoringUtils.addSink(ddrIO.pad_loop_out_h, "pad_loop_out_h")
 
+  // inout IOs
+  // BoringUtils.addSource(ddrIO.pad_dq_ch0, "pad_dq_ch0", disableDedup = true)
+  // BoringUtils.addSource(ddrIO.pad_dqsn_ch0, "pad_dqsn_ch0")
+  // BoringUtils.addSource(ddrIO.pad_dqs_ch0, "pad_dqs_ch0")
+  AnalogUtils.addSource(ddrIO.pad_dq_ch0, "pad_dq_ch0", disableDedup = true)
+  AnalogUtils.addSource(ddrIO.pad_dqsn_ch0, "pad_dqsn_ch0", disableDedup = true)
+  AnalogUtils.addSource(ddrIO.pad_dqs_ch0, "pad_dqs_ch0", disableDedup = true)
+
   BoringUtils.addSource(sysclk, "pll_refclk_in")
   BoringUtils.addSource(hardResetN, "top_rst_n")
   BoringUtils.addSource(hardResetN, "ddrc_rst")
+
+  BoringUtils.addSink(_outer.migUIClock.out.head._1.member.head.clock, "pll_aclk_2")
+  val ddrphy_rst_done = WireInit(false.B)
+  val ddrc_init_done = WireInit(false.B)
+  val pll_lock = WireInit(false.B)
+  BoringUtils.addSink(ddrphy_rst_done, "ddrphy_rst_done")
+  BoringUtils.addSink(ddrc_init_done, "ddrc_init_done")
+  BoringUtils.addSink(pll_lock, "pll_lock")
+  _outer.migUIClock.out.head._1.member.head.reset := !pll_lock
 }
 
 class PGL22GTestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {

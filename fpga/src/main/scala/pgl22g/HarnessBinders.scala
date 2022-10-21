@@ -2,14 +2,14 @@ package chipyard.fpga.pgl22g
 
 import chipsalliance.rocketchip.config.{Config, Parameters}
 import chisel3._
-import chisel3.experimental.{BaseModule, DataMirror, Direction, IntParam}
+import chisel3.experimental.{Analog, BaseModule, DataMirror, Direction, IntParam}
 import freechips.rocketchip.util.HeterogeneousBag
 import freechips.rocketchip.tilelink.TLBundle
 import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
 import sifive.blocks.devices.spi.{HasPeripherySPI, SPIPortIO}
 import chipyard.{CanHaveMasterTLMemPort, HasHarnessSignalReferences}
 import chipyard.harness.OverrideHarnessBinder
-import chisel3.util.experimental.BoringUtils
+import chisel3.util.experimental.{AnalogUtils, BoringUtils}
 import chisel3.util.{DecoupledIO, HasBlackBoxResource, IrrevocableIO, Queue}
 import freechips.rocketchip.amba.axi4.{AXI4Bundle, AXI4BundleParameters}
 import freechips.rocketchip.subsystem.{CacheBlockBytes, CanHaveMasterAXI4MemPort, ExtMem, MasterPortParams, MemoryBusKey, MemoryPortParams}
@@ -187,15 +187,20 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   outputPortNames = outputPortNames :+ "pll_lock"
   outputPortNames = outputPortNames :+ "ddrphy_rst_done"
   outputPortNames = outputPortNames :+ "ddrc_init_done"
-  outputPortNames = outputPortNames :+ "pll_aclk_0"
-  outputPortNames = outputPortNames :+ "pll_aclk_1"
+  // outputPortNames = outputPortNames :+ "pll_aclk_0"
+  // outputPortNames = outputPortNames :+ "pll_aclk_1"
   outputPortNames = outputPortNames :+ "pll_aclk_2"
   // inputPortNames = inputPortNames :+ "csysreq_ddrc"
-  outputPortNames = outputPortNames :+ "csysack_ddrc"
-  outputPortNames = outputPortNames :+ "cactive_ddrc"
+  // outputPortNames = outputPortNames :+ "csysack_ddrc"
+  // outputPortNames = outputPortNames :+ "cactive_ddrc"
   val addSink = (data: Data, name: String) => {
-    println(s"addSink($name)")
-    BoringUtils.addSink(data, name)
+    if (data.isInstanceOf[Analog]) {
+      println(s"addAnalogSink($name)")
+      AnalogUtils.addSink(data, name)
+    } else {
+      println(s"addSink($name)")
+      BoringUtils.addSink(data, name)
+    }
   }
   val addSource = (data: Data, name: String) => {
     println(s"addSource($name)")
@@ -217,6 +222,8 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
         addSink(data, name)
       } else if (outputPortNames.contains(name)) {
         addSource(data, name)
+      } else {
+        println(s"ignorePort($name)")
       }
     }
   })
