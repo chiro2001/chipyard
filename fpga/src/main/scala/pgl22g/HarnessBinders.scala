@@ -28,6 +28,14 @@ class WithUART extends OverrideHarnessBinder({
     }
   }
 })
+
+class WithPerfUART extends OverrideHarnessBinder({
+  (system: HasPeripheryUARTModuleImp, th: PGL22GPerfTestHarness with HasHarnessSignalReferences, ports: Seq[UARTPortIO]) => {
+    withClockAndReset(th.sys_clock, th.buildtopReset) {
+      th.uart <> ports.head
+    }
+  }
+})
 //
 // /*** SPI ***/
 // class WithSPISDCard extends OverrideHarnessBinder({
@@ -169,7 +177,7 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
     implicit val p: Parameters = chipyard.iobinders.GetSystemParameters(system)
     require(ports.size == 1)
     th match {
-      case pgl22gth: PGL22GBareTestHarnessImp => {
+      case pgl22gth: PGL22GTestHarnessDDRImp => {
         val (port, edge) = (ports.head, system.memAXI4Node.edges.in.head)
         val clockFreq = p(MemoryBusKey).dtsFrequency.get
         val memSize = p(ExtMem).get.master.size
