@@ -3,7 +3,7 @@ package chipyard.fpga.pgl22g
 
 import chipyard.ExtTLMem
 import chipyard.config.{AbstractConfig, WithL2TLBs, WithSystemBusWidth}
-import chipyard.harness.WithSimAXIMem
+import chipyard.iobinders.WithAXI4MemPunchthrough
 import freechips.rocketchip.config._
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.diplomacy.{DTSTimebase, SynchronousCrossing}
@@ -13,6 +13,56 @@ import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
 import testchipip.SerialTLKey
+
+class ModifiedAbstractConfig extends Config(
+  // The HarnessBinders control generation of hardware in the TestHarness
+  new chipyard.harness.WithUARTAdapter ++                       // add UART adapter to display UART on stdout, if uart is present
+    // new chipyard.harness.WithBlackBoxSimMem ++                    // add SimDRAM DRAM model for axi4 backing memory, if axi4 mem is enabled
+    new chipyard.harness.WithSimSerial ++                         // add external serial-adapter and RAM
+    new chipyard.harness.WithSimDebug ++                          // add SimJTAG or SimDTM adapters if debug module is enabled
+    new chipyard.harness.WithGPIOTiedOff ++                       // tie-off chiptop GPIOs, if GPIOs are present
+    new chipyard.harness.WithSimSPIFlashModel ++                  // add simulated SPI flash memory, if SPI is enabled
+    new chipyard.harness.WithSimAXIMMIO ++                        // add SimAXIMem for axi4 mmio port, if enabled
+    new chipyard.harness.WithTieOffInterrupts ++                  // tie-off interrupt ports, if present
+    new chipyard.harness.WithTieOffL2FBusAXI ++                   // tie-off external AXI4 master, if present
+    new chipyard.harness.WithCustomBootPinPlusArg ++
+    new chipyard.harness.WithClockAndResetFromHarness ++
+
+    // The IOBinders instantiate ChipTop IOs to match desired digital IOs
+    // IOCells are generated for "Chip-like" IOs, while simulation-only IOs are directly punched through
+    new chipyard.iobinders.WithAXI4MemPunchthrough ++
+    new chipyard.iobinders.WithAXI4MMIOPunchthrough ++
+    new chipyard.iobinders.WithL2FBusAXI4Punchthrough ++
+    new chipyard.iobinders.WithBlockDeviceIOPunchthrough ++
+    new chipyard.iobinders.WithNICIOPunchthrough ++
+    new chipyard.iobinders.WithSerialTLIOCells ++
+    new chipyard.iobinders.WithDebugIOCells ++
+    new chipyard.iobinders.WithUARTIOCells ++
+    new chipyard.iobinders.WithGPIOCells ++
+    new chipyard.iobinders.WithSPIIOCells ++
+    new chipyard.iobinders.WithTraceIOPunchthrough ++
+    new chipyard.iobinders.WithExtInterruptIOCells ++
+    new chipyard.iobinders.WithCustomBootPin ++
+    new chipyard.iobinders.WithDividerOnlyClockGenerator ++
+
+    new testchipip.WithSerialTLWidth(32) ++                           // fatten the serialTL interface to improve testing performance
+    new testchipip.WithDefaultSerialTL ++                             // use serialized tilelink port to external serialadapter/harnessRAM
+    new chipyard.config.WithBootROM ++                                // use default bootrom
+    new chipyard.config.WithUART ++                                   // add a UART
+    new chipyard.config.WithL2TLBs(1024) ++                           // use L2 TLBs
+    new chipyard.config.WithNoSubsystemDrivenClocks ++                // drive the subsystem diplomatic clocks from ChipTop instead of using implicit clocks
+    new chipyard.config.WithInheritBusFrequencyAssignments ++         // Unspecified clocks within a bus will receive the bus frequency if set
+    new chipyard.config.WithPeripheryBusFrequencyAsDefault ++         // Unspecified frequencies with match the pbus frequency (which is always set)
+    new chipyard.config.WithMemoryBusFrequency(100.0) ++              // Default 100 MHz mbus
+    new chipyard.config.WithPeripheryBusFrequency(100.0) ++           // Default 100 MHz pbus
+    new freechips.rocketchip.subsystem.WithJtagDTM ++                 // set the debug module to expose a JTAG port
+    new freechips.rocketchip.subsystem.WithNoMMIOPort ++              // no top-level MMIO master port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithNoSlavePort ++             // no top-level MMIO slave port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithInclusiveCache ++          // use Sifive L2 cache
+    new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++    // no external interrupts
+    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++ // leave the bus clocks undriven by sbus
+    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++     // hierarchical buses including sbus/mbus/pbus/fbus/cbus/l2
+    new freechips.rocketchip.system.BaseConfig)                       // "base" rocketchip system
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
   // case PeripheryUARTKey => List(
@@ -102,6 +152,7 @@ class WithMemoryBusWidth(bitWidth: Int) extends Config((site, here, up) => {
 
 class WithPGL22GTLMem extends Config(
   new WithTLIOPassthrough ++
+    new WithMemoryBusWidth(128) ++
     new chipyard.config.WithTLBackingMemory ++ // use TL backing memory
     new WithDDRMem ++
     // Total 48 Kbit
@@ -110,15 +161,16 @@ class WithPGL22GTLMem extends Config(
 class WithPGL22GAXIMem extends Config(
   new WithMemoryBusWidth(128) ++
     new WithPGL22GMemPort ++
-    new WithNBanks(0) ++ // Disable L2 Cache
+    // new WithNBanks(0) ++ // Disable L2 Cache
+    new WithAXI4MemPunchthrough ++
     new WithBlackBoxDDRMem
 )
 
 class WithPGL22GAXIMemBare extends Config(
   new WithMemoryBusWidth(128) ++
     new WithPGL22GMemPort ++
-    new WithNBanks(0) ++
-    new WithAXIIOPassthrough
+    // new WithNBanks(0) ++
+    new WithAXI4MemPunchthrough
 )
 
 // DOC include start: AbstractPGL22G and Rocket
@@ -170,7 +222,7 @@ class PGL22GAXIMemConfig extends Config(
 
 class PGL22GBareConfig extends Config(
   new WithPGL22GTweaks ++
-    new WithPGL22GAXIMemBare ++
+    new WithPGL22GAXIMem ++
     new PGL22GRocketConfig
   // new chipyard.RocketConfig
 )

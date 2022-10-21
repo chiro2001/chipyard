@@ -14,12 +14,15 @@ import freechips.rocketchip.amba.axi4.{AXI4Bundle, AXI4BundleParameters}
 import freechips.rocketchip.subsystem.{CacheBlockBytes, CanHaveMasterAXI4MemPort, ExtMem, MasterPortParams, MemoryBusKey, MemoryPortParams}
 import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksReset, PGL22GMIGIOClocksResetBundle, ddr3_core}
 import testchipip.{ClockedAndResetIO, SimDRAM}
+// import chipyard.fpga.pgl22g.{PGL22GTestHarnessImp => UseTestHarnessImp}
+import chipyard.fpga.pgl22g.{PGL22GBareTestHarnessImp => UseTestHarnessImp}
+
 
 /** * UART ** */
 class WithUART extends OverrideHarnessBinder({
   (system: HasPeripheryUARTModuleImp, th: BaseModule with HasHarnessSignalReferences, ports: Seq[UARTPortIO]) => {
     th match {
-      case pgl22gth: PGL22GTestHarnessImp => {
+      case pgl22gth: UseTestHarnessImp => {
         pgl22gth.pgl22gOuter.io_uart_bb.bundle <> ports.head
       }
     }
@@ -49,18 +52,18 @@ class WithDDRMem extends OverrideHarnessBinder({
   }
 })
 
-// class WithAXI4DDRMem extends OverrideHarnessBinder({
-//   (system: CanHaveMasterAXI4MemPort, th: BaseModule with HasHarnessSignalReferences, ports: Seq[HeterogeneousBag[TLBundle]]) => {
-//     th match { case pgl22gth: PGL22GFPGATestHarnessImp => {
-//       require(ports.size == 1)
-//
-//       val bundles = pgl22gth.pgl22gOuter.ddrClient.out.map(_._1)
-//       val ddrClientBundle = Wire(new HeterogeneousBag(bundles.map(_.cloneType)))
-//       bundles.zip(ddrClientBundle).foreach { case (bundle, io) => bundle <> io }
-//       ddrClientBundle <> ports.head
-//     } }
-//   }
-// })
+class WithAXI4DDRMem extends OverrideHarnessBinder({
+  (system: CanHaveMasterAXI4MemPort, th: BaseModule with HasHarnessSignalReferences, ports: Seq[HeterogeneousBag[TLBundle]]) => {
+    th match { case pgl22gth: PGL22GTestHarnessImp => {
+      require(ports.size == 1)
+
+      val bundles = pgl22gth.pgl22gOuter.ddrClient.out.map(_._1)
+      val ddrClientBundle = Wire(new HeterogeneousBag(bundles.map(_.cloneType)))
+      bundles.zip(ddrClientBundle).foreach { case (bundle, io) => bundle <> io }
+      ddrClientBundle <> ports.head
+    } }
+  }
+})
 
 class WithPGL22GMemPort extends Config((site, here, up) => {
   case ExtMem => Some(MemoryPortParams(MasterPortParams(
@@ -70,13 +73,39 @@ class WithPGL22GMemPort extends Config((site, here, up) => {
     idBits = 4), 1))
 })
 
-class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends Module {
+class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   val axi = IO(Flipped(new AXI4Bundle(params)))
   val extra = IO(new PGL22GMIGIOClocksResetBundle)
   require(params.dataBits == 128, s"Only support 128bit width data! now is ${params.dataBits}")
   val memInst = Module(new ddr3_core(memSize)).suggestName("ddr3_core_inst")
   val mio = memInst.io
-  mio <> extra
+  // mio <> extra
+  // 外部参考时钟输入
+  mio.pll_refclk_in <> extra.pll_refclk_in
+  // 外部复位输入
+  mio.top_rst_n <> extra.top_rst_n
+  // DDRC 的复位输入
+  mio.ddrc_rst <> extra.ddrc_rst
+  // ddr3_core 内部 PLL lock 信号。
+  mio.pll_lock <> extra.pll_lock
+  // DDRPHY 复位完成标志
+  mio.ddrphy_rst_done <> extra.ddrphy_rst_done
+  // DDRC 的初始化完成标志
+  mio.ddrc_init_done <> extra.ddrc_init_done
+  // Axi4 Port0 的时钟
+  mio.pll_aclk_0 <> extra.pll_aclk_0
+  // Axi4 Port1 的时钟
+  mio.pll_aclk_1 <> extra.pll_aclk_1
+  // Axi4 Port2 的时钟
+  mio.pll_aclk_2 <> extra.pll_aclk_2
+  // APB Port 的时钟
+  // mio.pll_pclk <> extra.pll_pclk
+  // DDRC 低功耗请求输入
+  mio.csysreq_ddrc <> extra.csysreq_ddrc
+  // DDRC 低功耗响应
+  mio.csysack_ddrc <> extra.csysack_ddrc
+  // DDRC 激活标志
+  mio.cactive_ddrc <> extra.cactive_ddrc
   axi.aw.bits.id <> mio.awid_0
   axi.aw.bits.addr <> mio.awaddr_0
   axi.aw.bits.len <> mio.awlen_0
@@ -101,6 +130,7 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends Module {
   axi.ar.bits.burst <> mio.arburst_0
   axi.ar.bits.lock <> mio.arlock_0
   axi.ar.valid <> mio.arvalid_0
+  axi.ar.ready <> mio.arready_0
   axi.r.ready <> mio.rready_0
   axi.r.bits.id <> mio.rid_0
   axi.r.bits.data <> mio.rdata_0
@@ -108,6 +138,18 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends Module {
   axi.r.bits.last <> mio.rlast_0
   axi.r.valid <> mio.rvalid_0
 }
+
+// object DDR3Mem {
+//   def connectMem(dut: CanHaveMasterAXI4MemPort)(implicit p: Parameters): Seq[DDR3Mem] = {
+//     dut.mem_axi4.zip(dut.memAXI4Node.in).map { case (io, (_, edge)) =>
+//       val memSize = p(ExtMem).get.master.size
+//       // val mem = LazyModule(new DDR3Mem(memSize, edge.bundle))
+//       val mem = Module(new DDR3Mem(memSize, edge.bundle))
+//       mem.axi <> io
+//       mem
+//     }
+//   }
+// }
 
 class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBinder({
   (system: CanHaveMasterAXI4MemPort, th: HasHarnessSignalReferences, ports: Seq[ClockedAndResetIO[AXI4Bundle]]) => {
@@ -123,6 +165,10 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
         mem.axi <> port.bits
         // mem.clock := port.clock
         // mem.reset := port.reset
+        mem.extra.pll_refclk_in := port.clock
+        mem.extra.top_rst_n := !(port.reset.asBool)
+        mem.extra.ddrc_rst := !(port.reset.asBool)
+        mem.extra.csysreq_ddrc := false.B
 
         // Bug in Chisel implementation. See https://github.com/chipsalliance/chisel3/pull/1781
         def Decoupled[T <: Data](irr: IrrevocableIO[T]): DecoupledIO[T] = {
