@@ -8,6 +8,7 @@ import chisel3.experimental.DataMirror
 import chisel3.util.experimental.{AnalogUtils, BoringUtils}
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.subsystem.CanHaveMasterAXI4MemPort
 import freechips.rocketchip.tilelink._
 import shell.pango.{DDRDesignInputSysClk, DDROverlayKeySysClk}
 import sifive.blocks.devices.uart._
@@ -227,6 +228,7 @@ class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GS
   dutClock := dutWrangler.node := dutGroup := migUIClock
   val io_uart_bb = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
   dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
+  // val innerDDRIO = new PGL22GMIGIODDRBase
   override lazy val module = new PGL22GBareTestHarnessImp(this)
 }
 
@@ -257,6 +259,9 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness) extends LazyRawMod
   val success = false.B
   childClock := buildtopClock
   childReset := buildtopReset
+
+  val ddrIO = IO(new PGL22GMIGIODDRBase)
+
   // harness binders are non-lazy
   _outer.topDesign match { case d: HasIOBinders =>
     ApplyHarnessBinders(this, d.lazySystem, d.portMap)
@@ -265,43 +270,44 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness) extends LazyRawMod
   // non-exhaustive since you need all ChipTop clocks to equal the default
   require(getRefClockFreq == p(DefaultClockFrequencyKey))
 
-  val ddrIO = IO(new PGL22GMIGIODDRBase)
-  BoringUtils.addSink(ddrIO.pad_addr_ch0, "pad_addr_ch0")
-  BoringUtils.addSink(ddrIO.pad_ba_ch0, "pad_ba_ch0")
-  BoringUtils.addSink(ddrIO.pad_rasn_ch0, "pad_rasn_ch0")
-  BoringUtils.addSink(ddrIO.pad_casn_ch0, "pad_casn_ch0")
-  BoringUtils.addSink(ddrIO.pad_wen_ch0, "pad_wen_ch0")
-  BoringUtils.addSink(ddrIO.pad_rstn_ch0, "pad_rstn_ch0")
-  BoringUtils.addSink(ddrIO.pad_ddr_clk_w, "pad_ddr_clk_w")
-  BoringUtils.addSink(ddrIO.pad_ddr_clkn_w, "pad_ddr_clkn_w")
-  BoringUtils.addSink(ddrIO.pad_cke_ch0, "pad_cke_ch0")
-  BoringUtils.addSink(ddrIO.pad_csn_ch0, "pad_csn_ch0")
-  BoringUtils.addSink(ddrIO.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
-  BoringUtils.addSink(ddrIO.pad_odt_ch0, "pad_odt_ch0")
-  BoringUtils.addSource(ddrIO.pad_loop_in, "pad_loop_in")
-  BoringUtils.addSource(ddrIO.pad_loop_in_h, "pad_loop_in_h")
-  BoringUtils.addSink(ddrIO.pad_loop_out, "pad_loop_out")
-  BoringUtils.addSink(ddrIO.pad_loop_out_h, "pad_loop_out_h")
+  // val ddrIO = IO(new PGL22GMIGIODDRBase)
+  // BoringUtils.addSink(ddrIO.pad_addr_ch0, "pad_addr_ch0")
+  // BoringUtils.addSink(ddrIO.pad_ba_ch0, "pad_ba_ch0")
+  // BoringUtils.addSink(ddrIO.pad_rasn_ch0, "pad_rasn_ch0")
+  // BoringUtils.addSink(ddrIO.pad_casn_ch0, "pad_casn_ch0")
+  // BoringUtils.addSink(ddrIO.pad_wen_ch0, "pad_wen_ch0")
+  // BoringUtils.addSink(ddrIO.pad_rstn_ch0, "pad_rstn_ch0")
+  // BoringUtils.addSink(ddrIO.pad_ddr_clk_w, "pad_ddr_clk_w")
+  // BoringUtils.addSink(ddrIO.pad_ddr_clkn_w, "pad_ddr_clkn_w")
+  // BoringUtils.addSink(ddrIO.pad_cke_ch0, "pad_cke_ch0")
+  // BoringUtils.addSink(ddrIO.pad_csn_ch0, "pad_csn_ch0")
+  // BoringUtils.addSink(ddrIO.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
+  // BoringUtils.addSink(ddrIO.pad_odt_ch0, "pad_odt_ch0")
+  // BoringUtils.addSource(ddrIO.pad_loop_in, "pad_loop_in")
+  // BoringUtils.addSource(ddrIO.pad_loop_in_h, "pad_loop_in_h")
+  // BoringUtils.addSink(ddrIO.pad_loop_out, "pad_loop_out")
+  // BoringUtils.addSink(ddrIO.pad_loop_out_h, "pad_loop_out_h")
 
   // inout IOs
   // BoringUtils.addSource(ddrIO.pad_dq_ch0, "pad_dq_ch0", disableDedup = true)
   // BoringUtils.addSource(ddrIO.pad_dqsn_ch0, "pad_dqsn_ch0")
   // BoringUtils.addSource(ddrIO.pad_dqs_ch0, "pad_dqs_ch0")
-  AnalogUtils.addSource(ddrIO.pad_dq_ch0, "pad_dq_ch0", disableDedup = true)
-  AnalogUtils.addSource(ddrIO.pad_dqsn_ch0, "pad_dqsn_ch0", disableDedup = true)
-  AnalogUtils.addSource(ddrIO.pad_dqs_ch0, "pad_dqs_ch0", disableDedup = true)
 
-  BoringUtils.addSource(sysclk, "pll_refclk_in")
-  BoringUtils.addSource(hardResetN, "top_rst_n")
-  BoringUtils.addSource(hardResetN, "ddrc_rst")
+  // AnalogUtils.add(ddrIO.pad_dq_ch0, "pad_dq_ch0")
+  // AnalogUtils.add(ddrIO.pad_dqsn_ch0, "pad_dqsn_ch0")
+  // AnalogUtils.add(ddrIO.pad_dqs_ch0, "pad_dqs_ch0")
 
-  BoringUtils.addSink(_outer.migUIClock.out.head._1.member.head.clock, "pll_aclk_2")
+  // BoringUtils.addSource(sysclk, "pll_refclk_in")
+  // BoringUtils.addSource(hardResetN, "top_rst_n")
+  // BoringUtils.addSource(hardResetN, "ddrc_rst")
+
+  // BoringUtils.addSink(_outer.migUIClock.out.head._1.member.head.clock, "pll_aclk_2")
   val ddrphy_rst_done = WireInit(false.B)
   val ddrc_init_done = WireInit(false.B)
   val pll_lock = WireInit(false.B)
-  BoringUtils.addSink(ddrphy_rst_done, "ddrphy_rst_done")
-  BoringUtils.addSink(ddrc_init_done, "ddrc_init_done")
-  BoringUtils.addSink(pll_lock, "pll_lock")
+  // BoringUtils.addSink(ddrphy_rst_done, "ddrphy_rst_done")
+  // BoringUtils.addSink(ddrc_init_done, "ddrc_init_done")
+  // BoringUtils.addSink(pll_lock, "pll_lock")
   _outer.migUIClock.out.head._1.member.head.reset := !pll_lock
 }
 
