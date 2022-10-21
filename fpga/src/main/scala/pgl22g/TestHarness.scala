@@ -1,21 +1,18 @@
 package chipyard.fpga.pgl22g
 
+import chipyard._
 import chipyard.harness.ApplyHarnessBinders
 import chipyard.iobinders.HasIOBinders
-import chipyard._
 import chisel3._
-import chisel3.experimental.DataMirror
-import chisel3.util.experimental.{AnalogUtils, BoringUtils}
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
-import freechips.rocketchip.subsystem.CanHaveMasterAXI4MemPort
 import freechips.rocketchip.tilelink._
 import shell.pango.{DDRDesignInputSysClk, DDROverlayKeySysClk}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.clocks._
-import sifive.fpgashells.shell._
 import sifive.fpgashells.ip.pango._
-import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksReset, PGL22GMIGIODDR, PGL22GMIGIODDRBase, PGL22GMIGIODDRIO}
+import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
+import sifive.fpgashells.shell._
 import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellBasicOverlays}
 
 class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {

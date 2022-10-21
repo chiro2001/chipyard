@@ -1,21 +1,19 @@
 package chipyard.fpga.pgl22g
 
 import chipsalliance.rocketchip.config.{Config, Parameters}
-import chisel3._
-import chisel3.experimental.{Analog, BaseModule, DataMirror, Direction, IntParam, attach}
-import freechips.rocketchip.util.HeterogeneousBag
-import freechips.rocketchip.tilelink.TLBundle
-import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
-import sifive.blocks.devices.spi.{HasPeripherySPI, SPIPortIO}
-import chipyard.{CanHaveMasterTLMemPort, HasHarnessSignalReferences}
 import chipyard.harness.OverrideHarnessBinder
-import chisel3.util.experimental.{AnalogUtils, BoringUtils}
-import chisel3.util.{DecoupledIO, HasBlackBoxResource, IrrevocableIO, Queue}
+import chipyard.{CanHaveMasterTLMemPort, HasHarnessSignalReferences}
+import chisel3._
+import chisel3.experimental.{Analog, BaseModule, DataMirror, Direction, attach}
+import chisel3.util.experimental.BoringUtils
+import chisel3.util.{DecoupledIO, IrrevocableIO, Queue}
 import freechips.rocketchip.amba.axi4.{AXI4Bundle, AXI4BundleParameters}
-import freechips.rocketchip.diplomacy.{LazyModule, LazyModuleImp, SimpleLazyModule}
-import freechips.rocketchip.subsystem.{CacheBlockBytes, CanHaveMasterAXI4MemPort, ExtMem, MasterPortParams, MemoryBusKey, MemoryPortParams}
-import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksReset, PGL22GMIGIOClocksResetBundle, ddr3_core}
-import testchipip.{ClockedAndResetIO, SimDRAM}
+import freechips.rocketchip.subsystem._
+import freechips.rocketchip.tilelink.TLBundle
+import freechips.rocketchip.util.HeterogeneousBag
+import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
+import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIODDR, PGL22GMIGIODDRIO, ddr3_core}
+import testchipip.ClockedAndResetIO
 // import chipyard.fpga.pgl22g.{PGL22GTestHarnessImp => UseTestHarnessImp}
 import chipyard.fpga.pgl22g.{PGL22GBareTestHarnessImp => UseTestHarnessImp}
 
@@ -86,60 +84,9 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   // val extra = IO(new PGL22GMIGIOClocksResetBundle)
   require(params.dataBits == 128, s"Only support 128bit width data! now is ${params.dataBits}")
   val memInst = Module(new ddr3_core(memSize)).suggestName("ddr3_core_inst")
+  val ddrIO = IO(new PGL22GMIGIODDR)
   val mio = memInst.io
   mio.csysreq_ddrc := false.B
-  var inputPortNames: Seq[String] = Seq()
-  var outputPortNames: Seq[String] = Seq()
-  inputPortNames = inputPortNames :+ "pll_refclk_in"
-  inputPortNames = inputPortNames :+ "top_rst_n"
-  inputPortNames = inputPortNames :+ "ddrc_rst"
-  outputPortNames = outputPortNames :+ "pll_lock"
-  outputPortNames = outputPortNames :+ "ddrphy_rst_done"
-  outputPortNames = outputPortNames :+ "ddrc_init_done"
-  // outputPortNames = outputPortNames :+ "pll_aclk_0"
-  // outputPortNames = outputPortNames :+ "pll_aclk_1"
-  outputPortNames = outputPortNames :+ "pll_aclk_2"
-  // inputPortNames = inputPortNames :+ "csysreq_ddrc"
-  // outputPortNames = outputPortNames :+ "csysack_ddrc"
-  // outputPortNames = outputPortNames :+ "cactive_ddrc"
-  val addSink = (data: Data, name: String) => {
-    if (data.isInstanceOf[Analog]) {
-      println(s"addAnalogSink($name)")
-      AnalogUtils.add(data.asInstanceOf[Analog], name)
-    } else {
-      println(s"addSink($name)")
-      BoringUtils.addSink(data, name)
-    }
-  }
-  val addSource = (data: Data, name: String) => {
-    println(s"addSource($name)")
-    BoringUtils.addSource(data, name)
-  }
-
-  // println(inputPortNames, outputPortNames)
-  // DataMirror.modulePorts(memInst).foreach(port => {
-  //   // println(port)
-  //   val (name, data) = port
-  //   if (name.startsWith("pad")) {
-  //     if (name.contains("in") || name.contains("_dq")) {
-  //       addSink(data, name)
-  //     } else {
-  //       addSource(data, name)
-  //     }
-  //   } else {
-  //     if (inputPortNames.contains(name)) {
-  //       addSink(data, name)
-  //     } else if (outputPortNames.contains(name)) {
-  //       addSource(data, name)
-  //     } else {
-  //       println(s"ignorePort($name)")
-  //     }
-  //   }
-  // })
-
-  AnalogUtils.add(mio.pad_dq_ch0, "pad_dq_ch0")
-  AnalogUtils.add(mio.pad_dqsn_ch0, "pad_dqsn_ch0")
-  AnalogUtils.add(mio.pad_dqs_ch0, "pad_dqs_ch0")
 
   axi.aw.bits.id <> mio.awid_0
   axi.aw.bits.addr <> mio.awaddr_0
@@ -173,12 +120,28 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   axi.r.bits.last <> mio.rlast_0
   axi.r.valid <> mio.rvalid_0
   // }
-  val pad_dq_ch0 = IO(Analog(16.W))
-  val pad_dqsn_ch0 = IO(Analog(2.W))
-  val pad_dqs_ch0 = IO(Analog(2.W))
-  attach(mio.pad_dq_ch0, pad_dq_ch0)
-  attach(mio.pad_dqsn_ch0, pad_dqsn_ch0)
-  attach(mio.pad_dqs_ch0, pad_dqs_ch0)
+  // val pad_dq_ch0 = IO(Analog(16.W))
+  // val pad_dqsn_ch0 = IO(Analog(2.W))
+  // val pad_dqs_ch0 = IO(Analog(2.W))
+  attach(mio.pad_dq_ch0, ddrIO.pad_dq_ch0)
+  attach(mio.pad_dqsn_ch0, ddrIO.pad_dqsn_ch0)
+  attach(mio.pad_dqs_ch0, ddrIO.pad_dqs_ch0)
+  mio.pad_addr_ch0 <> ddrIO.pad_addr_ch0
+  mio.pad_ba_ch0 <> ddrIO.pad_ba_ch0
+  mio.pad_rasn_ch0 <> ddrIO.pad_rasn_ch0
+  mio.pad_casn_ch0 <> ddrIO.pad_casn_ch0
+  mio.pad_wen_ch0 <> ddrIO.pad_wen_ch0
+  mio.pad_rstn_ch0 <> ddrIO.pad_rstn_ch0
+  mio.pad_ddr_clk_w <> ddrIO.pad_ddr_clk_w
+  mio.pad_ddr_clkn_w <> ddrIO.pad_ddr_clkn_w
+  mio.pad_cke_ch0 <> ddrIO.pad_cke_ch0
+  mio.pad_csn_ch0 <> ddrIO.pad_csn_ch0
+  mio.pad_dm_rdqs_ch0 <> ddrIO.pad_dm_rdqs_ch0
+  mio.pad_odt_ch0 <> ddrIO.pad_odt_ch0
+  mio.pad_loop_in <> ddrIO.pad_loop_in
+  mio.pad_loop_in_h <> ddrIO.pad_loop_in_h
+  mio.pad_loop_out <> ddrIO.pad_loop_out
+  mio.pad_loop_out_h <> ddrIO.pad_loop_out_h
 }
 
 // object DDR3Mem {
@@ -219,40 +182,30 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
           // pgl22gth.ddrIO <> mem.mio
           // pgl22gth.ddrIO <> ddrWires
           def connectWires(a: Data, b: Data, name: String) = {
-            BoringUtils.addSource(a, name)
-            BoringUtils.addSink(b, name)
+            // BoringUtils.addSource(a, name)
+            // BoringUtils.addSink(b, name)
+            a <> b
           }
-          connectWires(mem.mio.pad_addr_ch0, ddrWires.pad_addr_ch0, "pad_addr_ch0")
-          connectWires(mem.mio.pad_ba_ch0, ddrWires.pad_ba_ch0, "pad_ba_ch0")
-          connectWires(mem.mio.pad_rasn_ch0, ddrWires.pad_rasn_ch0, "pad_rasn_ch0")
-          connectWires(mem.mio.pad_casn_ch0, ddrWires.pad_casn_ch0, "pad_casn_ch0")
-          connectWires(mem.mio.pad_wen_ch0, ddrWires.pad_wen_ch0, "pad_wen_ch0")
-          connectWires(mem.mio.pad_rstn_ch0, ddrWires.pad_rstn_ch0, "pad_rstn_ch0")
-          connectWires(mem.mio.pad_ddr_clk_w, ddrWires.pad_ddr_clk_w, "pad_ddr_clk_w")
-          connectWires(mem.mio.pad_ddr_clkn_w, ddrWires.pad_ddr_clkn_w, "pad_ddr_clkn_w")
-          connectWires(mem.mio.pad_cke_ch0, ddrWires.pad_cke_ch0, "pad_cke_ch0")
-          connectWires(mem.mio.pad_csn_ch0, ddrWires.pad_csn_ch0, "pad_csn_ch0")
-          connectWires(mem.mio.pad_dm_rdqs_ch0, ddrWires.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
-          connectWires(mem.mio.pad_odt_ch0, ddrWires.pad_odt_ch0, "pad_odt_ch0")
-          connectWires(ddrWires.pad_loop_in, mem.mio.pad_loop_in, "pad_loop_in")
-          connectWires(ddrWires.pad_loop_in_h, mem.mio.pad_loop_in_h, "pad_loop_in_h")
-          connectWires(mem.mio.pad_loop_out, ddrWires.pad_loop_out, "pad_loop_out")
-          connectWires(mem.mio.pad_loop_out_h, ddrWires.pad_loop_out_h, "pad_loop_out_h")
+          connectWires(mem.ddrIO.pad_addr_ch0, ddrWires.pad_addr_ch0, "pad_addr_ch0")
+          connectWires(mem.ddrIO.pad_ba_ch0, ddrWires.pad_ba_ch0, "pad_ba_ch0")
+          connectWires(mem.ddrIO.pad_rasn_ch0, ddrWires.pad_rasn_ch0, "pad_rasn_ch0")
+          connectWires(mem.ddrIO.pad_casn_ch0, ddrWires.pad_casn_ch0, "pad_casn_ch0")
+          connectWires(mem.ddrIO.pad_wen_ch0, ddrWires.pad_wen_ch0, "pad_wen_ch0")
+          connectWires(mem.ddrIO.pad_rstn_ch0, ddrWires.pad_rstn_ch0, "pad_rstn_ch0")
+          connectWires(mem.ddrIO.pad_ddr_clk_w, ddrWires.pad_ddr_clk_w, "pad_ddr_clk_w")
+          connectWires(mem.ddrIO.pad_ddr_clkn_w, ddrWires.pad_ddr_clkn_w, "pad_ddr_clkn_w")
+          connectWires(mem.ddrIO.pad_cke_ch0, ddrWires.pad_cke_ch0, "pad_cke_ch0")
+          connectWires(mem.ddrIO.pad_csn_ch0, ddrWires.pad_csn_ch0, "pad_csn_ch0")
+          connectWires(mem.ddrIO.pad_dm_rdqs_ch0, ddrWires.pad_dm_rdqs_ch0, "pad_dm_rdqs_ch0")
+          connectWires(mem.ddrIO.pad_odt_ch0, ddrWires.pad_odt_ch0, "pad_odt_ch0")
+          connectWires(ddrWires.pad_loop_in, mem.ddrIO.pad_loop_in, "pad_loop_in")
+          connectWires(ddrWires.pad_loop_in_h, mem.ddrIO.pad_loop_in_h, "pad_loop_in_h")
+          connectWires(mem.ddrIO.pad_loop_out, ddrWires.pad_loop_out, "pad_loop_out")
+          connectWires(mem.ddrIO.pad_loop_out_h, ddrWires.pad_loop_out_h, "pad_loop_out_h")
 
-          // def farAttach(a: Analog, b: Analog, name: String) = {
-          //   AnalogUtils.add(a, name)
-          //   AnalogUtils.add(b, name)
-          // }
-          // farAttach(ddrWires.pad_dq_ch0, mem.mio.pad_dq_ch0, "pad_dq_ch0")
-          // farAttach(ddrWires.pad_dqsn_ch0, mem.mio.pad_dqsn_ch0, "pad_dqsn_ch0")
-          // farAttach(ddrWires.pad_dqs_ch0, mem.mio.pad_dqs_ch0, "pad_dqs_ch0")
-          AnalogUtils.add(ddrWires.pad_dq_ch0, "pad_dq_ch0")
-          AnalogUtils.add(ddrWires.pad_dqsn_ch0, "pad_dqsn_ch0")
-          AnalogUtils.add(ddrWires.pad_dqs_ch0, "pad_dqs_ch0")
-
-          attach(ddrWires.pad_dq_ch0, mem.pad_dq_ch0)
-          attach(ddrWires.pad_dqsn_ch0, mem.pad_dqsn_ch0)
-          attach(ddrWires.pad_dqs_ch0, mem.pad_dqs_ch0)
+          attach(ddrWires.pad_dq_ch0, mem.ddrIO.pad_dq_ch0)
+          attach(ddrWires.pad_dqsn_ch0, mem.ddrIO.pad_dqsn_ch0)
+          attach(ddrWires.pad_dqs_ch0, mem.ddrIO.pad_dqs_ch0)
           
           // Bug in Chisel implementation. See https://github.com/chipsalliance/chisel3/pull/1781
           def Decoupled[T <: Data](irr: IrrevocableIO[T]): DecoupledIO[T] = {
