@@ -14,7 +14,7 @@ import freechips.rocketchip.system.{BaseConfig, MemPortOnlyConfig, TinyConfig}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
-import testchipip.SerialTLKey
+import testchipip.{SerialTLKey, WithSerialTLMem}
 
 class ModifiedAbstractConfig extends Config(
   // The HarnessBinders control generation of hardware in the TestHarness
@@ -303,6 +303,37 @@ class PGL22GPerfConfig extends Config(
     new WithPGL22GAXIMem ++
     // new WithAXIIOPassthrough ++
     new PGL22GRocketConfig
+)
+
+class WithSmallScratchpadsOnly extends Config((site, here, up) => {
+  case RocketTilesKey => up(RocketTilesKey, site) map { r =>
+    r.copy(
+      core = r.core.copy(useVM = false),
+      dcache = r.dcache.map(_.copy(
+        nSets = 256/16, // 16/16Kb scratchpad
+        nWays = 1,
+        scratch = Some(0x80000000L))))
+  }
+})
+
+class PGL22GSodorConfig extends Config(
+  new WithPGL22GTweaks ++
+    // new WithPGL22GAXIMem ++
+    new sodor.common.WithNSodorCores(1, internalTile = sodor.common.Stage1Factory) ++
+    new testchipip.WithSerialTLWidth(32) ++
+    // new testchipip.WithSerialPBusMem ++
+    new WithSerialTLMem ++
+    new WithTLIOPassthrough ++
+    // new freechips.rocketchip.subsystem.WithScratchpadsOnly ++ // use sodor tile-internal scratchpad
+    new WithSmallScratchpadsOnly ++
+    new freechips.rocketchip.subsystem.WithNoMemPort ++ // use no external memory
+    new WithoutFPU ++
+    new WithL2TLBs(0) ++
+    new WithL1ICacheSets(64 * 2) ++
+    new WithL1DCacheSets(64 * 2) ++
+    // new WithDefaultMemPort ++
+    new freechips.rocketchip.subsystem.WithNBanks(0) ++
+    new ModifiedAbstractConfig
 )
 
 class SimTinyRocketPGL22GConfig extends Config(

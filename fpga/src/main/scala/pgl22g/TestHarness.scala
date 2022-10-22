@@ -257,7 +257,7 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
   _outer.xdc.addIOStandard(reset, "LVCMOS12")
   val resetIBUF = Module(new GTP_INBUF)
   resetIBUF.io.I := reset
-  val hardResetN = (!resetIBUF.io.O).asBool
+  val hardResetN = (resetIBUF.io.O).asBool
   val sysclk: Clock = _outer.sysClkNode.out.head._1.clock
   val powerOnReset: Bool = PowerOnResetFPGAOnly(sysclk)
   _outer.sdc.addAsyncPath(Seq(powerOnReset))
@@ -266,7 +266,7 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
     case _ => false.B
   }
   // used for
-  _outer.pllReset := (hardResetN || powerOnReset || ereset)
+  _outer.pllReset := (!hardResetN || powerOnReset || ereset)
   // reset setup
   val hReset = Wire(Reset())
   hReset := _outer.dutClock.in.head._1.reset
@@ -282,8 +282,8 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
   val ddrphy_rst_done = WireInit(false.B)
   val ddrc_init_done = WireInit(false.B)
   val pll_lock = WireInit(false.B)
-  val pll_clk_bus = Wire(Clock())
-  _outer.migUIClock.out.head._1.member.head.reset := !(pll_lock & ddrc_init_done & ddrphy_rst_done)
+  val pll_clk_bus = WireInit(sysclk)
+  _outer.migUIClock.out.head._1.member.head.reset := (!(pll_lock & ddrc_init_done & ddrphy_rst_done)) || _outer.pllReset
   _outer.migUIClock.out.head._1.member.head.clock := pll_clk_bus
   // harness binders are non-lazy
   _outer.topDesign match {

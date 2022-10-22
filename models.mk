@@ -26,6 +26,20 @@ ifeq ($(SUB_PROJECT),pgl22g-bare)
 	FPGA_BRAND        ?= pango
 endif
 
+ifeq ($(SUB_PROJECT),pgl22g-sodor)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= PGL22GBareTestHarness
+	VLOG_MODEL        ?= PGL22GBareTestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
+	CONFIG            ?= PGL22GSodorConfig
+	CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= pango
+endif
+
 ifeq ($(SUB_PROJECT),pgl22g-perf)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GPerfTestHarness

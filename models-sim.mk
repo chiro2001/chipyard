@@ -24,3 +24,16 @@ ifeq ($(SUB_PROJECT),pgl22g)
 	BOARD             ?= 
 	FPGA_BRAND        ?= 
 endif
+ifeq ($(SUB_PROJECT),sodor)
+	SBT_PROJECT			 	?= chipyard
+	MODEL 						?= TestHarness
+	VLOG_MODEL 				?= TestHarness
+	MODEL_PACKAGE 		?= chipyard
+	CONFIG 						?= Sodor5StageConfig
+	CONFIG_PACKAGE 		?= chipyard
+	GENERATOR_PACKAGE ?= chipyard
+	TB 								?= TestDriver
+	TOP 							?= ChipTop
+	BOARD 						?= 
+	FPGA_BRAND 				?= 
+endif
