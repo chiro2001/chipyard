@@ -14,7 +14,7 @@ import freechips.rocketchip.system.{BaseConfig, MemPortOnlyConfig, TinyConfig}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
-import testchipip.{SerialTLKey, WithSerialTLMem}
+import testchipip.{SerialTLKey, WithRingSystemBus, WithSerialTLMem}
 
 class ModifiedAbstractConfig extends Config(
   // The HarnessBinders control generation of hardware in the TestHarness
@@ -60,7 +60,7 @@ class ModifiedAbstractConfig extends Config(
     new freechips.rocketchip.subsystem.WithJtagDTM ++ // set the debug module to expose a JTAG port
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++ // no top-level MMIO master port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithNoSlavePort ++ // no top-level MMIO slave port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithInclusiveCache ++ // use Sifive L2 cache
+    // new freechips.rocketchip.subsystem.WithInclusiveCache ++ // use Sifive L2 cache
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++ // leave the bus clocks undriven by sbus
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++ // hierarchical buses including sbus/mbus/pbus/fbus/cbus/l2
@@ -165,16 +165,17 @@ class WithPGL22GTLMem extends Config(
     new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2)
 )
 
-class WithPGL22GAXIMem extends Config(
+class WithPGL22GAXIMem(base: BigInt = BigInt(0x80000000L)) extends Config(
   new WithMemoryBusWidth(128) ++
-    new WithPGL22GMemPort ++
+    new WithPGL22GMemPort(base = base) ++
     // new WithNBanks(0) ++ // Disable L2 Cache
     // new WithNBanks(1) ++
     new WithNBreakpoints(0) ++
     new WithHypervisor(false) ++
     new WithDefaultBtb ++
     new WithNTrackersPerBank(1) ++
-    new WithBroadcastManager ++
+    // new WithBroadcastManager ++
+    new WithBufferlessBroadcastHub ++
     // new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16, outerLatencyCycles = 3, subBankingFactor = 2) ++
     new WithAXI4MemPunchthrough ++
     new WithBlackBoxDDRMem
@@ -301,8 +302,28 @@ class PGL22GPerfConfig extends Config(
     // new WithNTrackersPerBank(1) ++
     // new WithBlackBoxDDRMem ++
     new WithPGL22GAXIMem ++
+    new WithNMemoryChannels(1) ++
+    new WithBufferlessBroadcastHub ++
+    // new testchipip.WithRingSystemBus ++
     // new WithAXIIOPassthrough ++
     new PGL22GRocketConfig
+)
+
+class PGL22GTinyConfig extends Config(
+  new WithPGL22GPerfTweaks ++
+    new WithPGL22GAXIMem ++
+    new WithNMemoryChannels(1) ++
+    new WithBufferlessBroadcastHub ++
+    // new PGL22GRocketConfig ++
+    // new chipyard.config.WithTLSerialLocation(
+    //   freechips.rocketchip.subsystem.FBUS,
+    //   freechips.rocketchip.subsystem.PBUS) ++ // attach TL serial adapter to f/p busses
+    // new freechips.rocketchip.subsystem.WithIncoherentBusTopology ++ // use incoherent bus topology
+    // new freechips.rocketchip.subsystem.WithNBanks(0) ++ // remove L2$
+    new freechips.rocketchip.subsystem.WithNoMemPort ++ // remove backing memory
+    // new freechips.rocketchip.subsystem.With1TinyCore ++ // single tiny rocket-core
+    new WithPGL22GTinyCore ++
+    new chipyard.config.AbstractConfig
 )
 
 class WithSmallScratchpadsOnly extends Config((site, here, up) => {
@@ -310,30 +331,47 @@ class WithSmallScratchpadsOnly extends Config((site, here, up) => {
     r.copy(
       core = r.core.copy(useVM = false),
       dcache = r.dcache.map(_.copy(
-        nSets = 256/16, // 16/16Kb scratchpad
+        nSets = 256 / 16, // 16/16Kb scratchpad
         nWays = 1,
         scratch = Some(0x80000000L))))
   }
 })
 
-class PGL22GSodorConfig extends Config(
+class PGL22GSodorConfigBase extends Config(
   new WithPGL22GTweaks ++
-    // new WithPGL22GAXIMem ++
-    new sodor.common.WithNSodorCores(1, internalTile = sodor.common.Stage1Factory) ++
-    new testchipip.WithSerialTLWidth(32) ++
+    new WithPGL22GAXIMem(base = BigInt(0x80000000L)) ++
+    // new testchipip.WithSerialTLWidth(32) ++
     // new testchipip.WithSerialPBusMem ++
-    new WithSerialTLMem ++
-    new WithTLIOPassthrough ++
+    // new WithSerialTLMem ++
+    // new WithTLIOPassthrough ++
     // new freechips.rocketchip.subsystem.WithScratchpadsOnly ++ // use sodor tile-internal scratchpad
-    new WithSmallScratchpadsOnly ++
-    new freechips.rocketchip.subsystem.WithNoMemPort ++ // use no external memory
+    // new WithSmallScratchpadsOnly ++
+    // new freechips.rocketchip.subsystem.WithNoMemPort ++ // use no external memory
     new WithoutFPU ++
     new WithL2TLBs(0) ++
     new WithL1ICacheSets(64 * 2) ++
     new WithL1DCacheSets(64 * 2) ++
     // new WithDefaultMemPort ++
-    new freechips.rocketchip.subsystem.WithNBanks(0) ++
+    // new freechips.rocketchip.subsystem.WithNBanks(0) ++
+    // new testchipip.WithRingSystemBus ++
+    new WithNMemoryChannels(1) ++
+    new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig
+)
+
+class PGL22GSodorConfig extends Config(
+  new sodor.common.WithNSodorCores(1, internalTile = sodor.common.Stage5Factory, scratchBase = BigInt(0x90000000L)) ++
+    new PGL22GSodorConfigBase
+)
+
+class PGL22GSodor3Config extends Config(
+  new sodor.common.WithNSodorCores(1, internalTile = sodor.common.Stage3Factory(ports = 1), scratchBase = BigInt(0x90000000L)) ++
+    new PGL22GSodorConfigBase
+)
+
+class PGL22GSodorUcodeConfig extends Config(
+  new sodor.common.WithNSodorCores(1, internalTile = sodor.common.UCodeFactory, scratchBase = BigInt(0x90000000L)) ++
+    new PGL22GSodorConfigBase
 )
 
 class SimTinyRocketPGL22GConfig extends Config(

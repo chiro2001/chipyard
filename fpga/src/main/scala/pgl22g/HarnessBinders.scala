@@ -77,9 +77,9 @@ class WithAXI4DDRMem extends OverrideHarnessBinder({
   }
 })
 
-class WithPGL22GMemPort extends Config((site, here, up) => {
+class WithPGL22GMemPort(base: BigInt = BigInt(0x80000000L)) extends Config((site, here, up) => {
   case ExtMem => Some(MemoryPortParams(MasterPortParams(
-    base = BigInt(0x80000000L),
+    base = base,
     size = BigInt(0x10000000),
     beatBytes = site(MemoryBusKey).beatBytes,
     idBits = 4), 1))
