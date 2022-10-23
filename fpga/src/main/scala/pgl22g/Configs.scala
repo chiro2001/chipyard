@@ -377,21 +377,23 @@ class PGL22GSodorUcodeConfig extends Config(
 class PGL22GPicoRVConfig extends Config(
   new picorv.WithNPicoRVCores(1) ++
     new WithPGL22GTweaks ++
-    new WithPGL22GAXIMem(base = BigInt(0x80000000L)) ++
-    // new testchipip.WithSerialTLWidth(32) ++
-    // new testchipip.WithSerialPBusMem ++
-    // new WithSerialTLMem ++
-    // new WithTLIOPassthrough ++
-    // new freechips.rocketchip.subsystem.WithScratchpadsOnly ++ // use sodor tile-internal scratchpad
-    // new WithSmallScratchpadsOnly ++
-    // new freechips.rocketchip.subsystem.WithNoMemPort ++ // use no external memory
+    new WithPGL22GAXIMem ++
     new WithoutFPU ++
     new WithL2TLBs(0) ++
     new WithL1ICacheSets(64 * 2) ++
     new WithL1DCacheSets(64 * 2) ++
-    // new WithDefaultMemPort ++
-    // new freechips.rocketchip.subsystem.WithNBanks(0) ++
-    // new testchipip.WithRingSystemBus ++
+    new WithNMemoryChannels(1) ++
+    new WithBufferlessBroadcastHub ++
+    new ModifiedAbstractConfig)
+
+class PGL22GSSRVConfig extends Config(
+  new ssrv.WithNSSRVCores(1) ++
+    new WithPGL22GTweaks ++
+    new WithPGL22GAXIMem ++
+    new WithoutFPU ++
+    new WithL2TLBs(0) ++
+    new WithL1ICacheSets(64 * 2) ++
+    new WithL1DCacheSets(64 * 2) ++
     new WithNMemoryChannels(1) ++
     new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig)
