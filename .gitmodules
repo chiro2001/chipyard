@@ -127,3 +127,6 @@
 [submodule "generators/constellation"]
 	path = generators/constellation
 	url = https://github.com/ucb-bar/constellation.git
+[submodule "generators/picorv"]
+	path = generators/picorv
+	url = https://github.com/chiro2001/picorv-chipyard
