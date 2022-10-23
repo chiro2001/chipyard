@@ -15,6 +15,7 @@ import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
 import testchipip.{SerialTLKey, WithRingSystemBus, WithSerialTLMem}
+import vexriscv.chipyard.WithNVexRiscvCores
 
 class ModifiedAbstractConfig extends Config(
   // The HarnessBinders control generation of hardware in the TestHarness
@@ -388,6 +389,18 @@ class PGL22GPicoRVConfig extends Config(
 
 class PGL22GSSRVConfig extends Config(
   new ssrv.WithNSSRVCores(1) ++
+    new WithPGL22GTweaks ++
+    new WithPGL22GAXIMem ++
+    new WithoutFPU ++
+    new WithL2TLBs(0) ++
+    new WithL1ICacheSets(64 * 2) ++
+    new WithL1DCacheSets(64 * 2) ++
+    new WithNMemoryChannels(1) ++
+    new WithBufferlessBroadcastHub ++
+    new ModifiedAbstractConfig)
+
+class PGL22GVexRiscvConfig extends Config(
+  new WithNVexRiscvCores(1) ++
     new WithPGL22GTweaks ++
     new WithPGL22GAXIMem ++
     new WithoutFPU ++

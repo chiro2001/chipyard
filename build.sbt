@@ -9,10 +9,13 @@ lazy val commonSettings = Seq(
   version := "1.6",
   scalaVersion := "2.12.10",
   assembly / test := {},
-  assembly / assemblyMergeStrategy := { _ match {
-    case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
-    case _ => MergeStrategy.first}},
-  scalacOptions ++= Seq("-deprecation","-unchecked","-Xsource:2.11"),
+  assembly / assemblyMergeStrategy := {
+    _ match {
+      case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+      case _ => MergeStrategy.first
+    }
+  },
+  scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xsource:2.11"),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
   unmanagedBase := (chipyardRoot / unmanagedBase).value,
   allDependencies := {
@@ -38,13 +41,13 @@ lazy val firesimDir = if (firesimAsLibrary) {
 }
 
 /**
-  * It has been a struggle for us to override settings in subprojects.
-  * An example would be adding a dependency to rocketchip on midas's targetutils library,
-  * or replacing dsptools's maven dependency on chisel with the local chisel project.
-  *
-  * This function works around this by specifying the project's root at src/ and overriding
-  * scalaSource and resourceDirectory.
-  */
+ * It has been a struggle for us to override settings in subprojects.
+ * An example would be adding a dependency to rocketchip on midas's targetutils library,
+ * or replacing dsptools's maven dependency on chisel with the local chisel project.
+ *
+ * This function works around this by specifying the project's root at src/ and overriding
+ * scalaSource and resourceDirectory.
+ */
 def freshProject(name: String, dir: File): Project = {
   Project(id = name, base = dir / "src")
     .settings(
@@ -64,8 +67,8 @@ val chiselVersion = "3.5.2"
 
 lazy val chiselSettings = Seq(
   libraryDependencies ++= Seq("edu.berkeley.cs" %% "chisel3" % chiselVersion,
-  "org.apache.commons" % "commons-lang3" % "3.12.0",
-  "org.apache.commons" % "commons-text" % "1.9"),
+    "org.apache.commons" % "commons-lang3" % "3.12.0",
+    "org.apache.commons" % "commons-text" % "1.9"),
   addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % chiselVersion cross CrossVersion.full))
 
 val firrtlVersion = "1.5.1"
@@ -81,7 +84,7 @@ lazy val chiselTestSettings = Seq(libraryDependencies ++= Seq("edu.berkeley.cs" 
 // -- Rocket Chip --
 
 // Rocket-chip dependencies (subsumes making RC a RootProject)
-lazy val hardfloat  = (project in rocketChipDir / "hardfloat")
+lazy val hardfloat = (project in rocketChipDir / "hardfloat")
   .settings(chiselSettings)
   .dependsOn(midasTargetUtils)
   .settings(commonSettings)
@@ -93,7 +96,7 @@ lazy val hardfloat  = (project in rocketChipDir / "hardfloat")
     )
   )
 
-lazy val rocketMacros  = (project in rocketChipDir / "macros")
+lazy val rocketMacros = (project in rocketChipDir / "macros")
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -146,10 +149,10 @@ lazy val testchipip = (project in file("generators/testchipip"))
 
 lazy val chipyard = (project in file("generators/chipyard"))
   .dependsOn(testchipip, rocketchip, boom, hwacha, sifive_blocks, sifive_cache, iocell,
-//    sha3, // On separate line to allow for cleaner tutorial-setup patches
+    //    sha3, // On separate line to allow for cleaner tutorial-setup patches
     dsptools, `rocket-dsp-utils`,
     gemmini, icenet, tracegen, cva6, nvdla, sodor, ibex, fft_generator,
-    constellation, picorv, ssrv, vexRiscv)
+    constellation, picorv, ssrv, VexRiscv)
   .settings(libraryDependencies ++= rocketLibDeps.value)
   .settings(commonSettings)
 
@@ -198,10 +201,33 @@ lazy val ssrv = (project in file("generators/ssrv"))
   .settings(libraryDependencies ++= rocketLibDeps.value)
   .settings(commonSettings)
 
-lazy val vexRiscv = (project in file("generators/vex-riscv"))
+val spinalVersion = "1.7.3"
+
+lazy val VexRiscv = (project in file("generators/vex-riscv")).
+  settings(
+    inThisBuild(List(
+      organization := "com.github.spinalhdl",
+      scalaVersion := "2.12.10",
+      version := "2.0.0"
+    )),
+    libraryDependencies ++= Seq(
+      "com.github.spinalhdl" % "spinalhdl-core_2.12" % spinalVersion,
+      "com.github.spinalhdl" % "spinalhdl-lib_2.12" % spinalVersion,
+      compilerPlugin("com.github.spinalhdl" % "spinalhdl-idsl-plugin_2.12" % spinalVersion),
+      // "org.scalatest" %% "scalatest" % "3.2.14",
+      // "org.yaml" % "snakeyaml" % "1.33"
+    ),
+    name := "VexRiscv"
+  )
   .dependsOn(rocketchip)
   .settings(libraryDependencies ++= rocketLibDeps.value)
   .settings(commonSettings)
+// fork := true
+
+// lazy val vexRiscv = (project in file("generators/vex-riscv"))
+//   .dependsOn(rocketchip)
+//   .settings(libraryDependencies ++= rocketLibDeps.value)
+//   .settings(commonSettings)
 
 lazy val ibex = (project in file("generators/ibex"))
   .dependsOn(rocketchip)
@@ -255,7 +281,7 @@ lazy val dsptools = freshProject("dsptools", file("./tools/dsptools"))
       "org.scalanlp" %% "breeze" % "1.1",
       "junit" % "junit" % "4.13" % "test",
       "org.scalacheck" %% "scalacheck" % "1.14.3" % "test",
-  ))
+    ))
 
 lazy val `api-config-chipsalliance` = freshProject("api-config-chipsalliance", file("./tools/api-config-chipsalliance"))
   .settings(
@@ -283,7 +309,7 @@ lazy val sifive_cache = (project in file("generators/sifive-cache"))
   .settings(libraryDependencies ++= rocketLibDeps.value)
 
 // Library components of FireSim
-lazy val midas      = ProjectRef(firesimDir, "midas")
+lazy val midas = ProjectRef(firesimDir, "midas")
 lazy val firesimLib = ProjectRef(firesimDir, "firesimLib")
 
 lazy val firechip = (project in file("generators/firechip"))
@@ -291,7 +317,7 @@ lazy val firechip = (project in file("generators/firechip"))
   .settings(
     chiselSettings,
     commonSettings,
-    Test / testGrouping := isolateAllTests( (Test / definedTests).value ),
+    Test / testGrouping := isolateAllTests((Test / definedTests).value),
     Test / testOptions += Tests.Argument("-oF")
   )
 lazy val fpga_shells = (project in file("./fpga/fpga-shells"))
