@@ -22,3 +22,7 @@ env-esp-tools.sh
 .bsp/
 .conda-env/
 .#*
+
+/*.v
+/*.yaml
+/*.bin

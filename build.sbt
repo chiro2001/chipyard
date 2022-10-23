@@ -149,7 +149,7 @@ lazy val chipyard = (project in file("generators/chipyard"))
 //    sha3, // On separate line to allow for cleaner tutorial-setup patches
     dsptools, `rocket-dsp-utils`,
     gemmini, icenet, tracegen, cva6, nvdla, sodor, ibex, fft_generator,
-    constellation, picorv, ssrv)
+    constellation, picorv, ssrv, vexRiscv)
   .settings(libraryDependencies ++= rocketLibDeps.value)
   .settings(commonSettings)
 
@@ -194,6 +194,11 @@ lazy val picorv = (project in file("generators/picorv"))
   .settings(commonSettings)
 
 lazy val ssrv = (project in file("generators/ssrv"))
+  .dependsOn(rocketchip)
+  .settings(libraryDependencies ++= rocketLibDeps.value)
+  .settings(commonSettings)
+
+lazy val vexRiscv = (project in file("generators/vex-riscv"))
   .dependsOn(rocketchip)
   .settings(libraryDependencies ++= rocketLibDeps.value)
   .settings(commonSettings)
