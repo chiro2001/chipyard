@@ -323,7 +323,7 @@ class PGL22GTinyConfig extends Config(
     new freechips.rocketchip.subsystem.WithNoMemPort ++ // remove backing memory
     // new freechips.rocketchip.subsystem.With1TinyCore ++ // single tiny rocket-core
     new WithPGL22GTinyCore ++
-    new chipyard.config.AbstractConfig
+    new PGL22GRocketConfig
 )
 
 class WithSmallScratchpadsOnly extends Config((site, here, up) => {
