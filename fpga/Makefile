@@ -108,7 +108,7 @@ BIT_FILE := $(build_dir)/generate_bitstream/$(MODEL).sbit
 EDA := pds_shell
 RUN_PROC ?= synth
 RUN_TCL := run_$(RUN_PROC).tcl
-EDA_ARGS := -f $(RUN_TCL) -project_name $(MODEL) -work_dir $(build_dir)
+EDA_ARGS := -f $(RUN_TCL) -project_name $(CONFIG)-$(MODEL) -work_dir $(build_dir)
 EDA_ARGS_DEBUG := $(EDA_ARGS)
 else
 BIT_FILE := $(build_dir)/obj/$(MODEL).bit
