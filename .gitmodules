@@ -133,3 +133,6 @@
 [submodule "generators/ssrv"]
 	path = generators/ssrv
 	url = https://github.com/chiro2001/ssrv-chipyard
+[submodule "generators/vex-riscv"]
+	path = generators/vex-riscv
+	url = https://github.com/chiro2001/VexRiscv-chipyard
