@@ -130,3 +130,6 @@
 [submodule "generators/picorv"]
 	path = generators/picorv
 	url = https://github.com/chiro2001/picorv-chipyard
+[submodule "generators/ssrv"]
+	path = generators/ssrv
+	url = https://github.com/chiro2001/ssrv-chipyard
