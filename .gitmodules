@@ -78,7 +78,7 @@
 	url = https://github.com/riscv-boom/dromajo.git
 [submodule "generators/riscv-sodor"]
 	path = generators/riscv-sodor
-	url = https://github.com/ucb-bar/riscv-sodor.git
+	url = https://github.com/chiro2001/riscv-sodor
 [submodule "fpga/fpga-shells"]
 	path = fpga/fpga-shells
 	url = https://github.com/chipsalliance/rocket-chip-fpga-shells.git
@@ -127,3 +127,9 @@
 [submodule "generators/constellation"]
 	path = generators/constellation
 	url = https://github.com/ucb-bar/constellation.git
+[submodule "generators/picorv"]
+	path = generators/picorv
+	url = https://github.com/chiro2001/picorv-chipyard
+[submodule "generators/ssrv"]
+	path = generators/ssrv
+	url = https://github.com/chiro2001/ssrv-chipyard

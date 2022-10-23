@@ -1,7 +1,16 @@
-GCC=riscv64-unknown-elf-gcc
-OBJDUMP=riscv64-unknown-elf-objdump
-CFLAGS= -std=gnu99 -O2 -fno-common -fno-builtin-printf -Wall
-LDFLAGS= -static
+# USE_64BIT := 1
+
+ifdef USE_64BIT
+CROSS_COMPILE := riscv64-unknown-elf
+CFLAGS := 
+else
+CROSS_COMPILE := riscv32-unknown-elf
+CFLAGS := -march=rv32ima -mabi=ilp32
+endif
+GCC := $(CROSS_COMPILE)-gcc
+OBJDUMP := $(CROSS_COMPILE)-objdump
+CFLAGS += -std=gnu99 -O2 -fno-common -fno-builtin-printf -Wall
+LDFLAGS := -static
 
 include libgloss.mk
 
