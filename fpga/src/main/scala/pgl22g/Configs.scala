@@ -411,6 +411,18 @@ class PGL22GVexRiscvConfig extends Config(
     new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig)
 
+class PGL22GVexRiscv2Config extends Config(
+  new WithNVexRiscvCores(2) ++
+    new WithPGL22GTweaks ++
+    new WithPGL22GAXIMem ++
+    new WithoutFPU ++
+    new WithL2TLBs(0) ++
+    new WithL1ICacheSets(64 * 2) ++
+    new WithL1DCacheSets(64 * 2) ++
+    new WithNMemoryChannels(1) ++
+    new WithBufferlessBroadcastHub ++
+    new ModifiedAbstractConfig)
+
 class SimTinyRocketPGL22GConfig extends Config(
   new WithPGL22GSimTweaks ++
     new PGL22GRocketConfig
