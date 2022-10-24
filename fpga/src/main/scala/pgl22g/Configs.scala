@@ -7,8 +7,10 @@ import chipyard.harness.WithBlackBoxSimMem
 import chipyard.iobinders.WithAXI4MemPunchthrough
 import freechips.rocketchip.config._
 import freechips.rocketchip.devices.debug._
+import freechips.rocketchip.devices.tilelink.BootROMLocated
 import freechips.rocketchip.diplomacy.{DTSTimebase, SynchronousCrossing}
 import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
+import freechips.rocketchip.stage.phases.TargetDirKey
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.system.{BaseConfig, MemPortOnlyConfig, TinyConfig}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
@@ -16,6 +18,8 @@ import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
 import testchipip.{SerialTLKey, WithRingSystemBus, WithSerialTLMem}
 import vexriscv.chipyard.WithNVexRiscvCores
+import sys.process._
+import java.io.File
 
 class ModifiedAbstractConfig extends Config(
   // The HarnessBinders control generation of hardware in the TestHarness
@@ -66,6 +70,23 @@ class ModifiedAbstractConfig extends Config(
     new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++ // leave the bus clocks undriven by sbus
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++ // hierarchical buses including sbus/mbus/pbus/fbus/cbus/l2
     new freechips.rocketchip.system.BaseConfig) // "base" rocketchip system
+
+class WithoutBootROM extends Config((site, here, up) => {
+  case BootROMLocated(x) => None
+})
+
+class WithPicoRVBootROM extends Config((site, here, up) => {
+  case BootROMLocated(x) => {
+    val baseDir = "./generators/picorv/src/main/resources/bootrom"
+    val chipyardBootROM = new File(s"$baseDir/start.rv${site(XLen)}.img")
+    if (!chipyardBootROM.exists()) {
+      val make = s"make -C $baseDir"
+      require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
+    }
+    up(BootROMLocated(x), site)
+      .map(_.copy(contentFileName = chipyardBootROM.getAbsolutePath))
+  }
+})
 
 class WithDefaultTimebase extends Config((site, here, up) => {
   case DTSTimebase => BigInt(1e6.toLong)
@@ -385,6 +406,7 @@ class PGL22GPicoRVConfig extends Config(
     new WithL1DCacheSets(64 * 2) ++
     new WithNMemoryChannels(1) ++
     new WithBufferlessBroadcastHub ++
+    new WithoutBootROM ++
     new ModifiedAbstractConfig)
 
 class WithPGL22GSimTinyTweaks extends Config(
@@ -401,6 +423,7 @@ class SimPGL22GPicoRVConfig extends Config(
   new picorv.WithNPicoRVCores(1) ++
     new WithMemoryBusWidth(32) ++
     new WithPGL22GSimTinyTweaks ++
+    new WithPicoRVBootROM ++
     new ModifiedAbstractConfig
 )
 
