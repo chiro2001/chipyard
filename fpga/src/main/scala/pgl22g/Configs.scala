@@ -387,6 +387,23 @@ class PGL22GPicoRVConfig extends Config(
     new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig)
 
+class WithPGL22GSimTinyTweaks extends Config(
+  new chipyard.config.WithNoDebug ++ // remove debug module
+    new freechips.rocketchip.subsystem.WithoutTLMonitors ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
+    new chipyard.harness.WithBlackBoxSimMem ++ // add SimDRAM DRAM model for axi4 backing memory, if axi4 mem is enabled
+    new chipyard.harness.WithSimSerial ++ // add external serial-adapter and RAM
+    new chipyard.harness.WithSimDebug ++ // add SimJTAG or SimDTM adapters if debug module is enabled
+    new WithRV32
+)
+
+class SimPGL22GPicoRVConfig extends Config(
+  new picorv.WithNPicoRVCores(1) ++
+    new WithMemoryBusWidth(32) ++
+    new WithPGL22GSimTinyTweaks ++
+    new ModifiedAbstractConfig
+)
+
 class PGL22GSSRVConfig extends Config(
   new ssrv.WithNSSRVCores(1) ++
     new WithPGL22GTweaks ++
@@ -425,5 +442,6 @@ class PGL22GVexRiscv2Config extends Config(
 
 class SimTinyRocketPGL22GConfig extends Config(
   new WithPGL22GSimTweaks ++
+    new WithPGL22GSimTinyTweaks ++
     new PGL22GRocketConfig
 )

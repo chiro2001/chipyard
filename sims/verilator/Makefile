@@ -1,6 +1,6 @@
 base_dir ?= $(abspath ../..)
 
-BINARY ?= $(RISCV)/riscv64-unknown-elf/share/riscv-tests/benchmarks/dhrystone.riscv
+BINARY ?= $(RISCV)/riscv64-unknown-elf/share/riscv-tests/isa/rv64ui-p-add
 SUB_PROJECT ?= pgl22g
 
 include $(base_dir)/models-sim.mk
@@ -217,13 +217,18 @@ model_mk_debug = $(model_dir_debug)/V$(VLOG_MODEL).mk
 #########################################################################################
 # build makefile fragment that builds the verilator sim rules
 #########################################################################################
-$(model_mk): $(sim_vsrcs) $(sim_common_files) $(EXTRA_SIM_REQS)
+model_mk_deps := $(sim_common_files) $(EXTRA_SIM_REQS)
+ifndef IGNORE_VSRCS
+model_mk_deps += $(sim_vsrcs)
+endif
+
+$(model_mk): $(model_mk_deps)
 	rm -rf $(model_dir)
 	mkdir -p $(model_dir)
 	$(VERILATOR) $(VERILATOR_OPTS) $(EXTRA_SIM_SOURCES) -o $(sim) -Mdir $(model_dir) -CFLAGS "-include $(model_header)"
 	touch $@
 
-$(model_mk_debug): $(sim_vsrcs) $(sim_common_files) $(EXTRA_SIM_REQS)
+$(model_mk_debug): $(model_mk_deps)
 	rm -rf $(model_dir_debug)
 	mkdir -p $(model_dir_debug)
 	$(VERILATOR) $(VERILATOR_OPTS) $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(TRACING_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
