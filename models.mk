@@ -26,6 +26,20 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	FPGA_BRAND        ?= pango
 endif
 
+ifeq ($(SUB_PROJECT),pgl22g-vexriscv-sim)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= PGL22GSimTestHarness
+	VLOG_MODEL        ?= PGL22GSimTestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
+	CONFIG            ?= SimPGL22GVexRiscvConfig
+	CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= TestDriver
+	TOP               ?= ChipTop
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= pango
+endif
+
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv2)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GBareTestHarness

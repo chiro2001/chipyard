@@ -16,8 +16,10 @@ import freechips.rocketchip.system.{BaseConfig, MemPortOnlyConfig, TinyConfig}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
+import ssrv.WithNSSRVCores
 import testchipip.{SerialTLKey, WithRingSystemBus, WithSerialTLMem}
 import vexriscv.chipyard.WithNVexRiscvCores
+
 import sys.process._
 import java.io.File
 
@@ -462,6 +464,21 @@ class PGL22GVexRiscv2Config extends Config(
     new WithNMemoryChannels(1) ++
     new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig)
+
+class SimPGL22GVexRiscvConfig extends Config(
+  new WithNVexRiscvCores(1) ++
+    new WithMemoryBusWidth(32) ++
+    new WithPGL22GSimTinyTweaks ++
+    new WithFPGAFrequency(100) ++
+    new ModifiedAbstractConfig
+)
+
+class SimPGL22GSSRVConfig extends Config(
+  new WithNSSRVCores(1) ++
+    new WithMemoryBusWidth(32) ++
+    new WithPGL22GSimTinyTweaks ++
+    new ModifiedAbstractConfig
+)
 
 class SimTinyRocketPGL22GConfig extends Config(
   new WithPGL22GSimTweaks ++

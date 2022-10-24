@@ -6,6 +6,7 @@ import chipyard.iobinders.HasIOBinders
 import chisel3._
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.prci.{ClockBundle, ClockBundleParameters}
 import freechips.rocketchip.tilelink._
 import shell.pango.{DDRDesignInputSysClk, DDROverlayKeySysClk}
 import sifive.blocks.devices.uart._
@@ -13,7 +14,7 @@ import sifive.fpgashells.clocks._
 import sifive.fpgashells.ip.pango._
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.shell._
-import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GPerfShell, PGL22GShellBasicOverlays}
+import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GPerfShell, PGL22GShellBasicOverlays, ShellPangoUARTPortIO, UARTPGL22GShellPlacer, UARTPangoPlacedOverlay}
 
 class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
 
@@ -145,7 +146,7 @@ class PGL22GAXIFPGATestHarnessImp(_outer: PGL22GAXIFPGATestHarness) extends Lazy
   val buildtopClock = _outer.dutClock.in.head._1.clock
   val buildtopReset = WireInit(hReset)
   val dutReset = hReset.asAsyncReset
-  val success = false.B
+  val success = WireInit(false.B)
 
   childClock := buildtopClock
   childReset := buildtopReset
@@ -192,7 +193,7 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
   val buildtopClock = _outer.dutClock.in.head._1.clock
   val buildtopReset = WireInit(hReset)
   val dutReset = hReset.asAsyncReset
-  val success = false.B
+  val success = WireInit(false.B)
 
   childClock := buildtopClock
   childReset := buildtopReset
@@ -208,11 +209,60 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
   require(getRefClockFreq == p(DefaultClockFrequencyKey))
 }
 
-import chipyard.TestHarness
+class PGL22GSimShell(implicit p: Parameters) extends IOShell {
+  val sdc = new SDC("shell.sdc")
+}
 
-class PGL22GSimTestHarness(implicit p: Parameters) extends TestHarness
+class PGL22GSimTestHarness(implicit p: Parameters) extends PGL22GSimShell {
+  def dp = designParameters
 
-case object PGL22GBuildTop extends Field[Parameters => LazyModule]((p: Parameters) => new ChipTop()(p))
+  val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
+
+  // val io_uart_bb = BundleBridgeSource(() => new UARTPortIO(dp(PeripheryUARTKey).head))
+  // dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
+
+  override lazy val module = new PGL22GSimTestHarnessImpl(this)
+}
+
+class PGL22GSimTestHarnessImpl(_outer: PGL22GSimTestHarness)
+  extends LazyRawModuleImp(_outer)
+    with HasHarnessSignalReferences {
+  val io_success = IO(Output(Bool()))
+  io_success := false.B
+
+  val reset = IO(Input(Bool()))
+  val clock = IO(Input(Clock()))
+
+  val resetInner = WireInit(false.B.asTypeOf(reset.cloneType))
+  val clockInner = WireInit(false.B.asClock)
+
+  override def buildtopClock = clockInner
+
+  override def buildtopReset = resetInner
+
+  override def dutReset = resetInner
+
+  override def success = io_success
+
+  val refClkBundle = p(HarnessClockInstantiatorKey).requestClockBundle("buildtop_reference_clock", getRefClockFreq * (1000 * 1000))
+  val implicitHarnessClockBundle = Wire(new ClockBundle(ClockBundleParameters()))
+  implicitHarnessClockBundle.clock := clock
+  implicitHarnessClockBundle.reset := reset
+  p(HarnessClockInstantiatorKey).instantiateHarnessDividerPLL(implicitHarnessClockBundle)
+
+  // buildtopClock := refClkBundle.clock
+  // buildtopReset := WireInit(refClkBundle.reset)
+
+  withClockAndReset(buildtopClock, buildtopReset) {
+    _outer.topDesign match {
+      case d: HasIOBinders =>
+        ApplyHarnessBinders(this, d.lazySystem, d.portMap)
+    }
+  }
+
+  buildtopClock := refClkBundle.clock
+  buildtopReset := WireInit(refClkBundle.reset)
+}
 
 class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
   def dp = designParameters
@@ -273,7 +323,7 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
   val buildtopClock = _outer.dutClock.in.head._1.clock
   val buildtopReset = WireInit(hReset)
   val dutReset = hReset.asAsyncReset
-  val success = false.B
+  val success = WireInit(false.B)
   childClock := buildtopClock
   childReset := buildtopReset
 
@@ -397,7 +447,7 @@ class PGL22GTestHarnessImp(_outer: PGL22GTestHarness) extends LazyRawModuleImp(_
   val buildtopClock = _outer.dutClock.in.head._1.clock
   val buildtopReset = WireInit(hReset)
   val dutReset = hReset.asAsyncReset
-  val success = false.B
+  val success = WireInit(false.B)
   childClock := buildtopClock
   childReset := buildtopReset
   // harness binders are non-lazy
