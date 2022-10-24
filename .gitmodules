@@ -136,3 +136,5 @@
 [submodule "generators/vex-riscv"]
 	path = generators/vex-riscv
 	url = https://github.com/chiro2001/VexRiscv-chipyard
+[submodule "generators/testchipip"]
+	url = https://github.com/chiro2001/testchipip
