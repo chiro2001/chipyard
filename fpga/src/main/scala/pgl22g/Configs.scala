@@ -81,12 +81,10 @@ class WithPicoRVBootROM extends Config((site, here, up) => {
   case BootROMLocated(x) => {
     val baseDir = "./generators/picorv/src/main/resources/bootrom"
     val chipyardBootROM = new File(s"$baseDir/start.rv${site(XLen)}.img")
-    if (!chipyardBootROM.exists()) {
-      val clean = s"make -C $baseDir clean"
-      require(clean.! == 0 && chipyardBootROM.exists(), "Failed to clean bootrom!")
-      val make = s"make -C $baseDir"
-      require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
-    }
+    val clean = s"make -C $baseDir clean"
+    require(clean.! == 0 && !chipyardBootROM.exists(), "Failed to clean bootrom!")
+    val make = s"make -C $baseDir"
+    require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
     up(BootROMLocated(x), site)
       .map(_.copy(contentFileName = chipyardBootROM.getAbsolutePath))
   }
@@ -96,12 +94,10 @@ class WithVexRiscvBootROM extends Config((site, here, up) => {
   case BootROMLocated(x) => {
     val baseDir = "./generators/vex-riscv/src/main/resources/bootrom"
     val chipyardBootROM = new File(s"$baseDir/bootrom.rv${site(XLen)}.simple.img")
-    if (!chipyardBootROM.exists()) {
-      val clean = s"make -C $baseDir clean"
-      require(clean.! == 0 && chipyardBootROM.exists(), "Failed to clean bootrom!")
-      val make = s"make -C $baseDir"
-      require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
-    }
+    val clean = s"make -C $baseDir clean"
+    require(clean.! == 0 && !chipyardBootROM.exists(), "Failed to clean bootrom!")
+    val make = s"make -C $baseDir"
+    require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
     up(BootROMLocated(x), site)
       .map(_.copy(contentFileName = chipyardBootROM.getAbsolutePath))
   }
@@ -121,7 +117,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
   //   idcodeManufId = 0x489,
   //   debugIdleCycles = 5)
   case SerialTLKey => None // remove serialized tl port
-  case PeripheryUARTKey => List(UARTParams(address = BigInt(0x64000000L)))
+  case PeripheryUARTKey => List(UARTParams(address = BigInt(0x54000000L)))
   // case PeripherySPIKey => List(SPIParams(rAddress = BigInt(0x64001000L)))
   // case VCU118ShellPMOD => "SDIO"
 })
