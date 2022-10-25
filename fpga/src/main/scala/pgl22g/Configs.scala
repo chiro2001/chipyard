@@ -82,6 +82,23 @@ class WithPicoRVBootROM extends Config((site, here, up) => {
     val baseDir = "./generators/picorv/src/main/resources/bootrom"
     val chipyardBootROM = new File(s"$baseDir/start.rv${site(XLen)}.img")
     if (!chipyardBootROM.exists()) {
+      val clean = s"make -C $baseDir clean"
+      require(clean.! == 0 && chipyardBootROM.exists(), "Failed to clean bootrom!")
+      val make = s"make -C $baseDir"
+      require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
+    }
+    up(BootROMLocated(x), site)
+      .map(_.copy(contentFileName = chipyardBootROM.getAbsolutePath))
+  }
+})
+
+class WithVexRiscvBootROM extends Config((site, here, up) => {
+  case BootROMLocated(x) => {
+    val baseDir = "./generators/vex-riscv/src/main/resources/bootrom"
+    val chipyardBootROM = new File(s"$baseDir/bootrom.rv${site(XLen)}.simple.img")
+    if (!chipyardBootROM.exists()) {
+      val clean = s"make -C $baseDir clean"
+      require(clean.! == 0 && chipyardBootROM.exists(), "Failed to clean bootrom!")
       val make = s"make -C $baseDir"
       require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
     }
@@ -469,7 +486,7 @@ class SimPGL22GVexRiscvConfig extends Config(
   new WithNVexRiscvCores(1) ++
     new WithMemoryBusWidth(32) ++
     new WithPGL22GSimTinyTweaks ++
-    new WithFPGAFrequency(100) ++
+    new WithVexRiscvBootROM ++
     new ModifiedAbstractConfig
 )
 
