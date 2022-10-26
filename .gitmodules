@@ -138,3 +138,5 @@
 	url = https://github.com/chiro2001/VexRiscv-chipyard
 [submodule "generators/testchipip"]
 	url = https://github.com/chiro2001/testchipip
+[submodule "coremark"]
+	url = https://github.com/chiro2001/coremark-workload
