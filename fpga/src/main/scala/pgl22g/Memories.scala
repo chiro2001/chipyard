@@ -4,17 +4,16 @@ import chipsalliance.rocketchip.config.Config
 import chipyard.iobinders.WithAXI4MemPunchthrough
 import freechips.rocketchip.subsystem.{MemoryBusKey, RocketTilesKey, WithBufferlessBroadcastHub, WithDefaultBtb, WithHypervisor, WithNBreakpoints, WithNTrackersPerBank}
 
-class WithSmallScratchpadsOnly extends Config((site, here, up) => {
+class WithScratchpadsSize(startAddress: Long = 0x80000000L, sizeKB: Int = 16) extends Config((site, here, up) => {
   case RocketTilesKey => up(RocketTilesKey, site) map { r =>
     r.copy(
       core = r.core.copy(useVM = false),
       dcache = r.dcache.map(_.copy(
-        nSets = 256 / 16, // 16/16Kb scratchpad
+        nSets = sizeKB * 16,  // how much?
         nWays = 1,
-        scratch = Some(0x80000000L))))
+        scratch = Some(startAddress))))
   }
 })
-
 
 // class WithMemory extends Config((site, here, up) => {
 //   // case ExtMem => None // disable AXI backing memory

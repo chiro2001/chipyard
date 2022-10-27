@@ -29,7 +29,7 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip)
 	MODEL             ?= PGL22GSimTestHarness
 	VLOG_MODEL        ?= PGL22GSimTestHarness
 	MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
-	CONFIG            ?= SimPGL22GOnChipConfig
+	CONFIG            ?= SimPGL22GOnChipRocketConfig
 	CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= TestDriver
