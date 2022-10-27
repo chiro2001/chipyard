@@ -1,6 +1,7 @@
 base_dir ?= $(abspath ../..)
 
-BINARY ?= $(RISCV)/riscv64-unknown-elf/share/riscv-tests/isa/rv64ui-p-add
+# BINARY ?= $(RISCV)/riscv64-unknown-elf/share/riscv-tests/isa/rv32ui-p-add
+BINARY ?= $(base_dir)/software/coremark/overlay/coremark.bare.riscv
 SUB_PROJECT ?= pgl22g
 
 include $(base_dir)/models-sim.mk
