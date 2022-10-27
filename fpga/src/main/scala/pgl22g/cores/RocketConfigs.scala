@@ -4,8 +4,18 @@ import chipsalliance.rocketchip.config.Config
 import freechips.rocketchip.devices.debug.DebugModuleKey
 import freechips.rocketchip.diplomacy.SynchronousCrossing
 import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
-import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithBufferlessBroadcastHub, WithNMemoryChannels}
+import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithBufferlessBroadcastHub, WithNMemoryChannels, WithRV32}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
+
+class RocketSmall32Config extends Config(
+  new freechips.rocketchip.subsystem.WithNSmallCores(1) ++
+    new WithRV32 ++
+    new chipyard.config.AbstractConfig)
+
+class RocketBig32Config extends Config(
+  new freechips.rocketchip.subsystem.WithNBigCores(1) ++
+    new WithRV32 ++
+    new chipyard.config.AbstractConfig)
 
 class WithPGL22GRocketCore extends Config((site, here, up) => {
   case XLen => 32

@@ -41,9 +41,9 @@ class PGL22GOnChipRocketConfig extends Config(
     new chipyard.config.WithL2TLBs(0) ++
     new freechips.rocketchip.subsystem.WithNBanks(0) ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++ // remove offchip mem port
-    new WithScratchpadsSize(startAddress = 0x90000000L) ++ // use rocket l1 DCache scratchpad as base phys mem
     // new freechips.rocketchip.subsystem.WithNBigCores(1) ++
     new WithTinyScratchpadsTinyCore ++             // single tiny rocket-core
+    new WithScratchpadsSize(startAddress = 0x90000000L) ++ // use rocket l1 DCache scratchpad as base phys mem
     new WithRV32 ++
     new chipyard.config.AbstractConfig)
 
