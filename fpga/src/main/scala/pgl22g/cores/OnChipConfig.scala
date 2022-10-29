@@ -63,4 +63,13 @@ class PGL22GOnChipRocketCoreMarkConfig extends Config(
     new WithTinyScratchpadsTinyCore ++ // single tiny rocket-core
     new chipyard.config.AbstractConfig)
 
+class PGL22GOnChipRocketTestsConfig extends Config(
+  new PGL22GOnChipBaseConfig ++
+    new WithScratchpadsSize(startAddress = 0x80000000L, sizeKB = 64) ++ // use rocket l1 DCache scratchpad as base phys mem
+    // new WithBareCoreMarkBootROM(address = 0x80000000L, hang = 0x80000000L) ++
+    // new WithBareCoreMarkBootROM ++
+    new WithTestsBootROM ++
+    new WithTinyScratchpadsTinyCore ++ // single tiny rocket-core
+    new chipyard.config.AbstractConfig)
+
 class SimPGL22GOnChipRocketConfig extends PGL22GOnChipRocketConfig

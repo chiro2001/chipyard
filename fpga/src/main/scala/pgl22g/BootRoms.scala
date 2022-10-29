@@ -37,6 +37,19 @@ class WithVexRiscvBootROM extends Config((site, here, up) => {
   }
 })
 
+class WithTestsBootROM extends Config((site, here, up) => {
+  case BootROMLocated(x) => {
+    val baseDir = "./software/tests"
+    val bootrom = new File(s"$baseDir/start.rv${site(XLen)}.img")
+    val clean = s"make -C $baseDir clean"
+    require(clean.! == 0 && !bootrom.exists(), "Failed to clean bootrom!")
+    val make = s"make -C $baseDir"
+    require(make.! == 0 && bootrom.exists(), "Failed to build bootrom!")
+    up(BootROMLocated(x), site)
+      .map(_.copy(contentFileName = bootrom.getAbsolutePath))
+  }
+})
+
 class WithBareCoreMarkBootROM
 (address: BigInt = 0x10000,
  size: Int = 0x10000,

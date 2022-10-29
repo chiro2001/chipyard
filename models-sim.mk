@@ -102,6 +102,19 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip)
 	BOARD             ?= 
 	FPGA_BRAND        ?= 
 endif
+ifeq ($(SUB_PROJECT),pgl22g-onchip-rockect-test)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= PGL22GSimTestHarness
+	VLOG_MODEL        ?= PGL22GSimTestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
+	CONFIG            ?= PGL22GOnChipRocketTestsConfig
+	CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= TestDriver
+	TOP               ?= ChipTop
+	BOARD             ?= 
+	FPGA_BRAND        ?= 
+endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip-coremark)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GSimTestHarness
