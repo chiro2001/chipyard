@@ -46,7 +46,7 @@ class WithTestsBootROM extends Config((site, here, up) => {
     val make = s"make -C $baseDir"
     require(make.! == 0 && bootrom.exists(), "Failed to build bootrom!")
     up(BootROMLocated(x), site)
-      .map(_.copy(contentFileName = bootrom.getAbsolutePath))
+      .map(_.copy(contentFileName = bootrom.getAbsolutePath, hang = 0x10000))
   }
 })
 
