@@ -50,6 +50,32 @@ ifeq ($(SUB_PROJECT),default32-small)
 	BOARD 						?= 
 	FPGA_BRAND 				?= 
 endif
+ifeq ($(SUB_PROJECT),default-cva6)
+	SBT_PROJECT			 	?= chipyard
+	MODEL 						?= TestHarness
+	VLOG_MODEL 				?= TestHarness
+	MODEL_PACKAGE 		?= chipyard
+	CONFIG 						?= CVA6Config
+	CONFIG_PACKAGE 		?= chipyard
+	GENERATOR_PACKAGE ?= chipyard
+	TB 								?= TestDriver
+	TOP 							?= ChipTop
+	BOARD 						?= 
+	FPGA_BRAND 				?= 
+endif
+ifeq ($(SUB_PROJECT),default-cva6dmi)
+	SBT_PROJECT			 	?= chipyard
+	MODEL 						?= TestHarness
+	VLOG_MODEL 				?= TestHarness
+	MODEL_PACKAGE 		?= chipyard
+	CONFIG 						?= dmiCVA6Config
+	CONFIG_PACKAGE 		?= chipyard
+	GENERATOR_PACKAGE ?= chipyard
+	TB 								?= TestDriver
+	TOP 							?= ChipTop
+	BOARD 						?= 
+	FPGA_BRAND 				?= 
+endif
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GSimTestHarness
