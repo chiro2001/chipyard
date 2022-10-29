@@ -36,3 +36,20 @@ class WithVexRiscvBootROM extends Config((site, here, up) => {
       .map(_.copy(contentFileName = chipyardBootROM.getAbsolutePath))
   }
 })
+
+class WithBareCoreMarkBootROM
+(address: BigInt = 0x10000,
+ size: Int = 0x10000,
+ hang: BigInt = 0x10000, // The hang parameter is used as the power-on reset vector
+) extends Config((site, here, up) => {
+  case BootROMLocated(x) => {
+    val baseDir = "./software/coremark"
+    val binary = new File(s"$baseDir/overlay/coremark.bare.bin" + (if (site(XLen) != 32) "64" else ""))
+    val clean = s"make -C $baseDir clean"
+    require(clean.! == 0 && !binary.exists(), "Failed to clean coremark!")
+    val make = s"make -C $baseDir"
+    require(make.! == 0 && binary.exists(), "Failed to build coremark!")
+    up(BootROMLocated(x), site)
+      .map(_.copy(contentFileName = binary.getAbsolutePath, address = address, size = size, hang = hang))
+  }
+})

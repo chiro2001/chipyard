@@ -9,7 +9,7 @@ class WithScratchpadsSize(startAddress: Long = 0x80000000L, sizeKB: Int = 16) ex
     r.copy(
       core = r.core.copy(useVM = false),
       dcache = r.dcache.map(_.copy(
-        nSets = sizeKB * 16,  // how much?
+        nSets = sizeKB * 16,
         nWays = 1,
         scratch = Some(startAddress))))
   }
