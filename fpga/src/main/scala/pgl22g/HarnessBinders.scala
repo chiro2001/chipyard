@@ -68,9 +68,9 @@ class WithSPIFlashHarnessBinder extends OverrideHarnessBinder({
       case th: PGL22GTestHarnessSPIFlashImpl => {
         ports.map {
           case s: SPIChipIO =>
-            s.sck := th.qspi.sck
+            th.qspi.sck := s.sck
             require(s.cs.size == 1)
-            s.cs.head := th.qspi.cs
+            th.qspi.cs := s.cs.head
             require(s.dq.size == 4)
             s.dq.zip(th.qspi.dq).foreach(x => attach(x._1, x._2))
         }
