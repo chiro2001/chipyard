@@ -41,6 +41,7 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
     with PGL22GTestHarnessDDRImp
     with PGL22GTestHarnessUartImp {
   val pgl22gOuter = _outer
+  override val uart = _outer.io_uart_bb.bundle
   // is resetN
   val reset = IO(Input(Bool()))
   _outer.xdc.addPackagePin(reset, "L19")
@@ -81,5 +82,4 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
       ApplyHarnessBinders(this, d.lazySystem, d.portMap)
   }
   require(getRefClockFreq == p(DefaultClockFrequencyKey))
-  override val uart = _outer.io_uart_bb.bundle
 }

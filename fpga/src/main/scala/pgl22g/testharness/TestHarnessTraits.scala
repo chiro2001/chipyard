@@ -15,6 +15,8 @@ trait PGL22GTestHarnessUartImp {
   val uart: UARTPortIO
 }
 
+trait PGL22GTestHarnessUartTopClockImp extends PGL22GTestHarnessUartImp
+
 trait PGL22GTestHarnessDDRImp {
   val ddr: PGL22GMIGIODDRBase
   val ddrphy_rst_done: Bool

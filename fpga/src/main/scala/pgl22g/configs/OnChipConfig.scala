@@ -76,8 +76,8 @@ class PGL22GOnChipRocketTestsBaseConfig extends Config(
     new WithoutFPU ++
     new WithRV32 ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
-    new freechips.rocketchip.subsystem.WithNoMemPort ++ // remove offchip mem port
     new chipyard.harness.WithSimSerial ++
+    new WithUART ++
     new ModifiedAbstractConfig)
 
 class PGL22GOnChipRocketTestsConfig extends Config(
@@ -86,7 +86,7 @@ class PGL22GOnChipRocketTestsConfig extends Config(
 )
 
 class PGL22GOnChipRocketTestsSmallConfig extends Config(
-  new SimPGL22GOnChipRocketBaseConfig ++
+  new PGL22GOnChipRocketTestsBaseConfig ++
     new WithNSmallCores(1)
 )
 
