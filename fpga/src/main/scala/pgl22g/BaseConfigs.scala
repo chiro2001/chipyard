@@ -62,6 +62,6 @@ class BasePerfConfig extends Config(
     // new freechips.rocketchip.subsystem.WithNBanks(0) ++ // remove L2$
     // new freechips.rocketchip.subsystem.WithNoMemPort ++             // remove backing memory
     new WithPGL22GMemPort ++
-    new WithSystemModifications ++
+    new WithDDRPeripherals ++
     new freechips.rocketchip.subsystem.With1TinyCore ++ // single tiny rocket-core
     new ModifiedAbstractConfig)

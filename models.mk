@@ -7,7 +7,7 @@ ifeq ($(SUB_PROJECT),pgl22g)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -21,7 +21,7 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -35,12 +35,12 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv-sim)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= TestDriver
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
 
-ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-sim-test)
+ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GOnChipTestHarness
 	VLOG_MODEL        ?= PGL22GOnChipTestHarness
@@ -54,7 +54,7 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-sim-test)
 	FPGA_BRAND        ?= pango
 endif
 
-ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-sim-test-small)
+ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test-small)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GOnChipTestHarness
 	VLOG_MODEL        ?= PGL22GOnChipTestHarness
@@ -77,7 +77,7 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv2)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -91,7 +91,7 @@ ifeq ($(SUB_PROJECT),pgl22g-picorv)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -105,7 +105,7 @@ ifeq ($(SUB_PROJECT),pgl22g-ssrv)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -119,7 +119,7 @@ ifeq ($(SUB_PROJECT),pgl22g-bare)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -133,7 +133,7 @@ ifeq ($(SUB_PROJECT),pgl22g-tiny)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -147,7 +147,7 @@ ifeq ($(SUB_PROJECT),pgl22g-sodor)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -161,7 +161,7 @@ ifeq ($(SUB_PROJECT),pgl22g-sodor3)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -175,7 +175,7 @@ ifeq ($(SUB_PROJECT),pgl22g-sodoru)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -189,7 +189,7 @@ ifeq ($(SUB_PROJECT),pgl22g-perf)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
 endif
@@ -203,7 +203,7 @@ ifeq ($(SUB_PROJECT),pgl22g-xilinx)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= xilinx
 endif
@@ -217,7 +217,7 @@ ifeq ($(SUB_PROJECT),vcu118)
 	CONFIG_PACKAGE    ?= chipyard.fpga.vcu118
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= vcu118
 	FPGA_BRAND        ?= xilinx
 endif
@@ -231,7 +231,7 @@ ifeq ($(SUB_PROJECT),bringup)
 	CONFIG_PACKAGE    ?= chipyard.fpga.vcu118.bringup
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= vcu118
 	FPGA_BRAND        ?= xilinx
 endif
@@ -246,7 +246,7 @@ ifeq ($(SUB_PROJECT),arty)
 	CONFIG_PACKAGE    ?= chipyard.fpga.arty
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= none # unused
-	TOP               ?= ChipTop
+	TOP               ?= $(MODEL)
 	BOARD             ?= arty
 	FPGA_BRAND        ?= xilinx
 endif

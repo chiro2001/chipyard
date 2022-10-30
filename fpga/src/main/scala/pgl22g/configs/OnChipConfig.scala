@@ -72,17 +72,19 @@ class PGL22GOnChipRocketTestsBaseConfig extends Config(
     // new WithBareCoreMarkBootROM ++
     new WithTestsBootROM ++
     // new chipyard.config.WithNoDebug ++ // remove debug module
-    // new freechips.rocketchip.subsystem.WithoutTLMonitors ++
+    new freechips.rocketchip.subsystem.WithoutTLMonitors ++
+    new WithDefaultPeripherals ++
     new WithoutFPU ++
     new WithRV32 ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
     new chipyard.harness.WithSimSerial ++
     new WithUART ++
+    new WithSPIFlash ++
     new ModifiedAbstractConfig)
 
 class PGL22GOnChipRocketTestsConfig extends Config(
-  new WithTinyScratchpadsTinyCore ++ // single tiny rocket-core
-    new PGL22GOnChipRocketTestsBaseConfig
+  new PGL22GOnChipRocketTestsBaseConfig ++
+    new WithTinyScratchpadsTinyCore
 )
 
 class PGL22GOnChipRocketTestsSmallConfig extends Config(

@@ -27,14 +27,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
   // case VCU118ShellPMOD => "SDIO"
 })
 
-class WithSystemModifications extends Config((site, here, up) => {
-  // case BootROMLocated(x) => up(BootROMLocated(x), site).map { p =>
-  //   // invoke makefile for sdboot
-  //   val freqMHz = (site(DefaultClockFrequencyKey) * 1e6).toLong
-  //   val make = s"make -C fpga/src/main/resources/vcu118/sdboot PBUS_CLK=${freqMHz} bin"
-  //   require (make.! == 0, "Failed to build bootrom")
-  //   p.copy(hang = 0x10000, contentFileName = s"./fpga/src/main/resources/vcu118/sdboot/build/sdboot.bin")
-  // }
+class WithDDRPeripherals extends Config((site, here, up) => {
   case ExtMem => up(ExtMem, site).map(x => x.copy(master = x.master.copy(size = site(PGL22GDDRSize)))) // set extmem to DDR size
   case SerialTLKey => None // remove serialized tl port
 })

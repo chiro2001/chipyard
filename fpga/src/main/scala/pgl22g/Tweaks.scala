@@ -14,7 +14,7 @@ class WithPGL22GTweaks(freq: Double = 8) extends Config(
     // new WithSPIIOPassthrough ++
     new WithDefaultPeripherals ++
     new WithDefaultTimebase ++
-    new WithSystemModifications ++ // setup busses, use sdboot bootrom, setup ext. mem. size
+    new WithDDRPeripherals ++
     new chipyard.config.WithNoDebug ++ // remove debug module
     new freechips.rocketchip.subsystem.WithoutTLMonitors ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
@@ -35,7 +35,7 @@ class WithPGL22GPerfTweaks(freq: Double = 8) extends Config(
     // new WithUARTIOPassthrough ++
     // new WithSPIIOPassthrough ++
     new WithDefaultPeripherals ++
-    new WithSystemModifications ++ // setup busses, use sdboot bootrom, setup ext. mem. size
+    new WithDDRPeripherals ++
     new chipyard.config.WithNoDebug ++ // remove debug module
     new freechips.rocketchip.subsystem.WithoutTLMonitors ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++

@@ -16,6 +16,7 @@ import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
 import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, PGL22GMIGIODDRIO, ddr3_core}
 import testchipip.ClockedAndResetIO
 import pgl22g._
+import sifive.blocks.devices.spi.{PeripherySPIFlashKey, SPIFlashParams}
 
 
 /** * UART ** */
@@ -48,6 +49,13 @@ class WithUART extends OverrideHarnessBinder({
 //     } }
 //   }
 // })
+
+// default 128M bit = 16MB
+class WithSPIFlash(size: BigInt = 16 * 1024 * 1024) extends Config((site, here, up) => {
+  // Note: the default size matches freedom with the addresses below
+  case PeripherySPIFlashKey => Seq(
+    SPIFlashParams(rAddress = 0x10040000, fAddress = 0x20000000, fSize = size))
+})
 
 /** * Experimental DDR ** */
 class WithDDRMem extends OverrideHarnessBinder({
