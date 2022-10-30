@@ -26,3 +26,4 @@ env-esp-tools.sh
 /*.v
 /*.yaml
 /*.bin
+/tmp

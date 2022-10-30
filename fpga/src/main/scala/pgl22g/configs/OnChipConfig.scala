@@ -130,13 +130,7 @@ class SimPGL22GOnChipRocketSmallConfig extends Config(
 class PGL22GOnChipVexRiscvTestsConfig extends Config(
   new PGL22GOnChipRocketTestsBaseConfig ++
     // new WithPGL22GTweaks ++
-    new WithNVexRiscvCores(1) ++
-    // new WithPGL22GAXIMem ++
-    new WithoutFPU ++
-    new WithL2TLBs(0) ++
-    new WithL1ICacheSets(64 * 2) ++
-    new WithL1DCacheSets(64 * 2) ++
-    new WithScratchpadsSize(startAddress = 0x80000000L, sizeKB = 64) ++ // use rocket l1 DCache scratchpad as base phys mem
+    new WithNVexRiscvCores(1, onChipRAM = true) ++
     new WithNoMemPort ++
     new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig
