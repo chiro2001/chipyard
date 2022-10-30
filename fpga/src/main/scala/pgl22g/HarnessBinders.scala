@@ -1,22 +1,26 @@
 package pgl22g
 
+import Chisel.{Bool, Bundle, Data}
 import chipsalliance.rocketchip.config.{Config, Parameters}
 import chipyard.harness.OverrideHarnessBinder
+import chipyard.iobinders.JTAGChipIO
 import chipyard.{CanHaveMasterTLMemPort, HasHarnessSignalReferences}
 import chisel3._
-import chisel3.experimental.{Analog, BaseModule, DataMirror, Direction, attach}
-import chisel3.util.experimental.BoringUtils
+import chisel3.experimental.{BaseModule, DataMirror, Direction, attach}
 import chisel3.util.{DecoupledIO, IrrevocableIO, Queue}
 import freechips.rocketchip.amba.axi4.{AXI4Bundle, AXI4BundleParameters}
+import freechips.rocketchip.devices.debug.HasPeripheryDebug
+import freechips.rocketchip.jtag.JTAGIO
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink.TLBundle
 import freechips.rocketchip.util.HeterogeneousBag
-import pgl22g.testharness.{PGL22GTestHarnessDDRImp, PGL22GTestHarnessImp, PGL22GTestHarnessPerfUartImp, PGL22GTestHarnessUartImp, PGL22GTestHarnessUartTopClockImp}
-import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
-import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, PGL22GMIGIODDRIO, ddr3_core}
-import testchipip.ClockedAndResetIO
-import pgl22g._
+import pgl22g.testharness._
+import sifive.blocks.devices.pinctrl.{BasePin, Pin}
 import sifive.blocks.devices.spi.{PeripherySPIFlashKey, SPIFlashParams}
+import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
+import sifive.fpgashells.ip.pango.GTP_INBUFG
+import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, ddr3_core}
+import testchipip.ClockedAndResetIO
 
 
 /** * UART ** */
@@ -36,6 +40,20 @@ class WithUART extends OverrideHarnessBinder({
           th.uart <> ports.head
         }
       }
+    }
+  }
+})
+
+class WithJTAG extends OverrideHarnessBinder({
+  (system: HasPeripheryDebug, th: BaseModule with HasHarnessSignalReferences with PGL22GTestHarnessJtagImpl, ports: Seq[Data]) => {
+    ports.map {
+      case j: JTAGChipIO =>
+        j.TCK <> th.jtag.TCK
+        j.TMS <> th.jtag.TMS
+        j.TDI <> th.jtag.TDI
+        j.TDO <> th.jtag.TDO.data
+        th.jtag.TDO.driven := true.B
+        th.jtagResetN := th.jtag.srst_n
     }
   }
 })

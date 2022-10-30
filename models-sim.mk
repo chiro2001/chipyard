@@ -5,11 +5,6 @@ ifeq ($(SUB_PROJECT),default)
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= RocketConfig
 	CONFIG_PACKAGE 		?= chipyard
-	GENERATOR_PACKAGE ?= chipyard
-	TB 								?= TestDriver
-	TOP 							?= ChipTop
-	BOARD 						?= 
-	FPGA_BRAND 				?= 
 endif
 ifeq ($(SUB_PROJECT),default-tiny)
 	SBT_PROJECT			 	?= chipyard
@@ -18,11 +13,6 @@ ifeq ($(SUB_PROJECT),default-tiny)
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= TinyRocketConfig
 	CONFIG_PACKAGE 		?= chipyard
-	GENERATOR_PACKAGE ?= chipyard
-	TB 								?= TestDriver
-	TOP 							?= ChipTop
-	BOARD 						?= 
-	FPGA_BRAND 				?= 
 endif
 ifeq ($(SUB_PROJECT),default32)
 	SBT_PROJECT			 	?= fpga_platforms
@@ -31,11 +21,6 @@ ifeq ($(SUB_PROJECT),default32)
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= RocketBig32Config
 	CONFIG_PACKAGE 		?= chipyard.fpga.pgl22g
-	GENERATOR_PACKAGE ?= chipyard
-	TB 								?= TestDriver
-	TOP 							?= ChipTop
-	BOARD 						?= 
-	FPGA_BRAND 				?= 
 endif
 ifeq ($(SUB_PROJECT),default32-small)
 	SBT_PROJECT			 	?= fpga_platforms
@@ -44,11 +29,6 @@ ifeq ($(SUB_PROJECT),default32-small)
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= RocketSmall32Config
 	CONFIG_PACKAGE 		?= chipyard.fpga.pgl22g
-	GENERATOR_PACKAGE ?= chipyard
-	TB 								?= TestDriver
-	TOP 							?= ChipTop
-	BOARD 						?= 
-	FPGA_BRAND 				?= 
 endif
 ifeq ($(SUB_PROJECT),default-cva6)
 	SBT_PROJECT			 	?= chipyard
@@ -57,11 +37,6 @@ ifeq ($(SUB_PROJECT),default-cva6)
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= CVA6Config
 	CONFIG_PACKAGE 		?= chipyard
-	GENERATOR_PACKAGE ?= chipyard
-	TB 								?= TestDriver
-	TOP 							?= ChipTop
-	BOARD 						?= 
-	FPGA_BRAND 				?= 
 endif
 ifeq ($(SUB_PROJECT),default-cva6dmi)
 	SBT_PROJECT			 	?= chipyard
@@ -70,11 +45,6 @@ ifeq ($(SUB_PROJECT),default-cva6dmi)
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= dmiCVA6Config
 	CONFIG_PACKAGE 		?= chipyard
-	GENERATOR_PACKAGE ?= chipyard
-	TB 								?= TestDriver
-	TOP 							?= ChipTop
-	BOARD 						?= 
-	FPGA_BRAND 				?= 
 endif
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	SBT_PROJECT       ?= fpga_platforms
@@ -83,11 +53,6 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= SimPGL22GVexRiscvConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
 endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip)
 	SBT_PROJECT       ?= fpga_platforms
@@ -96,11 +61,6 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= SimPGL22GOnChipRocketConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
 endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip-small)
 	SBT_PROJECT       ?= fpga_platforms
@@ -109,11 +69,14 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-small)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= SimPGL22GOnChipRocketSmallConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
+endif
+ifeq ($(SUB_PROJECT),pgl22g-onchip-med)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= PGL22GSimTestHarness
+	VLOG_MODEL        ?= PGL22GSimTestHarness
+	MODEL_PACKAGE     ?= pgl22g.testharness
+	CONFIG            ?= SimPGL22GOnChipRocketMedConfig
+	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip-rockect-test)
 	SBT_PROJECT       ?= fpga_platforms
@@ -122,11 +85,6 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rockect-test)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= PGL22GOnChipRocketTestsConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
 endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip-coremark)
 	SBT_PROJECT       ?= fpga_platforms
@@ -135,11 +93,6 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-coremark)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= PGL22GOnChipRocketCoreMarkConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
 endif
 ifeq ($(SUB_PROJECT),pgl22g-ssrv)
 	SBT_PROJECT       ?= fpga_platforms
@@ -148,11 +101,6 @@ ifeq ($(SUB_PROJECT),pgl22g-ssrv)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= SimPGL22GSSRVConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
 endif
 ifeq ($(SUB_PROJECT),pgl22g-picorv)
 	SBT_PROJECT       ?= fpga_platforms
@@ -161,11 +109,6 @@ ifeq ($(SUB_PROJECT),pgl22g-picorv)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= SimPGL22GPicoRVConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
 endif
 ifeq ($(SUB_PROJECT),pgl22g)
 	SBT_PROJECT       ?= fpga_platforms
@@ -174,11 +117,6 @@ ifeq ($(SUB_PROJECT),pgl22g)
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= SimTinyRocketPGL22GConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
-	GENERATOR_PACKAGE ?= chipyard
-	TB                ?= TestDriver
-	TOP               ?= ChipTop
-	BOARD             ?= 
-	FPGA_BRAND        ?= 
 endif
 ifeq ($(SUB_PROJECT),sodor)
 	SBT_PROJECT			 	?= chipyard
@@ -187,9 +125,8 @@ ifeq ($(SUB_PROJECT),sodor)
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= Sodor5StageConfig
 	CONFIG_PACKAGE 		?= chipyard
-	GENERATOR_PACKAGE ?= chipyard
-	TB 								?= TestDriver
-	TOP 							?= ChipTop
-	BOARD 						?= 
-	FPGA_BRAND 				?= 
 endif
+
+GENERATOR_PACKAGE ?= chipyard
+TB ?= TestDriver
+TOP ?= ChipTop

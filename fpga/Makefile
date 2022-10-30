@@ -73,20 +73,12 @@ tcl_files: $(tcl_files_source)
 	cd $(build_dir) && sed -i 's/\%top\%/$(TOP)/g' *.tcl
 	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
 	cd $(build_dir) && sed -i 's#\%fpga_dir\%#$(fpga_dir)#g' *.tcl
+	cd $(build_dir) && sed -i 's#\%vsrc_mem\%#$(MEM)#g' *.tcl
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
 pds_ip_cores:
 	-rm -rf $(build_dir)/ipcores
 	-cp -r $(fpga_dir)/common/ipcores $(build_dir)
-
-# .PHONY: $(build_dir)/mem.v
-$(build_dir)/mem.v:
-	cp $(fpga_dir)/common/vsrc/mem.v $(build_dir)/mem.v
-$(build_dir)/mem_split.v:
-	cp $(fpga_dir)/common/vsrc/mem_split.v $(build_dir)/mem_split.v
-
-# $(build_dir)/FPGAStart.v: $(fpga_dir)/common/vsrc/FPGAStart.v
-# 	cp $(fpga_dir)/common/vsrc/FPGAStart.v $(build_dir)/FPGAStart.v
 
 ifneq ($(FPGA_BRAND),xilinx)
 synth_list_f_req := tcl_files

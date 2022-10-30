@@ -45,8 +45,8 @@ class PGL22GAXIFPGATestHarnessImp(_outer: PGL22GAXIFPGATestHarness) extends Lazy
 
   // is resetN
   val reset = IO(Input(Bool()))
-  _outer.xdc.addPackagePin(reset, "L19")
-  _outer.xdc.addIOStandard(reset, "LVCMOS12")
+  _outer.fdc.addPackagePin(reset, "L19")
+  _outer.fdc.addIOStandard(reset, "LVCMOS12")
 
   val resetIBUF = Module(new GTP_INBUF)
   resetIBUF.io.I := reset
@@ -167,8 +167,8 @@ class PGL22GFPGATestHarnessImp(_outer: PGL22GFPGATestHarness) extends LazyRawMod
 
   // is resetN
   val reset = IO(Input(Bool()))
-  _outer.xdc.addPackagePin(reset, "L19")
-  _outer.xdc.addIOStandard(reset, "LVCMOS12")
+  _outer.fdc.addPackagePin(reset, "L19")
+  _outer.fdc.addIOStandard(reset, "LVCMOS12")
 
   val resetIBUF = Module(new GTP_INBUF)
   resetIBUF.io.I := reset

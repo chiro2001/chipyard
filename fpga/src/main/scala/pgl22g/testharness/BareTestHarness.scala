@@ -44,8 +44,8 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
   override val uart = _outer.io_uart_bb.bundle
   // is resetN
   val reset = IO(Input(Bool()))
-  _outer.xdc.addPackagePin(reset, "L19")
-  _outer.xdc.addIOStandard(reset, "LVCMOS12")
+  _outer.fdc.addPackagePin(reset, "L19")
+  _outer.fdc.addIOStandard(reset, "LVCMOS12")
   val resetIBUF = Module(new GTP_INBUF)
   resetIBUF.io.I := reset
   val hardResetN = (resetIBUF.io.O).asBool

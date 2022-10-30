@@ -3,8 +3,8 @@ package pgl22g.testharness
 import chisel3._
 import sifive.blocks.devices.uart.UARTPortIO
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
+import sifive.fpgashells.shell.FlippedJTAGIO
 import sifive.fpgashells.shell.pango.PerfUARTIO
-import pgl22g._
 
 trait PGL22GTestHarnessPerfUartImp {
   val uart: PerfUARTIO
@@ -16,6 +16,11 @@ trait PGL22GTestHarnessUartImp {
 }
 
 trait PGL22GTestHarnessUartTopClockImp extends PGL22GTestHarnessUartImp
+
+trait PGL22GTestHarnessJtagImpl {
+  val jtag: FlippedJTAGIO
+  val jtagResetN: Bool
+}
 
 trait PGL22GTestHarnessDDRImp {
   val ddr: PGL22GMIGIODDRBase

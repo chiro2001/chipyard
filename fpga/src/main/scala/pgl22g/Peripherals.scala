@@ -1,6 +1,7 @@
 package pgl22g
 
 import chipsalliance.rocketchip.config.Config
+import freechips.rocketchip.devices.debug.{JtagDTMConfig, JtagDTMKey}
 import freechips.rocketchip.diplomacy.DTSTimebase
 import freechips.rocketchip.subsystem.ExtMem
 import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTParams}
@@ -36,3 +37,11 @@ class WithFPGAFrequency(fMHz: Double) extends Config(
   new chipyard.config.WithPeripheryBusFrequency(fMHz) ++ // assumes using PBUS as default freq.
     new chipyard.config.WithMemoryBusFrequency(fMHz)
 )
+
+class WithDebugPeripherals extends Config((site, here, up) => {
+  case JtagDTMKey => new JtagDTMConfig(
+    idcodeVersion = 2,
+    idcodePartNum = 0x000,
+    idcodeManufId = 0x489,
+    debugIdleCycles = 5)
+})
