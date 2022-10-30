@@ -16,11 +16,11 @@ import freechips.rocketchip.tilelink.TLBundle
 import freechips.rocketchip.util.HeterogeneousBag
 import pgl22g.testharness._
 import sifive.blocks.devices.pinctrl.{BasePin, Pin}
-import sifive.blocks.devices.spi.{HasPeripherySPIFlash, PeripherySPIFlashKey, SPIFlashParams}
+import sifive.blocks.devices.spi.{HasPeripherySPIFlash, HasPeripherySPIFlashModuleImp, PeripherySPIFlashKey, SPIFlashParams}
 import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
 import sifive.fpgashells.ip.pango.GTP_INBUFG
 import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, ddr3_core}
-import testchipip.{ClockedAndResetIO, SPIChipIO}
+import testchipip.{ClockedAndResetIO, SPIChipIO, SimSPIFlashModel}
 
 
 /** * UART ** */
@@ -39,6 +39,8 @@ class WithUARTHarnessBinder extends OverrideHarnessBinder({
         withClockAndReset(th.buildtopClock, th.buildtopReset) {
           th.uart <> ports.head
         }
+      }
+      case th: PGL22GSimTestHarnessImpl => {
       }
     }
   }
@@ -63,17 +65,16 @@ class WithJTAGHarnessBinder extends OverrideHarnessBinder({
 })
 
 class WithSPIFlashHarnessBinder extends OverrideHarnessBinder({
-  (system: HasPeripherySPIFlash, th: BaseModule with HasHarnessSignalReferences, ports: Seq[Data]) => {
+  (system: HasPeripherySPIFlashModuleImp, th: BaseModule with HasHarnessSignalReferences, ports: Seq[SPIChipIO]) => {
     th match {
       case th: PGL22GTestHarnessSPIFlashImpl => {
-        ports.map {
-          case s: SPIChipIO =>
-            th.qspi.sck := s.sck
-            require(s.cs.size == 1)
-            th.qspi.cs := s.cs.head
-            require(s.dq.size == 4)
-            s.dq.zip(th.qspi.dq).foreach(x => attach(x._1, x._2))
-        }
+        require(ports.size == 1)
+        val s = ports.head
+        th.qspi.sck := s.sck
+        require(s.cs.size == 1)
+        th.qspi.cs := s.cs.head
+        require(s.dq.size == 4)
+        s.dq.zip(th.qspi.dq).foreach(x => attach(x._1, x._2))
       }
       case th: PGL22GSimTestHarnessImpl => {
       }
