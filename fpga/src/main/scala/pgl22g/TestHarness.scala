@@ -14,9 +14,9 @@ import sifive.fpgashells.clocks._
 import sifive.fpgashells.ip.pango._
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.shell._
-import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GPerfShell, PGL22GShellBasicOverlays, ShellPangoUARTPortIO, UARTPGL22GShellPlacer, UARTPangoPlacedOverlay}
+import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GPerfShell, PGL22GShellBasicOverlays, PGL22GShellDDROverlays, PerfUARTIO, ShellPangoUARTPortIO, UARTPGL22GShellPlacer, UARTPangoPlacedOverlay}
 
-class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
+class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
 
   def dp = designParameters
 
@@ -91,7 +91,7 @@ class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GS
   override lazy val module = new PGL22GFPGATestHarnessImp(this)
 }
 
-class PGL22GAXIFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
+class PGL22GAXIFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
   def dp = designParameters
 
   val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
@@ -264,7 +264,7 @@ class PGL22GSimTestHarnessImpl(_outer: PGL22GSimTestHarness)
   buildtopReset := WireInit(refClkBundle.reset)
 }
 
-class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
+class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
   def dp = designParameters
 
   val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
@@ -286,20 +286,11 @@ class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GS
   override lazy val module = new PGL22GBareTestHarnessImp(this)
 }
 
-trait PGL22GTestHarnessDDRImp {
-  val ddr: PGL22GMIGIODDRBase
-  val ddrphy_rst_done: Bool
-  val ddrc_init_done: Bool
-  val pll_lock: Bool
-  val pll_clk_bus: Clock
-  val sysclk: Clock
-  val hardResetN: Bool
-}
-
 class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
   extends LazyRawModuleImp(_outer)
     with HasHarnessSignalReferences
-    with PGL22GTestHarnessDDRImp {
+    with PGL22GTestHarnessDDRImp
+    with PGL22GTestHarnessUartImp {
   val pgl22gOuter = _outer
   // is resetN
   val reset = IO(Input(Bool()))
@@ -341,9 +332,10 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
       ApplyHarnessBinders(this, d.lazySystem, d.portMap)
   }
   require(getRefClockFreq == p(DefaultClockFrequencyKey))
+  override val uart = _outer.io_uart_bb.bundle
 }
 
-class PGL22GTestHarness(override implicit val p: Parameters) extends PGL22GShellBasicOverlays {
+class PGL22GTestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
 
   def dp = designParameters
 
@@ -424,7 +416,10 @@ class PGL22GTestHarness(override implicit val p: Parameters) extends PGL22GShell
   override lazy val module = new PGL22GTestHarnessImp(this)
 }
 
-class PGL22GTestHarnessImp(_outer: PGL22GTestHarness) extends LazyRawModuleImp(_outer) with HasHarnessSignalReferences {
+class PGL22GTestHarnessImp(_outer: PGL22GTestHarness)
+  extends LazyRawModuleImp(_outer)
+    with HasHarnessSignalReferences
+    with PGL22GTestHarnessUartImp {
   val pgl22gOuter = _outer
   // is resetN
   val reset = IO(Input(Bool()))
@@ -458,12 +453,14 @@ class PGL22GTestHarnessImp(_outer: PGL22GTestHarness) extends LazyRawModuleImp(_
   // check the top-level reference clock is equal to the default
   // non-exhaustive since you need all ChipTop clocks to equal the default
   require(getRefClockFreq == p(DefaultClockFrequencyKey))
+  override val uart = _outer.io_uart_bb.bundle
 }
 
 class PGL22GPerfTestHarness(override implicit val p: Parameters)
   extends PGL22GPerfShell
     with HasHarnessSignalReferences
-    with PGL22GTestHarnessDDRImp {
+    with PGL22GTestHarnessDDRImp
+    with PGL22GTestHarnessPerfUartImp {
   val lazyDut = LazyModule(p(BuildTop)(p)).suggestName("chiptop")
 
   val sysclk = Wire(Clock())

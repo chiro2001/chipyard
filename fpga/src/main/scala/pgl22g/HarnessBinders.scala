@@ -14,28 +14,24 @@ import freechips.rocketchip.util.HeterogeneousBag
 import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
 import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, PGL22GMIGIODDRIO, ddr3_core}
 import testchipip.ClockedAndResetIO
-// import chipyard.fpga.pgl22g.{PGL22GTestHarnessImp => UseTestHarnessImp}
-import chipyard.fpga.pgl22g.{PGL22GBareTestHarnessImp => UseTestHarnessImp}
 
 
 /** * UART ** */
 class WithUART extends OverrideHarnessBinder({
   (system: HasPeripheryUARTModuleImp, th: BaseModule with HasHarnessSignalReferences, ports: Seq[UARTPortIO]) => {
     th match {
-      case pgl22gth: UseTestHarnessImp => {
-        pgl22gth.pgl22gOuter.io_uart_bb.bundle <> ports.head
+      case th: PGL22GTestHarnessUartImp => {
+        th.uart <> ports.head
+      }
+      case th: PGL22GTestHarnessPerfUartImp => {
+        withClockAndReset(th.sys_clock, th.buildtopReset) {
+          th.uart <> ports.head
+        }
       }
     }
   }
 })
 
-class WithPerfUART extends OverrideHarnessBinder({
-  (system: HasPeripheryUARTModuleImp, th: PGL22GPerfTestHarness with HasHarnessSignalReferences, ports: Seq[UARTPortIO]) => {
-    withClockAndReset(th.sys_clock, th.buildtopReset) {
-      th.uart <> ports.head
-    }
-  }
-})
 //
 // /*** SPI ***/
 // class WithSPISDCard extends OverrideHarnessBinder({

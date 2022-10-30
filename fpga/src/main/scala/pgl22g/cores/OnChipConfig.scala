@@ -85,8 +85,8 @@ class PGL22GOnChipRocketTestsConfig extends Config(
 )
 
 class PGL22GOnChipRocketTestsSmallConfig extends Config(
-  new WithNSmallCores(1) ++
-    new SimPGL22GOnChipRocketBaseConfig
+  new SimPGL22GOnChipRocketBaseConfig ++
+    new WithNSmallCores(1)
 )
 
 class SimPGL22GOnChipRocketBaseConfig extends Config(

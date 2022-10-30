@@ -28,7 +28,7 @@ class WithPGL22GTweaks(freq: Double = 8) extends Config(
 
 class WithPGL22GPerfTweaks(freq: Double = 8) extends Config(
   // harness binders
-  new WithPerfUART ++
+  new WithUART ++
     // new WithSPISDCard ++
     // io binders
     // new WithUARTIOPassthrough ++
