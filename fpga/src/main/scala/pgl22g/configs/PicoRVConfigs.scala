@@ -1,8 +1,9 @@
-package chipyard.fpga.pgl22g
+package pgl22g.configs
 
 import chipsalliance.rocketchip.config.Config
 import chipyard.config.WithL2TLBs
 import freechips.rocketchip.subsystem.{WithBufferlessBroadcastHub, WithL1DCacheSets, WithL1ICacheSets, WithNMemoryChannels, WithoutFPU}
+import pgl22g._
 
 class PGL22GPicoRVConfig extends Config(
   new picorv.WithNPicoRVCores(1) ++

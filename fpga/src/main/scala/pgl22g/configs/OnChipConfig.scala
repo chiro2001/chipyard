@@ -1,4 +1,4 @@
-package chipyard.fpga.pgl22g
+package pgl22g.configs
 
 import chipsalliance.rocketchip.config.Config
 import chipyard.config.{WithL2TLBs, WithSerialTLBackingMemory}
@@ -6,6 +6,7 @@ import freechips.rocketchip.diplomacy.SynchronousCrossing
 import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
 import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithNSmallCores, WithRV32, WithoutFPU}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
+import pgl22g._
 
 class WithTinyScratchpadsTinyCore extends Config((site, here, up) => {
   case XLen => 32

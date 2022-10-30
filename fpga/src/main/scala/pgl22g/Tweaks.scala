@@ -1,8 +1,9 @@
-package chipyard.fpga.pgl22g
+package pgl22g
 
 import chipsalliance.rocketchip.config.Config
 import chipyard.config.WithL2TLBs
 import freechips.rocketchip.subsystem.{WithL1DCacheSets, WithL1ICacheSets, WithRV32, WithoutFPU}
+import pgl22g._
 
 class WithPGL22GTweaks(freq: Double = 8) extends Config(
   // harness binders

@@ -1,6 +1,7 @@
-package chipyard.fpga.pgl22g
+package pgl22g
 
 import chipsalliance.rocketchip.config.Config
+import pgl22g._
 
 class ModifiedAbstractConfig extends Config(
   // The HarnessBinders control generation of hardware in the TestHarness

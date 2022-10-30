@@ -1,9 +1,10 @@
-package chipyard.fpga.pgl22g
+package pgl22g.testharness
 
 import chisel3._
 import sifive.blocks.devices.uart.UARTPortIO
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.shell.pango.PerfUARTIO
+import pgl22g._
 
 trait PGL22GTestHarnessPerfUartImp {
   val uart: PerfUARTIO

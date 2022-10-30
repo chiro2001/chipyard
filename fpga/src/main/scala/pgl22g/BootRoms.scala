@@ -1,4 +1,4 @@
-package chipyard.fpga.pgl22g
+package pgl22g
 
 import chipsalliance.rocketchip.config.Config
 import freechips.rocketchip.devices.tilelink.BootROMLocated
@@ -6,6 +6,7 @@ import freechips.rocketchip.tile.XLen
 
 import sys.process._
 import java.io.File
+import pgl22g._
 
 class WithoutBootROM extends Config((site, here, up) => {
   case BootROMLocated(x) => None

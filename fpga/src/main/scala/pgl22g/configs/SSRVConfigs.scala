@@ -1,9 +1,10 @@
-package chipyard.fpga.pgl22g
+package pgl22g.configs
 
 import chipsalliance.rocketchip.config.Config
 import chipyard.config.WithL2TLBs
 import freechips.rocketchip.subsystem.{WithBufferlessBroadcastHub, WithL1DCacheSets, WithL1ICacheSets, WithNMemoryChannels, WithoutFPU}
 import ssrv.WithNSSRVCores
+import pgl22g._
 
 class PGL22GSSRVConfig extends Config(
   new ssrv.WithNSSRVCores(1) ++

@@ -1,4 +1,4 @@
-package chipyard.fpga.pgl22g
+package pgl22g
 
 import chipsalliance.rocketchip.config.{Config, Parameters}
 import chipyard.harness.OverrideHarnessBinder
@@ -11,9 +11,11 @@ import freechips.rocketchip.amba.axi4.{AXI4Bundle, AXI4BundleParameters}
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink.TLBundle
 import freechips.rocketchip.util.HeterogeneousBag
+import pgl22g.testharness.{PGL22GTestHarnessDDRImp, PGL22GTestHarnessImp, PGL22GTestHarnessPerfUartImp, PGL22GTestHarnessUartImp}
 import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
 import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, PGL22GMIGIODDRIO, ddr3_core}
 import testchipip.ClockedAndResetIO
+import pgl22g._
 
 
 /** * UART ** */

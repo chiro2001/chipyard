@@ -1,4 +1,4 @@
-package chipyard.fpga.pgl22g
+package pgl22g
 
 import chipyard.CanHaveMasterTLMemPort
 import chisel3._
@@ -10,6 +10,7 @@ import freechips.rocketchip.amba.axi4.AXI4Bundle
 import freechips.rocketchip.subsystem.CanHaveMasterAXI4MemPort
 import freechips.rocketchip.tilelink.TLBundle
 import sifive.blocks.devices.uart.HasPeripheryUARTModuleImp
+import pgl22g._
 
 class WithDebugResetPassthrough extends ComposeIOBinder({
   (system: HasPeripheryDebugModuleImp) => {

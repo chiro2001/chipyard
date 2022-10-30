@@ -1,4 +1,4 @@
-package chipyard.fpga.pgl22g
+package pgl22g.testharness
 
 import chipyard._
 import chipyard.harness.ApplyHarnessBinders
@@ -14,7 +14,8 @@ import sifive.fpgashells.clocks._
 import sifive.fpgashells.ip.pango._
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.shell._
-import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GPerfShell, PGL22GShellBasicOverlays, PGL22GShellDDROverlays, PerfUARTIO, ShellPangoUARTPortIO, UARTPGL22GShellPlacer, UARTPangoPlacedOverlay}
+import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GPerfShell, PGL22GShellDDROverlays}
+import pgl22g._
 
 class PGL22GFPGATestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
 

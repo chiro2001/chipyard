@@ -1,4 +1,4 @@
-package chipyard.fpga.pgl22g
+package pgl22g
 
 import chipsalliance.rocketchip.config.Config
 import freechips.rocketchip.diplomacy.DTSTimebase
@@ -6,6 +6,7 @@ import freechips.rocketchip.subsystem.ExtMem
 import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTParams}
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
 import testchipip.SerialTLKey
+import pgl22g._
 
 class WithDefaultTimebase extends Config((site, here, up) => {
   case DTSTimebase => BigInt(1e6.toLong)
