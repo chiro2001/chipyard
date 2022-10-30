@@ -42,7 +42,6 @@ class PGL22GOnChipTestHarnessImp(_outer: PGL22GOnChipTestHarness)
     with PGL22GTestHarnessJtagImpl {
   val pgl22gOuter = _outer
   override val uart = _outer.io_uart_bb.bundle
-  // override val jtag = _outer.io_jtag.bundle
   override val jtag = IO(new FlippedJTAGIO)
   override val jtagResetN = WireInit(true.B)
   // is resetN

@@ -45,15 +45,22 @@ class WithUART extends OverrideHarnessBinder({
 })
 
 class WithJTAG extends OverrideHarnessBinder({
-  (system: HasPeripheryDebug, th: BaseModule with HasHarnessSignalReferences with PGL22GTestHarnessJtagImpl, ports: Seq[Data]) => {
-    ports.map {
-      case j: JTAGChipIO =>
-        j.TCK <> th.jtag.TCK
-        j.TMS <> th.jtag.TMS
-        j.TDI <> th.jtag.TDI
-        j.TDO <> th.jtag.TDO.data
-        th.jtag.TDO.driven := true.B
-        th.jtagResetN := th.jtag.srst_n
+  (system: HasPeripheryDebug, th: BaseModule with HasHarnessSignalReferences, ports: Seq[Data]) => {
+    th match {
+      case th: PGL22GTestHarnessJtagImpl => {
+        ports.map {
+          case j: JTAGChipIO =>
+            j.TCK <> th.jtag.TCK
+            j.TMS <> th.jtag.TMS
+            j.TDI <> th.jtag.TDI
+            j.TDO <> th.jtag.TDO.data
+            th.jtag.TDO.driven := true.B
+            th.jtagResetN := th.jtag.srst_n
+        }
+      }
+      case th: PGL22GSimTestHarnessImpl => {
+
+      }
     }
   }
 })

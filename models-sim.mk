@@ -78,7 +78,7 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-med)
 	CONFIG            ?= SimPGL22GOnChipRocketMedConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
-ifeq ($(SUB_PROJECT),pgl22g-onchip-rockect-test)
+ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GSimTestHarness
 	VLOG_MODEL        ?= PGL22GSimTestHarness

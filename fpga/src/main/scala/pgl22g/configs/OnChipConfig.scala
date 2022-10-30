@@ -4,7 +4,7 @@ import chipsalliance.rocketchip.config.Config
 import chipyard.config.{WithL2TLBs, WithSerialTLBackingMemory}
 import freechips.rocketchip.diplomacy.SynchronousCrossing
 import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
-import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithNSmallCores, WithRV32, WithoutFPU}
+import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithNMedCores, WithNSmallCores, WithRV32, WithoutFPU}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import pgl22g._
 
@@ -92,6 +92,11 @@ class PGL22GOnChipRocketTestsConfig extends Config(
 class PGL22GOnChipRocketTestsSmallConfig extends Config(
   new PGL22GOnChipRocketTestsBaseConfig ++
     new WithNSmallCores(1)
+)
+
+class PGL22GOnChipRocketTestsMedConfig extends Config(
+  new PGL22GOnChipRocketTestsBaseConfig ++
+    new WithNMedCores(1)
 )
 
 class SimPGL22GOnChipRocketBaseConfig extends Config(

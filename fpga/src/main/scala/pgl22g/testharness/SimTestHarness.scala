@@ -7,7 +7,7 @@ import chipyard.iobinders.HasIOBinders
 import chisel3._
 import freechips.rocketchip.diplomacy.{LazyModule, LazyRawModuleImp}
 import freechips.rocketchip.prci.{ClockBundle, ClockBundleParameters}
-import sifive.fpgashells.shell.{IOShell, SDC}
+import sifive.fpgashells.shell.{FlippedJTAGIO, IOShell, SDC}
 
 class PGL22GSimShell(implicit p: Parameters) extends IOShell {
   val sdc = new SDC("shell.sdc")
