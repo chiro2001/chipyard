@@ -1,13 +1,13 @@
 package pgl22g.configs
 
 import chipsalliance.rocketchip.config.Config
-import chipyard.config.{WithL2TLBs, WithSerialTLBackingMemory}
 import freechips.rocketchip.diplomacy.SynchronousCrossing
 import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
-import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithBufferlessBroadcastHub, WithL1DCacheSets, WithL1ICacheSets, WithNMedCores, WithNMemoryChannels, WithNSmallCores, WithNoMemPort, WithRV32, WithoutFPU}
+import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import pgl22g._
-import vexriscv.chipyard.WithNVexRiscvCores
+import pgl22g.onchip.WithOnChipSystem
+import vexriscv.chipyard.{WithCoreInternalJTAGDebug, WithNVexRiscvCores}
 
 class WithTinyScratchpadsTinyCore extends Config((site, here, up) => {
   case XLen => 32
@@ -128,11 +128,15 @@ class SimPGL22GOnChipRocketSmallConfig extends Config(
 )
 
 class PGL22GOnChipVexRiscvTestsConfig extends Config(
-  new PGL22GOnChipRocketTestsBaseConfig ++
-    // new WithPGL22GTweaks ++
-    new WithNVexRiscvCores(1, onChipRAM = true) ++
-    new WithNoMemPort ++
-    new WithBufferlessBroadcastHub ++
-    new ModifiedAbstractConfig
+  // new PGL22GOnChipRocketTestsBaseConfig ++
+  //   // new WithPGL22GTweaks ++
+  //   new WithNVexRiscvCores(1, onChipRAM = true) ++
+  //   new WithNoMemPort ++
+  //   new WithBufferlessBroadcastHub ++
+  //   new ModifiedAbstractConfig
+  new WithNVexRiscvCores(1, onChipRAM = true) ++
+    new WithCoreInternalJTAGDebug ++
+    new WithOnChipSystem ++
+    new PGL22GOnChipRocketTestsBaseConfig
 )
 

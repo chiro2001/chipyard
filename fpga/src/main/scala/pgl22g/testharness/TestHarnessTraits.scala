@@ -5,6 +5,7 @@ import chisel3._
 import sifive.blocks.devices.uart.UARTPortIO
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.shell.pango.{PerfUARTIO, SPIFlashIO}
+import vexriscv.chipyard.VexJTAGChipIO
 
 trait PGL22GTestHarnessPerfUartImp {
   val uart: PerfUARTIO
@@ -19,6 +20,10 @@ trait PGL22GTestHarnessUartTopClockImp extends PGL22GTestHarnessUartImp
 
 trait PGL22GTestHarnessJtagImpl {
   val jtag: JTAGChipIO
+}
+
+trait PGL22GTestHarnessVexJtagImpl {
+  val jtag: VexJTAGChipIO
 }
 
 trait PGL22GTestHarnessDDRImp {

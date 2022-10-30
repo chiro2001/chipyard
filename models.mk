@@ -236,8 +236,8 @@ ifeq ($(SUB_PROJECT),arty)
 endif
 
 SBT_PROJECT ?= fpga_platforms
-TB  ?= none # unused
-TOP ?= $(MODEL)
+TB ?= none # unused
+# TOP ?= $(MODEL)
 SYN_TOP ?= $(TOP)
 MEM ?= mem.v
 CONSTRAINTS ?= ddr

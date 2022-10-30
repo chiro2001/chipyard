@@ -6,14 +6,12 @@ import chipyard.iobinders.{HasIOBinders, JTAGChipIO}
 import chipyard.{BuildTop, DefaultClockFrequencyKey, HasHarnessSignalReferences}
 import chisel3._
 import freechips.rocketchip.diplomacy.{BundleBridgeSource, LazyModule, LazyRawModuleImp}
-import freechips.rocketchip.jtag.JTAGIO
 import shell.pango.PGL22GOnChipShell
 import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTPortIO}
-import sifive.fpgashells.clocks.{ClockGroup, ClockSinkNode, PLLFactoryKey, PLLNode, ResetWrangler}
-import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
+import sifive.fpgashells.clocks.{ClockGroup, ClockSinkNode, PLLFactoryKey, ResetWrangler}
 import sifive.fpgashells.ip.pango.{GTP_INBUF, PowerOnResetFPGAOnly}
-import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellDDROverlays, SPIFlashIO}
-import sifive.fpgashells.shell.{ClockInputDesignInput, ClockInputOverlayKey, FlippedJTAGIO, JTAGDebugDesignInput, JTAGDebugOverlayKey, JTAGDebugShellInput, UARTDesignInput, UARTOverlayKey}
+import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, SPIFlashIO}
+import sifive.fpgashells.shell.{ClockInputDesignInput, ClockInputOverlayKey, UARTDesignInput, UARTOverlayKey}
 
 class PGL22GOnChipTestHarness(override implicit val p: Parameters) extends PGL22GOnChipShell {
   def dp = designParameters
