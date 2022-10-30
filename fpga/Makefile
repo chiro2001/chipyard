@@ -70,7 +70,7 @@ tcl_files: $(tcl_files_source)
 	mkdir -p $(build_dir)
 	cp $(fpga_common_script_dir)/*.tcl $(build_dir)/
 	cp $(fpga_dir)/$(BOARD)/tcl/*.tcl $(build_dir)/
-	cd $(build_dir) && sed -i 's/\%top\%/$(TOP)/g' *.tcl
+	cd $(build_dir) && sed -i 's/\%top\%/$(SYN_TOP)/g' *.tcl
 	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
 	cd $(build_dir) && sed -i 's#\%fpga_dir\%#$(fpga_dir)#g' *.tcl
 	cd $(build_dir) && sed -i 's#\%vsrc_mem\%#$(MEM)#g' *.tcl

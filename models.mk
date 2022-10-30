@@ -83,9 +83,23 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv2)
 	CONFIG            ?= PGL22GVexRiscv2Config
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
-	
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
+endif
+
+ifeq ($(SUB_PROJECT),pgl22g-onchip-vexriscv-test)
+	MODEL             ?= PGL22GOnChipTestHarness
+	VLOG_MODEL        ?= PGL22GOnChipTestHarness
+	MODEL_PACKAGE     ?= pgl22g.testharness
+	CONFIG            ?= PGL22GOnChipVexRiscvTestsConfig
+	CONFIG_PACKAGE    ?= pgl22g.configs
+	GENERATOR_PACKAGE ?= chipyard
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= pango
+	TOP								?= ChipTop
+	SYN_TOP						?= PGL22GOnChipTestHarness
+	MEM								?= mem_onchip.v
+	CONSTRAINTS	 			?= onchip
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-picorv)

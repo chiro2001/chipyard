@@ -4,9 +4,10 @@ import chipsalliance.rocketchip.config.Config
 import chipyard.config.{WithL2TLBs, WithSerialTLBackingMemory}
 import freechips.rocketchip.diplomacy.SynchronousCrossing
 import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
-import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithNMedCores, WithNSmallCores, WithRV32, WithoutFPU}
+import freechips.rocketchip.subsystem.{CacheBlockBytes, RocketCrossingKey, RocketCrossingParams, RocketTilesKey, SystemBusKey, TileMasterPortParams, WithBufferlessBroadcastHub, WithL1DCacheSets, WithL1ICacheSets, WithNMedCores, WithNMemoryChannels, WithNSmallCores, WithNoMemPort, WithRV32, WithoutFPU}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import pgl22g._
+import vexriscv.chipyard.WithNVexRiscvCores
 
 class WithTinyScratchpadsTinyCore extends Config((site, here, up) => {
   case XLen => 32
@@ -125,3 +126,19 @@ class SimPGL22GOnChipRocketSmallConfig extends Config(
     new freechips.rocketchip.subsystem.WithNBigCores(1) ++
     new chipyard.config.AbstractConfig
 )
+
+class PGL22GOnChipVexRiscvTestsConfig extends Config(
+  new PGL22GOnChipRocketTestsBaseConfig ++
+    // new WithPGL22GTweaks ++
+    new WithNVexRiscvCores(1) ++
+    // new WithPGL22GAXIMem ++
+    new WithoutFPU ++
+    new WithL2TLBs(0) ++
+    new WithL1ICacheSets(64 * 2) ++
+    new WithL1DCacheSets(64 * 2) ++
+    new WithScratchpadsSize(startAddress = 0x80000000L, sizeKB = 64) ++ // use rocket l1 DCache scratchpad as base phys mem
+    new WithNoMemPort ++
+    new WithBufferlessBroadcastHub ++
+    new ModifiedAbstractConfig
+)
+

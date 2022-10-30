@@ -62,7 +62,7 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip)
 	CONFIG            ?= SimPGL22GOnChipRocketConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
-ifeq ($(SUB_PROJECT),pgl22g-onchip-small)
+ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-sim-small)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GSimTestHarness
 	VLOG_MODEL        ?= PGL22GSimTestHarness
@@ -70,12 +70,12 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-small)
 	CONFIG            ?= SimPGL22GOnChipRocketSmallConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
-ifeq ($(SUB_PROJECT),pgl22g-onchip-med)
+ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test-med)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GSimTestHarness
 	VLOG_MODEL        ?= PGL22GSimTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
-	CONFIG            ?= SimPGL22GOnChipRocketMedConfig
+	CONFIG            ?= PGL22GOnChipRocketTestsMedConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test)
@@ -84,6 +84,14 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test)
 	VLOG_MODEL        ?= PGL22GSimTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= PGL22GOnChipRocketTestsConfig
+	CONFIG_PACKAGE    ?= pgl22g.configs
+endif
+ifeq ($(SUB_PROJECT),pgl22g-onchip-vexriscv-test)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= PGL22GSimTestHarness
+	VLOG_MODEL        ?= PGL22GSimTestHarness
+	MODEL_PACKAGE     ?= pgl22g.testharness
+	CONFIG            ?= PGL22GOnChipVexRiscvTestsConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip-coremark)
