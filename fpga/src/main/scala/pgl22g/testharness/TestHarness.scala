@@ -1,14 +1,18 @@
 package pgl22g.testharness
 
 import chipyard._
+import chipyard.harness.ApplyHarnessBinders
+import chipyard.iobinders.HasIOBinders
+import chisel3._
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
 import shell.pango.{DDRDesignInputSysClk, DDROverlayKeySysClk}
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.clocks._
+import sifive.fpgashells.ip.pango.{GTP_INBUF, PowerOnResetFPGAOnly}
 import sifive.fpgashells.shell._
-import sifive.fpgashells.shell.pango.PGL22GShellDDROverlays
+import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellDDROverlays}
 
 class PGL22GTestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
 
@@ -89,4 +93,44 @@ class PGL22GTestHarness(override implicit val p: Parameters) extends PGL22GShell
 
   // module implementation
   override lazy val module = new PGL22GTestHarnessImp(this)
+}
+
+class PGL22GTestHarnessImp(_outer: PGL22GTestHarness)
+  extends LazyRawModuleImp(_outer)
+    with HasHarnessSignalReferences
+    with PGL22GTestHarnessUartImp {
+  val pgl22gOuter = _outer
+  // is resetN
+  val reset = IO(Input(Bool()))
+  _outer.xdc.addPackagePin(reset, "L19")
+  _outer.xdc.addIOStandard(reset, "LVCMOS12")
+  val resetIBUF = Module(new GTP_INBUF)
+  resetIBUF.io.I := reset
+  val sysclk: Clock = _outer.sysClkNode.out.head._1.clock
+  val powerOnReset: Bool = PowerOnResetFPGAOnly(sysclk)
+  _outer.sdc.addAsyncPath(Seq(powerOnReset))
+  val ereset: Bool = _outer.chiplink.get() match {
+    case Some(x: ChipLinkPGL22GPlacedOverlay) => !x.ereset_n
+    case _ => false.B
+  }
+  // used for
+  _outer.pllReset := ((!resetIBUF.io.O) || powerOnReset || ereset)
+  // reset setup
+  val hReset = Wire(Reset())
+  hReset := _outer.dutClock.in.head._1.reset
+  val buildtopClock = _outer.dutClock.in.head._1.clock
+  val buildtopReset = WireInit(hReset)
+  val dutReset = hReset.asAsyncReset
+  val success = WireInit(false.B)
+  childClock := buildtopClock
+  childReset := buildtopReset
+  // harness binders are non-lazy
+  _outer.topDesign match {
+    case d: HasIOBinders =>
+      ApplyHarnessBinders(this, d.lazySystem, d.portMap)
+  }
+  // check the top-level reference clock is equal to the default
+  // non-exhaustive since you need all ChipTop clocks to equal the default
+  require(getRefClockFreq == p(DefaultClockFrequencyKey))
+  override val uart = _outer.io_uart_bb.bundle
 }

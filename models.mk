@@ -42,8 +42,8 @@ endif
 
 ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-sim-test)
 	SBT_PROJECT       ?= fpga_platforms
-	MODEL             ?= PGL22GSimTestHarness
-	VLOG_MODEL        ?= PGL22GSimTestHarness
+	MODEL             ?= PGL22GOnChipTestHarness
+	VLOG_MODEL        ?= PGL22GOnChipTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= PGL22GOnChipRocketTestsConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
@@ -56,8 +56,8 @@ endif
 
 ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-sim-test-small)
 	SBT_PROJECT       ?= fpga_platforms
-	MODEL             ?= PGL22GSimTestHarness
-	VLOG_MODEL        ?= PGL22GSimTestHarness
+	MODEL             ?= PGL22GOnChipTestHarness
+	VLOG_MODEL        ?= PGL22GOnChipTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= PGL22GOnChipRocketTestsSmallConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
