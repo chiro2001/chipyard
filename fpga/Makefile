@@ -74,6 +74,7 @@ tcl_files: $(tcl_files_source)
 	cd $(build_dir) && sed -i 's/\%long_name\%/$(long_name)/g' *.tcl
 	cd $(build_dir) && sed -i 's#\%fpga_dir\%#$(fpga_dir)#g' *.tcl
 	cd $(build_dir) && sed -i 's#\%vsrc_mem\%#$(MEM)#g' *.tcl
+	cd $(build_dir) && sed -i 's#\%constraints\%#$(CONSTRAINTS)#g' *.tcl
 fdc_files:
 	cp $(fpga_dir)/$(BOARD)/constraints/*.fdc $(build_dir)
 pds_ip_cores:

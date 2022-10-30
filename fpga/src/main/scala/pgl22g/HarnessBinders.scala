@@ -53,13 +53,10 @@ class WithJTAG extends OverrideHarnessBinder({
             j.TCK <> th.jtag.TCK
             j.TMS <> th.jtag.TMS
             j.TDI <> th.jtag.TDI
-            j.TDO <> th.jtag.TDO.data
-            th.jtag.TDO.driven := true.B
-            th.jtagResetN := th.jtag.srst_n
+            j.TDO <> th.jtag.TDO
         }
       }
       case th: PGL22GSimTestHarnessImpl => {
-
       }
     }
   }

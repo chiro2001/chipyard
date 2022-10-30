@@ -2,7 +2,7 @@ package pgl22g.testharness
 
 import chipsalliance.rocketchip.config.Parameters
 import chipyard.harness.ApplyHarnessBinders
-import chipyard.iobinders.HasIOBinders
+import chipyard.iobinders.{HasIOBinders, JTAGChipIO}
 import chipyard.{BuildTop, DefaultClockFrequencyKey, HasHarnessSignalReferences}
 import chisel3._
 import freechips.rocketchip.diplomacy.{BundleBridgeSource, LazyModule, LazyRawModuleImp}
@@ -30,8 +30,6 @@ class PGL22GOnChipTestHarness(override implicit val p: Parameters) extends PGL22
   dutClock := dutWrangler.node := dutGroup := migUIClock
   val io_uart_bb = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
   dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
-  // val io_jtag = BundleBridgeSource(() => (new FlippedJTAGIO))
-  // dp(JTAGDebugOverlayKey).head.place(JTAGDebugDesignInput())
   override lazy val module = new PGL22GOnChipTestHarnessImp(this)
 }
 
@@ -42,8 +40,7 @@ class PGL22GOnChipTestHarnessImp(_outer: PGL22GOnChipTestHarness)
     with PGL22GTestHarnessJtagImpl {
   val pgl22gOuter = _outer
   override val uart = _outer.io_uart_bb.bundle
-  override val jtag = IO(new FlippedJTAGIO)
-  override val jtagResetN = WireInit(true.B)
+  override val jtag = IO(new JTAGChipIO)
   // is resetN
   val reset = IO(Input(Bool()))
   _outer.fdc.addPackagePin(reset, "L19")

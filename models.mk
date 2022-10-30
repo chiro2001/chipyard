@@ -42,7 +42,7 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test)
 	FPGA_BRAND        ?= pango
 	TOP								?= ChipTop
 	SYN_TOP						?= PGL22GOnChipTestHarness
-	mem								?= mem_onchip.v
+	MEM								?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
 
