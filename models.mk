@@ -40,7 +40,9 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test)
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
-	MEM 							?= mem_onchip.v
+	TOP								?= ChipTop
+	SYN_TOP						?= PGL22GOnChipTestHarness
+	mem								?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
 
@@ -53,6 +55,8 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test-small)
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
+	TOP								?= ChipTop
+	SYN_TOP						?= PGL22GOnChipTestHarness
 	MEM 							?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
@@ -66,6 +70,8 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test-med)
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
+	TOP								?= ChipTop
+	SYN_TOP						?= PGL22GOnChipTestHarness
 	MEM 							?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
@@ -218,5 +224,6 @@ endif
 SBT_PROJECT ?= fpga_platforms
 TB  ?= none # unused
 TOP ?= $(MODEL)
+SYN_TOP ?= $(TOP)
 MEM ?= mem.v
 CONSTRAINTS ?= ddr
