@@ -83,6 +83,7 @@ class PGL22GOnChipRocketTestsBaseConfig extends Config(
     new WithJTAGHarnessBinder ++
     new WithSPIFlash ++
     new WithSPIFlashHarnessBinder ++
+    new WithFPGAFrequency(8) ++
     new ModifiedAbstractConfig)
 
 class PGL22GOnChipRocketTestsConfig extends Config(

@@ -9,7 +9,7 @@ import freechips.rocketchip.diplomacy.{BundleBridgeSource, LazyModule, LazyRawMo
 import freechips.rocketchip.jtag.JTAGIO
 import shell.pango.PGL22GOnChipShell
 import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTPortIO}
-import sifive.fpgashells.clocks.{ClockGroup, ClockSinkNode, PLLNode, ResetWrangler}
+import sifive.fpgashells.clocks.{ClockGroup, ClockSinkNode, PLLFactoryKey, PLLNode, ResetWrangler}
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.ip.pango.{GTP_INBUF, PowerOnResetFPGAOnly}
 import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellDDROverlays, SPIFlashIO}
@@ -21,13 +21,13 @@ class PGL22GOnChipTestHarness(override implicit val p: Parameters) extends PGL22
   val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
   require(dp(ClockInputOverlayKey).nonEmpty)
   val sysClkNode = dp(ClockInputOverlayKey).head.place(ClockInputDesignInput()).overlayOutput.node
-  val migUIClock = PLLNode(feedback = false)
-  migUIClock := sysClkNode
+  val harnessSysPLL = dp(PLLFactoryKey)()
+  harnessSysPLL := sysClkNode
   println(s"PGL22G FPGA Base Clock Freq: ${dp(DefaultClockFrequencyKey)} MHz")
   val dutClock = ClockSinkNode(freqMHz = dp(DefaultClockFrequencyKey))
   val dutWrangler = LazyModule(new ResetWrangler)
   val dutGroup = ClockGroup()
-  dutClock := dutWrangler.node := dutGroup := migUIClock
+  dutClock := dutWrangler.node := dutGroup := harnessSysPLL
   val io_uart_bb = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
   dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
   override lazy val module = new PGL22GOnChipTestHarnessImp(this)
