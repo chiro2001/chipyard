@@ -2,7 +2,7 @@ package pgl22g
 
 import chipsalliance.rocketchip.config.Config
 import chipyard.iobinders.WithAXI4MemPunchthrough
-import freechips.rocketchip.subsystem.{MemoryBusKey, RocketTilesKey, WithBufferlessBroadcastHub, WithDefaultBtb, WithHypervisor, WithNBreakpoints, WithNTrackersPerBank}
+import freechips.rocketchip.subsystem.{ExtMem, MasterPortParams, MemoryBusKey, MemoryPortParams, RocketTilesKey, WithBufferlessBroadcastHub, WithDefaultBtb, WithHypervisor, WithNBreakpoints, WithNTrackersPerBank}
 import pgl22g._
 
 class WithScratchpadsSize(startAddress: Long = 0x80000000L, sizeKB: Int = 16) extends Config((site, here, up) => {
@@ -57,3 +57,11 @@ class WithPGL22GAXIMemBare extends Config(
     // new WithNBanks(0) ++
     new WithAXI4MemPunchthrough
 )
+
+class WithPGL22GMemPort(base: BigInt = BigInt(0x80000000L)) extends Config((site, here, up) => {
+  case ExtMem => Some(MemoryPortParams(MasterPortParams(
+    base = base,
+    size = BigInt(0x10000000),
+    beatBytes = site(MemoryBusKey).beatBytes,
+    idBits = 4), 1))
+})

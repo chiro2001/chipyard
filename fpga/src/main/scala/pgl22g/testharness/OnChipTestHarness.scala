@@ -37,10 +37,12 @@ class PGL22GOnChipTestHarnessImp(_outer: PGL22GOnChipTestHarness)
   extends LazyRawModuleImp(_outer)
     with HasHarnessSignalReferences
     with PGL22GTestHarnessUartTopClockImp
-    with PGL22GTestHarnessJtagImpl {
+    with PGL22GTestHarnessJtagImpl
+    with PGL22GTestHarnessSPIFlashImpl {
   val pgl22gOuter = _outer
   override val uart = _outer.io_uart_bb.bundle
   override val jtag = IO(new JTAGChipIO)
+  override val qspi = IO(new SPIFlashIO)
   // is resetN
   val reset = IO(Input(Bool()))
   _outer.fdc.addPackagePin(reset, "L19")

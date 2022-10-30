@@ -78,10 +78,11 @@ class PGL22GOnChipRocketTestsBaseConfig extends Config(
     new WithRV32 ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
     new chipyard.harness.WithSimSerial ++
-    new WithUART ++
+    new WithUARTHarnessBinder ++
     new WithDebugPeripherals ++
-    new WithJTAG ++
+    new WithJTAGHarnessBinder ++
     new WithSPIFlash ++
+    new WithSPIFlashHarnessBinder ++
     new ModifiedAbstractConfig)
 
 class PGL22GOnChipRocketTestsConfig extends Config(

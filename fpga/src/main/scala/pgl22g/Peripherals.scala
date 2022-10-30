@@ -8,6 +8,7 @@ import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTParams}
 import sifive.fpgashells.shell.pango.PGL22GDDRSize
 import testchipip.SerialTLKey
 import pgl22g._
+import sifive.blocks.devices.spi.{PeripherySPIFlashKey, SPIFlashParams}
 
 class WithDefaultTimebase extends Config((site, here, up) => {
   case DTSTimebase => BigInt(1e6.toLong)
@@ -44,4 +45,11 @@ class WithDebugPeripherals extends Config((site, here, up) => {
     idcodePartNum = 0x000,
     idcodeManufId = 0x489,
     debugIdleCycles = 5)
+})
+
+// default 128M bit = 16MB
+class WithSPIFlash(size: BigInt = 16 * 1024 * 1024) extends Config((site, here, up) => {
+  // Note: the default size matches freedom with the addresses below
+  case PeripherySPIFlashKey => Seq(
+    SPIFlashParams(rAddress = 0x10040000, fAddress = 0x20000000, fSize = size))
 })

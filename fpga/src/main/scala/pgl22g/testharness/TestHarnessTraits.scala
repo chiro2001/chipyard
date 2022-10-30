@@ -2,6 +2,7 @@ package pgl22g.testharness
 
 import chipyard.iobinders.JTAGChipIO
 import chisel3._
+import chisel3.experimental._
 import sifive.blocks.devices.uart.UARTPortIO
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.shell.pango.PerfUARTIO
@@ -31,3 +32,12 @@ trait PGL22GTestHarnessDDRImp {
   val hardResetN: Bool
 }
 
+class SPIFlashIO extends Bundle {
+  val sck = Input(Bool())
+  val cs = Input(Bool())
+  val dq = Vec(4, Analog(1.W))
+}
+
+trait PGL22GTestHarnessSPIFlashImpl {
+  val qspi: SPIFlashIO
+}

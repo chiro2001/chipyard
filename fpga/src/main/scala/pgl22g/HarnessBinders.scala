@@ -16,15 +16,15 @@ import freechips.rocketchip.tilelink.TLBundle
 import freechips.rocketchip.util.HeterogeneousBag
 import pgl22g.testharness._
 import sifive.blocks.devices.pinctrl.{BasePin, Pin}
-import sifive.blocks.devices.spi.{PeripherySPIFlashKey, SPIFlashParams}
+import sifive.blocks.devices.spi.{HasPeripherySPIFlash, PeripherySPIFlashKey, SPIFlashParams}
 import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
 import sifive.fpgashells.ip.pango.GTP_INBUFG
 import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, ddr3_core}
-import testchipip.ClockedAndResetIO
+import testchipip.{ClockedAndResetIO, SPIChipIO}
 
 
 /** * UART ** */
-class WithUART extends OverrideHarnessBinder({
+class WithUARTHarnessBinder extends OverrideHarnessBinder({
   (system: HasPeripheryUARTModuleImp, th: BaseModule with HasHarnessSignalReferences, ports: Seq[UARTPortIO]) => {
     th match {
       case th: PGL22GTestHarnessUartImp => {
@@ -44,7 +44,7 @@ class WithUART extends OverrideHarnessBinder({
   }
 })
 
-class WithJTAG extends OverrideHarnessBinder({
+class WithJTAGHarnessBinder extends OverrideHarnessBinder({
   (system: HasPeripheryDebug, th: BaseModule with HasHarnessSignalReferences, ports: Seq[Data]) => {
     th match {
       case th: PGL22GTestHarnessJtagImpl => {
@@ -62,6 +62,25 @@ class WithJTAG extends OverrideHarnessBinder({
   }
 })
 
+class WithSPIFlashHarnessBinder extends OverrideHarnessBinder({
+  (system: HasPeripherySPIFlash, th: BaseModule with HasHarnessSignalReferences, ports: Seq[Data]) => {
+    th match {
+      case th: PGL22GTestHarnessSPIFlashImpl => {
+        ports.map {
+          case s: SPIChipIO =>
+            s.sck := th.qspi.sck
+            require(s.cs.size == 1)
+            s.cs.head := th.qspi.cs
+            require(s.dq.size == 4)
+            s.dq.zip(th.qspi.dq).foreach(x => attach(x._1, x._2))
+        }
+      }
+      case th: PGL22GSimTestHarnessImpl => {
+      }
+    }
+  }
+})
+
 //
 // /*** SPI ***/
 // class WithSPISDCard extends OverrideHarnessBinder({
@@ -71,13 +90,6 @@ class WithJTAG extends OverrideHarnessBinder({
 //     } }
 //   }
 // })
-
-// default 128M bit = 16MB
-class WithSPIFlash(size: BigInt = 16 * 1024 * 1024) extends Config((site, here, up) => {
-  // Note: the default size matches freedom with the addresses below
-  case PeripherySPIFlashKey => Seq(
-    SPIFlashParams(rAddress = 0x10040000, fAddress = 0x20000000, fSize = size))
-})
 
 /** * Experimental DDR ** */
 class WithDDRMem extends OverrideHarnessBinder({
@@ -108,14 +120,6 @@ class WithAXI4DDRMem extends OverrideHarnessBinder({
       }
     }
   }
-})
-
-class WithPGL22GMemPort(base: BigInt = BigInt(0x80000000L)) extends Config((site, here, up) => {
-  case ExtMem => Some(MemoryPortParams(MasterPortParams(
-    base = base,
-    size = BigInt(0x10000000),
-    beatBytes = site(MemoryBusKey).beatBytes,
-    idBits = 4), 1))
 })
 
 class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {

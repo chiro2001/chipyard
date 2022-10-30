@@ -7,7 +7,7 @@ import pgl22g._
 
 class WithPGL22GTweaks(freq: Double = 8) extends Config(
   // harness binders
-  new WithUART ++
+  new WithUARTHarnessBinder ++
     // new WithSPISDCard ++
     // io binders
     new WithUARTIOPassthrough ++
@@ -29,7 +29,7 @@ class WithPGL22GTweaks(freq: Double = 8) extends Config(
 
 class WithPGL22GPerfTweaks(freq: Double = 8) extends Config(
   // harness binders
-  new WithUART ++
+  new WithUARTHarnessBinder ++
     // new WithSPISDCard ++
     // io binders
     // new WithUARTIOPassthrough ++
