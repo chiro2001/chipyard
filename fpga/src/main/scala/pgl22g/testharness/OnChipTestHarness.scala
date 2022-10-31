@@ -5,6 +5,7 @@ import chipyard.harness.ApplyHarnessBinders
 import chipyard.iobinders.{HasIOBinders, JTAGChipIO}
 import chipyard.{BuildTop, ChipTop, DefaultClockFrequencyKey, HasHarnessSignalReferences}
 import chisel3._
+import freechips.rocketchip.devices.debug.DebugModuleKey
 import freechips.rocketchip.diplomacy.{BundleBridgeSource, InModuleBody, LazyModule, LazyRawModuleImp}
 import pgl22g.onchip.OnChipDigitalTop
 import shell.pango.PGL22GOnChipShell
@@ -42,7 +43,10 @@ class PGL22GOnChipTestHarnessImp(_outer: PGL22GOnChipTestHarness)
     with PGL22GTestHarnessSPIFlashImpl {
   val pgl22gOuter = _outer
   override val uart = _outer.io_uart_bb.bundle
-  override val jtag = IO(new JTAGChipIO)
+  override val jtag = p(DebugModuleKey) match {
+    case None => None
+    case Some(value) => Some(IO(new JTAGChipIO))
+  }
   // // jtag.TCK <> _outer.io_jtag.bundle.jtag_tck
   // // jtag.TMS <> _outer.io_jtag.bundle.jtag_tms
   // // jtag.TDO <> _outer.io_jtag.bundle.jtag_tdo

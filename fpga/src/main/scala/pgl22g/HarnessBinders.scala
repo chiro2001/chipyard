@@ -51,10 +51,13 @@ class WithJTAGHarnessBinder extends OverrideHarnessBinder({
         println(s"WithJTAGHarnessBinder - PGL22GTestHarnessJtagImpl! ports: ${ports}")
         ports.map {
           case j: JTAGChipIO =>
-            j.TCK <> th.jtag.TCK
-            j.TMS <> th.jtag.TMS
-            j.TDI <> th.jtag.TDI
-            j.TDO <> th.jtag.TDO
+            th.jtag match {
+              case Some(jtag) =>
+                j.TCK <> jtag.TCK
+                j.TMS <> jtag.TMS
+                j.TDI <> jtag.TDI
+                j.TDO <> jtag.TDO
+            }
         }
       }
       case th: PGL22GSimTestHarnessImpl => {

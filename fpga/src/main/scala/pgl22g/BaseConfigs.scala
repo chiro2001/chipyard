@@ -34,8 +34,6 @@ class ModifiedAbstractConfig extends Config(
     new chipyard.iobinders.WithCustomBootPin ++
     new chipyard.iobinders.WithDividerOnlyClockGenerator ++
 
-    new WithInternalJTAGIOCells ++
-
     new testchipip.WithSerialTLWidth(32) ++ // fatten the serialTL interface to improve testing performance
     new testchipip.WithDefaultSerialTL ++ // use serialized tilelink port to external serialadapter/harnessRAM
     new chipyard.config.WithBootROM ++ // use default bootrom

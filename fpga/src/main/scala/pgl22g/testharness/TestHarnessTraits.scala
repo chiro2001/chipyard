@@ -19,7 +19,7 @@ trait PGL22GTestHarnessUartImp {
 trait PGL22GTestHarnessUartTopClockImp extends PGL22GTestHarnessUartImp
 
 trait PGL22GTestHarnessJtagImpl {
-  val jtag: JTAGChipIO
+  val jtag: Option[JTAGChipIO]
 }
 
 trait PGL22GTestHarnessVexJtagImpl {
