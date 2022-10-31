@@ -1,7 +1,7 @@
 package pgl22g
 
-import Chisel.{Bool, Bundle, Data}
-import chipsalliance.rocketchip.config.{Config, Parameters}
+import Chisel.Data
+import chipsalliance.rocketchip.config.Parameters
 import chipyard.harness.OverrideHarnessBinder
 import chipyard.iobinders.JTAGChipIO
 import chipyard.{CanHaveMasterTLMemPort, HasHarnessSignalReferences}
@@ -10,17 +10,15 @@ import chisel3.experimental.{BaseModule, DataMirror, Direction, attach}
 import chisel3.util.{DecoupledIO, IrrevocableIO, Queue}
 import freechips.rocketchip.amba.axi4.{AXI4Bundle, AXI4BundleParameters}
 import freechips.rocketchip.devices.debug.HasPeripheryDebug
-import freechips.rocketchip.jtag.JTAGIO
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink.TLBundle
 import freechips.rocketchip.util.HeterogeneousBag
 import pgl22g.testharness._
-import sifive.blocks.devices.pinctrl.{BasePin, Pin}
-import sifive.blocks.devices.spi.{HasPeripherySPIFlash, HasPeripherySPIFlashModuleImp, PeripherySPIFlashKey, SPIFlashParams}
+import sifive.blocks.devices.spi.HasPeripherySPIFlashModuleImp
 import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
-import sifive.fpgashells.ip.pango.GTP_INBUFG
 import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, ddr3_core}
-import testchipip.{ClockedAndResetIO, SPIChipIO, SimSPIFlashModel}
+import testchipip.{ClockedAndResetIO, SPIChipIO}
+import vexriscv.chipyard.{HasCoreInternalDebug, VexJTAGChipIO}
 
 
 /** * UART ** */
@@ -50,6 +48,7 @@ class WithJTAGHarnessBinder extends OverrideHarnessBinder({
   (system: HasPeripheryDebug, th: BaseModule with HasHarnessSignalReferences, ports: Seq[Data]) => {
     th match {
       case th: PGL22GTestHarnessJtagImpl => {
+        println(s"WithJTAGHarnessBinder - PGL22GTestHarnessJtagImpl! ports: ${ports}")
         ports.map {
           case j: JTAGChipIO =>
             j.TCK <> th.jtag.TCK
@@ -58,6 +57,27 @@ class WithJTAGHarnessBinder extends OverrideHarnessBinder({
             j.TDO <> th.jtag.TDO
         }
       }
+      case th: PGL22GSimTestHarnessImpl => {
+      }
+    }
+  }
+})
+
+class WithInternalJTAGHarnessBinder extends OverrideHarnessBinder({
+  (system: HasCoreInternalDebug, th: BaseModule with HasHarnessSignalReferences, ports: Seq[Data]) => {
+    th match {
+      case th: PGL22GTestHarnessJtagImpl =>
+        println(s"WithInternalJTAGHarnessBinder - PGL22GTestHarnessJtagImpl! ports: ${ports}")
+        ports.map {
+          case j: JTAGChipIO =>
+            system.jtagBundle.map {
+              t: VexJTAGChipIO =>
+                j.TCK <> t.jtag_tck
+                j.TMS <> t.jtag_tms
+                j.TDI <> t.jtag_tdi
+                j.TDO <> t.jtag_tdo
+            }
+        }
       case th: PGL22GSimTestHarnessImpl => {
       }
     }

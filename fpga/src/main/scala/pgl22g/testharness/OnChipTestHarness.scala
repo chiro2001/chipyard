@@ -3,15 +3,17 @@ package pgl22g.testharness
 import chipsalliance.rocketchip.config.Parameters
 import chipyard.harness.ApplyHarnessBinders
 import chipyard.iobinders.{HasIOBinders, JTAGChipIO}
-import chipyard.{BuildTop, DefaultClockFrequencyKey, HasHarnessSignalReferences}
+import chipyard.{BuildTop, ChipTop, DefaultClockFrequencyKey, HasHarnessSignalReferences}
 import chisel3._
-import freechips.rocketchip.diplomacy.{BundleBridgeSource, LazyModule, LazyRawModuleImp}
+import freechips.rocketchip.diplomacy.{BundleBridgeSource, InModuleBody, LazyModule, LazyRawModuleImp}
+import pgl22g.onchip.OnChipDigitalTop
 import shell.pango.PGL22GOnChipShell
 import sifive.blocks.devices.uart.{PeripheryUARTKey, UARTPortIO}
 import sifive.fpgashells.clocks.{ClockGroup, ClockSinkNode, PLLFactoryKey, ResetWrangler}
 import sifive.fpgashells.ip.pango.{GTP_INBUF, PowerOnResetFPGAOnly}
 import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, SPIFlashIO}
 import sifive.fpgashells.shell.{ClockInputDesignInput, ClockInputOverlayKey, UARTDesignInput, UARTOverlayKey}
+import vexriscv.chipyard.{CoreInternalJTAGDebugKey, VexJTAGChipIO}
 
 class PGL22GOnChipTestHarness(override implicit val p: Parameters) extends PGL22GOnChipShell {
   def dp = designParameters
@@ -28,6 +30,7 @@ class PGL22GOnChipTestHarness(override implicit val p: Parameters) extends PGL22
   dutClock := dutWrangler.node := dutGroup := harnessSysPLL
   val io_uart_bb = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
   dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
+  // val io_jtag = BundleBridgeSource(() => (new VexJTAGChipIO))
   override lazy val module = new PGL22GOnChipTestHarnessImp(this)
 }
 
@@ -40,6 +43,22 @@ class PGL22GOnChipTestHarnessImp(_outer: PGL22GOnChipTestHarness)
   val pgl22gOuter = _outer
   override val uart = _outer.io_uart_bb.bundle
   override val jtag = IO(new JTAGChipIO)
+  // // jtag.TCK <> _outer.io_jtag.bundle.jtag_tck
+  // // jtag.TMS <> _outer.io_jtag.bundle.jtag_tms
+  // // jtag.TDO <> _outer.io_jtag.bundle.jtag_tdo
+  // // jtag.TDI <> _outer.io_jtag.bundle.jtag_tdi
+  // _outer.topDesign match {
+  //   case top: ChipTop =>
+  //     println(s"ChipTop: ${top}")
+  //     top.lazySystem match {
+  //       case sys: OnChipDigitalTop =>
+  //         println(s"topSystem: ${sys}")
+  //         sys.jtagBundle.get.jtag_tck <> jtag.TCK
+  //         sys.jtagBundle.get.jtag_tms <> jtag.TMS
+  //         sys.jtagBundle.get.jtag_tdo <> jtag.TDO
+  //         sys.jtagBundle.get.jtag_tdi <> jtag.TDI
+  //     }
+  // }
   override val qspi = IO(new SPIFlashIO)
   // is resetN
   val reset = IO(Input(Bool()))

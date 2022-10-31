@@ -82,6 +82,8 @@ class PGL22GOnChipRocketTestsBaseConfig extends Config(
     new WithUARTHarnessBinder ++
     new WithDebugPeripherals ++
     new WithJTAGHarnessBinder ++
+    new WithInternalJTAGHarnessBinder ++
+    new WithInternalJTAGIOCells ++
     new WithSPIFlash ++
     new WithSPIFlashHarnessBinder ++
     new WithFPGAFrequency(5.0) ++
@@ -134,9 +136,12 @@ class PGL22GOnChipVexRiscvTestsConfig extends Config(
   //   new WithNoMemPort ++
   //   new WithBufferlessBroadcastHub ++
   //   new ModifiedAbstractConfig
-  new WithNVexRiscvCores(1, onChipRAM = true) ++
+  new WithOnChipSystem ++
+    new WithNVexRiscvCores(1, onChipRAM = true) ++
+    new WithOnChipSystem ++
     new WithCoreInternalJTAGDebug ++
     new WithOnChipSystem ++
-    new PGL22GOnChipRocketTestsBaseConfig
+    new PGL22GOnChipRocketTestsBaseConfig ++
+    new WithOnChipSystem
 )
 
