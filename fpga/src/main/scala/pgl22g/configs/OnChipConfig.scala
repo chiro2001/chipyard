@@ -140,7 +140,7 @@ class PGL22GOnChipVexRiscvTestsConfig extends Config(
   //   new ModifiedAbstractConfig
   // new WithOnChipSystem ++
   // new WithCoreInternalJTAGDebug ++
-  new WithVexOnChipMemSize(80 * 1024) ++
+  new WithVexOnChipMemSize(52 * 1024) ++
     new WithVexICacheSize(16 * 1024) ++
     new WithVexDefaultConfig ++
     new WithNVexRiscvCores(1, onChipRAM = true) ++
