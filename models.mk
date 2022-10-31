@@ -238,6 +238,6 @@ endif
 SBT_PROJECT ?= fpga_platforms
 TB ?= none # unused
 TOP ?= ChipTop
-SYN_TOP ?= $(TOP)
+SYN_TOP ?= $(MODEL)
 MEM ?= mem.v
 CONSTRAINTS ?= ddr
