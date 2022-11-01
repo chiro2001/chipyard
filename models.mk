@@ -33,6 +33,19 @@ ifeq ($(SUB_PROJECT),vexchip)
 	CONFIG						?= GenVexChip
 endif
 
+ifeq ($(SUB_PROJECT),vexchip-debug)
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= pango
+	SYN_TOP						?= VexChipTop
+	CONSTRAINTS				?= vexchip
+	MODEL							?= VexChip
+	MODEL_PACKAGE     ?= vexriscv.demo
+	CONFIG_PACKAGE    ?= vexriscv.demo
+	GENERATOR_PACKAGE ?= chipyard
+	VLOG_MODEL				?= VexChip
+	CONFIG						?= GenVexChipDebug
+endif
+
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-sim)
 	MODEL             ?= PGL22GSimTestHarness
 	VLOG_MODEL        ?= PGL22GSimTestHarness
