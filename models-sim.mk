@@ -1,5 +1,5 @@
 ifeq ($(SUB_PROJECT),vexchip)
-	SBT_PROJECT			 	?= VecRiscv
+	SBT_PROJECT			 	?= VexRiscv
 	MODEL 						?= VexChip
 	VLOG_MODEL 				?= VexChip
 	MODEL_PACKAGE 		?= vexriscv.demo
@@ -7,7 +7,7 @@ ifeq ($(SUB_PROJECT),vexchip)
 	CONFIG_PACKAGE 		?= vexriscv.demo
 endif
 ifeq ($(SUB_PROJECT),vexchip-debug)
-	SBT_PROJECT			 	?= VecRiscv
+	SBT_PROJECT			 	?= VexRiscv
 	MODEL 						?= VexChip
 	VLOG_MODEL 				?= VexChip
 	MODEL_PACKAGE 		?= vexriscv.demo

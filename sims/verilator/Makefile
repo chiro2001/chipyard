@@ -302,7 +302,8 @@ VEX_VERILATOR_CXXFLAGS = \
 	$(TRACING_CFLAGS) \
 	-D__STDC_FORMAT_MACROS \
 	-DTEST_HARNESS=V$(VLOG_MODEL) \
-	-DVERILATOR
+	-DVERILATOR \
+	-DTRACE=1 -DTRACE_START=0 # -DPRINT_PERF
 
 VEX_VERILATOR_LDFLAGS = $(SIM_LDFLAGS)
 
@@ -317,17 +318,19 @@ VEX_INCLUDE := $(VEX_CPP_DIR)/../
 VEX_VERILATOR_OPTS = $(VEX_VERILATOR_CC_OPTS) $(VEX_VERILATOR_NONCC_OPTS) \
 	$(VEX_MAIN) -I$(VEX_INCLUDE)
 
+VEX_TRACE_OPTS := --trace --trace-fst
+
 .PHONY: model_mk_vex
 model_mk_vex: $(VEXCHIP_VERILOG) #$(model_mk_deps)
 	rm -rf $(model_dir)
 	mkdir -p $(model_dir)
-	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_OPTS) $(build_dir)/VexChipTop.v $(EXTRA_SIM_SOURCES) -o $(sim) -Mdir $(model_dir) -CFLAGS "-include $(model_header)"
+	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_OPTS) $(build_dir)/VexChipTop.v $(EXTRA_SIM_SOURCES) -o $(sim) $(VEX_TRACE_OPTS) -Mdir $(model_dir) -CFLAGS "-include $(model_header)"
 
 .PHONY: model_mk_debug_vex
 model_mk_debug_vex: $(VEXCHIP_DEBUG_VERILOG) build_dir_mk #$(model_mk_deps)
 	rm -rf $(model_dir_debug)
 	mkdir -p $(model_dir_debug)
-	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_OPTS) $(build_dir)/VexChipTopDebug.v $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(TRACING_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
+	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_OPTS) $(build_dir)/VexChipTopDebug.v $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(VEX_TRACE_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
 
 vex-$(sim): debug_info model_mk_vex
 	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(VLOG_MODEL).mk
@@ -340,3 +343,8 @@ vex-default: vex-$(sim)
 	-cp $(build_dir)/*.bin .
 vex-debug: vex-$(sim_debug)
 	-cp $(build_dir)/*.bin .
+
+vex-run: vex-default
+	$(sim)
+vex-run-debug: vex-debug
+	$(sim_debug)
