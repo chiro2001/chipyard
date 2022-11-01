@@ -11,7 +11,7 @@ ifeq ($(SUB_PROJECT),vexchip-debug)
 	MODEL 						?= VexChip
 	VLOG_MODEL 				?= VexChip
 	MODEL_PACKAGE 		?= vexriscv.demo
-	CONFIG 						?= GenVexChipDebug
+	CONFIG 						?= GenVexChip
 	CONFIG_PACKAGE 		?= vexriscv.demo
 endif
 ifeq ($(SUB_PROJECT),default)
