@@ -17,6 +17,7 @@ _start:
 	sw a4,0(a0)
 	sw a5,0(a0)
 	sw a6,0(a0)
+	j _start
 	/* set stack pointer */
 	lui sp,0x80000000>>12
 	# lui sp,(128*1024)>>12

@@ -13,10 +13,11 @@ class RocketSmall32Config extends Config(
     new WithRV32 ++
     new chipyard.config.AbstractConfig)
 
-class RocketBig32Config extends Config(
-  new freechips.rocketchip.subsystem.WithNBigCores(1) ++
-    new WithRV32 ++
-    new chipyard.config.AbstractConfig)
+// requirement failed: rowBits(32) < coreDataBits(64)
+// class RocketBig32Config extends Config(
+//   new freechips.rocketchip.subsystem.WithNBigCores(1) ++
+//     new WithRV32 ++
+//     new chipyard.config.AbstractConfig)
 
 class WithPGL22GRocketCore extends Config((site, here, up) => {
   case XLen => 32

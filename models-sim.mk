@@ -14,21 +14,13 @@ ifeq ($(SUB_PROJECT),default-tiny)
 	CONFIG 						?= TinyRocketConfig
 	CONFIG_PACKAGE 		?= chipyard
 endif
-ifeq ($(SUB_PROJECT),default32)
-	SBT_PROJECT			 	?= fpga_platforms
-	MODEL 						?= TestHarness
-	VLOG_MODEL 				?= TestHarness
-	MODEL_PACKAGE 		?= chipyard
-	CONFIG 						?= RocketBig32Config
-	CONFIG_PACKAGE 		?= chipyard.fpga.pgl22g
-endif
 ifeq ($(SUB_PROJECT),default32-small)
 	SBT_PROJECT			 	?= fpga_platforms
 	MODEL 						?= TestHarness
 	VLOG_MODEL 				?= TestHarness
 	MODEL_PACKAGE 		?= chipyard
 	CONFIG 						?= RocketSmall32Config
-	CONFIG_PACKAGE 		?= chipyard.fpga.pgl22g
+	CONFIG_PACKAGE 		?= pgl22g.configs
 endif
 ifeq ($(SUB_PROJECT),default-cva6)
 	SBT_PROJECT			 	?= chipyard
