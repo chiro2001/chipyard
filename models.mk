@@ -21,29 +21,29 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 endif
 
 ifeq ($(SUB_PROJECT),vexchip)
-	BOARD             ?= pgl22g
-	FPGA_BRAND        ?= pango
-	SYN_TOP						?= VexChipTop
-	CONSTRAINTS				?= vexchip
-	MODEL							?= VexChip
+	MODEL             ?= VexChip
 	MODEL_PACKAGE     ?= vexriscv.demo
+	CONFIG            ?= GenVexChip
 	CONFIG_PACKAGE    ?= vexriscv.demo
 	GENERATOR_PACKAGE ?= chipyard
-	VLOG_MODEL				?= VexChip
-	CONFIG						?= GenVexChip
+	VLOG_MODEL        ?= VexChip
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= pango
+	CONSTRAINTS       ?= vexchip
+	SYN_TOP           ?= VexChipTop
 endif
 
 ifeq ($(SUB_PROJECT),vexchip-debug)
-	BOARD             ?= pgl22g
-	FPGA_BRAND        ?= pango
-	SYN_TOP						?= VexChipTop
-	CONSTRAINTS				?= vexchip
-	MODEL							?= VexChip
+	MODEL             ?= VexChip
 	MODEL_PACKAGE     ?= vexriscv.demo
+	CONFIG            ?= GenVexChipDebug
 	CONFIG_PACKAGE    ?= vexriscv.demo
 	GENERATOR_PACKAGE ?= chipyard
-	VLOG_MODEL				?= VexChip
-	CONFIG						?= GenVexChipDebug
+	VLOG_MODEL        ?= VexChip
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= pango
+	CONSTRAINTS       ?= vexchip
+	SYN_TOP           ?= VexChipTop
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-sim)
@@ -66,9 +66,9 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test)
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
-	TOP								?= ChipTop
-	SYN_TOP						?= PGL22GOnChipTestHarness
-	MEM								?= mem_onchip.v
+	TOP               ?= ChipTop
+	SYN_TOP           ?= PGL22GOnChipTestHarness
+	MEM               ?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
 
@@ -81,8 +81,8 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test-small)
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
-	TOP								?= ChipTop
-	SYN_TOP						?= PGL22GOnChipTestHarness
+	TOP               ?= ChipTop
+	SYN_TOP           ?= PGL22GOnChipTestHarness
 	MEM 							?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
@@ -96,8 +96,8 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test-med)
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
-	TOP								?= ChipTop
-	SYN_TOP						?= PGL22GOnChipTestHarness
+	TOP               ?= ChipTop
+	SYN_TOP           ?= PGL22GOnChipTestHarness
 	MEM 							?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
@@ -122,9 +122,9 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-vexriscv-test)
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
 	FPGA_BRAND        ?= pango
-	TOP								?= ChipTop
-	SYN_TOP						?= PGL22GOnChipTestHarness
-	MEM								?= mem_onchip.v
+	TOP               ?= ChipTop
+	SYN_TOP           ?= PGL22GOnChipTestHarness
+	MEM               ?= mem_onchip.v
 	CONSTRAINTS	 			?= onchip
 endif
 

@@ -1,3 +1,19 @@
+ifeq ($(SUB_PROJECT),vexchip)
+	SBT_PROJECT			 	?= VecRiscv
+	MODEL 						?= VexChip
+	VLOG_MODEL 				?= VexChip
+	MODEL_PACKAGE 		?= vexriscv.demo
+	CONFIG 						?= GenVexChip
+	CONFIG_PACKAGE 		?= vexriscv.demo
+endif
+ifeq ($(SUB_PROJECT),vexchip-debug)
+	SBT_PROJECT			 	?= VecRiscv
+	MODEL 						?= VexChip
+	VLOG_MODEL 				?= VexChip
+	MODEL_PACKAGE 		?= vexriscv.demo
+	CONFIG 						?= GenVexChipDebug
+	CONFIG_PACKAGE 		?= vexriscv.demo
+endif
 ifeq ($(SUB_PROJECT),default)
 	SBT_PROJECT			 	?= chipyard
 	MODEL 						?= TestHarness
@@ -130,3 +146,5 @@ endif
 GENERATOR_PACKAGE ?= chipyard
 TB ?= TestDriver
 TOP ?= ChipTop
+BOARD ?= pgl22g
+FPGA_BRAND ?= pango
