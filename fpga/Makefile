@@ -146,6 +146,17 @@ test:
 show:
 	python scripts/show_graph.py $(abspath $(build_dir)/$(long_name).graphml)
 
-.PHONY vex-onchip-verilog
-vex-onchip-verilog:
-	echo
+VEXCHIP_VERILOG := $(base_dir)/VexChip.v
+
+.PHONY: $(VEXCHIP_VERILOG)
+$(VEXCHIP_VERILOG):
+	cd $(base_dir) && sbt -v "project VexRiscv; runMain vexriscv.demo.GenVexChip"
+	cp $(VEXCHIP_VERILOG) $(build_dir)
+	cp $(fpga_dir)/$(BOARD)/vsrc/VexChipTop.v $(build_dir)/
+	-touch $(build_dir)/empty.sv
+	-mv $(base_dir)/*.bin $(build_dir)
+
+.PHONY: vexchip-bitstream
+vexchip-bitstream: $(VEXCHIP_VERILOG) tcl_files
+	mkdir -p $(build_dir)
+	cd $(build_dir) && $(EDA) $(EDA_ARGS)
