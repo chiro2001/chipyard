@@ -351,3 +351,6 @@ vex-run: vex-default
 	$(sim)
 vex-run-debug: vex-debug
 	$(sim_debug)
+vex-openocd:
+	file ./generators/vex-riscv/src/test/openocd/vexchip_sim.cfg
+	cd $(base_dir) && openocd -c "set VEXRISCV_YAML VexChip.yaml" -f ./generators/vex-riscv/src/test/openocd/vexchip_sim.cfg
