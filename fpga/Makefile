@@ -145,3 +145,7 @@ test:
 .PHONY: show
 show:
 	python scripts/show_graph.py $(abspath $(build_dir)/$(long_name).graphml)
+
+.PHONY vex-onchip-verilog
+vex-onchip-verilog:
+	echo
