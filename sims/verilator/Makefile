@@ -293,8 +293,7 @@ VEX_VERILATOR_NONCC_OPTS = \
 	$(MAX_WIDTH_OPTS) \
 	$(PREPROC_DEFINES) \
 	--top-module $(VLOG_MODEL) \
-	--vpi \
-	$(VEXCHIP_VERILOG)
+	--vpi
 
 VEX_VERILATOR_CXXFLAGS = \
 	$(SIM_CXXFLAGS) \
@@ -302,8 +301,7 @@ VEX_VERILATOR_CXXFLAGS = \
 	$(TRACING_CFLAGS) \
 	-D__STDC_FORMAT_MACROS \
 	-DTEST_HARNESS=V$(VLOG_MODEL) \
-	-DVERILATOR \
-	-DTRACE=1 -DTRACE_START=0 # -DPRINT_PERF
+	-DVERILATOR
 
 VEX_VERILATOR_LDFLAGS = $(SIM_LDFLAGS)
 
@@ -316,8 +314,7 @@ VEX_MAIN := $(VEX_CPP_DIR)/main.cpp
 VEX_MAIN_DEBUG := $(VEX_CPP_DIR)/main_debug.cpp
 VEX_INCLUDE := $(VEX_CPP_DIR)/../
 
-VEX_VERILATOR_OPTS = $(VEX_VERILATOR_CC_OPTS) $(VEX_VERILATOR_NONCC_OPTS) \
-	-I$(VEX_INCLUDE)
+VEX_VERILATOR_OPTS = $(VEX_VERILATOR_NONCC_OPTS) -I$(VEX_INCLUDE)
 
 VEX_TRACE_OPTS := --trace --trace-fst
 
@@ -325,13 +322,15 @@ VEX_TRACE_OPTS := --trace --trace-fst
 model_mk_vex: $(VEXCHIP_VERILOG) #$(model_mk_deps)
 	rm -rf $(model_dir)
 	mkdir -p $(model_dir)
-	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_OPTS) $(VEX_MAIN) $(EXTRA_SIM_SOURCES) -o $(sim) $(VEX_TRACE_OPTS) -Mdir $(model_dir) -CFLAGS "-include $(model_header)"
+	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_CC_OPTS) $(VEX_VERILATOR_OPTS) $(VEXCHIP_VERILOG) $(VEX_MAIN) $(EXTRA_SIM_SOURCES) -o $(sim) -Mdir $(model_dir) -CFLAGS "-include $(model_header)"
 
 .PHONY: model_mk_debug_vex
-model_mk_debug_vex: $(VEXCHIP_DEBUG_VERILOG) build_dir_mk #$(model_mk_deps)
+model_mk_debug_vex: $(VEXCHIP_DEBUG_VERILOG)_DEBUG build_dir_mk #$(model_mk_deps)
 	rm -rf $(model_dir_debug)
 	mkdir -p $(model_dir_debug)
-	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_OPTS) $(VEX_MAIN_DEBUG) $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(VEX_TRACE_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
+	cd $(build_dir) && $(VERILATOR) \
+		-CFLAGS "$(VEX_VERILATOR_CXXFLAGS) -DTRACE=1 -DTRACE_START=0" -LDFLAGS "$(VEX_VERILATOR_LDFLAGS)" \
+		$(VEX_VERILATOR_OPTS) $(VEXCHIP_DEBUG_VERILOG) $(VEX_MAIN_DEBUG) $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(VEX_TRACE_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
 
 vex-$(sim): debug_info model_mk_vex
 	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(VLOG_MODEL).mk

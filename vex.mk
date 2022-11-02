@@ -14,8 +14,8 @@ $(VEXCHIP_VERILOG): build_dir_mk
 	-touch $(build_dir)/empty.sv
 	-mv $(base_dir)/*.bin $(build_dir)
 
-.PHONY: $(VEXCHIP_DEBUG_VERILOG)
-$(VEXCHIP_DEBUG_VERILOG): build_dir_mk
+.PHONY: $(VEXCHIP_DEBUG_VERILOG)_DEBUG
+$(VEXCHIP_DEBUG_VERILOG)_DEBUG: build_dir_mk
 	cd $(base_dir) && sbt -v "project VexRiscv; runMain vexriscv.demo.GenVexChipDebug"
 	cp $(VEXCHIP_DEBUG_VERILOG) $(build_dir)
 	cp $(fpga_dir)/$(BOARD)/vsrc/VexChipTopDebug.v $(build_dir)
