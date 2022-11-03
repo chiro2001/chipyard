@@ -28,7 +28,7 @@ class WithPicoRVBootROM extends Config((site, here, up) => {
 object CoreMarkBootROM {
   def make(): String = {
     val baseDir = "./software/coremark"
-    val binary = new File(s"$baseDir/overlay/coremark.bare.bin" + (if (site(XLen) != 32) "64" else ""))
+    val binary = new File(s"$baseDir/overlay/coremark.bare.bin")
     val clean = s"make -C $baseDir clean"
     require(clean.! == 0 && !binary.exists(), "Failed to clean coremark!")
     val make = s"make -C $baseDir"
