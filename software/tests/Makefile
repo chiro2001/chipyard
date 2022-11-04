@@ -8,7 +8,7 @@ CFLAGS_RV64=-mabi=lp64 -march=rv64im
 OBJCOPY=$(CROSS_COMPILE)objcopy
 OBJDUMP=$(CROSS_COMPILE)objdump
 
-START_FILES := print.c main.c hello.c
+START_FILES := print.c main.c hello.c sifive-uart.c
 
 default: img dump
 

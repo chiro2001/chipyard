@@ -8,11 +8,14 @@
 #ifndef FIRMWARE_H
 #define FIRMWARE_H
 
-#include <stdint.h>
-#include <stdbool.h>
+// #include <stddef.h>
+// #include <stdint.h>
+#include "sbi_types.h"
+// #include <stdbool.h>
 
 // main.c
 void main(void);
+void park(void);
 
 // irq.c
 // uint32_t *irq(uint32_t *regs, uint32_t irqs);
@@ -44,5 +47,9 @@ void hello(void);
 
 // stats.c
 // void stats(void);
+
+// int printf(const char* fmt, ...);
+// int puts(const char* s);
+// void* memset(void* dest, int byte, size_t len);
 
 #endif
