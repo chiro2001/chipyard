@@ -1,7 +1,7 @@
 bootrom_img = start.rv32.img start.rv64.img
 bootrom_dump = start.rv32.dump start.rv64.dump
 
-CROSS_COMPILE := riscv-none-embed-
+CROSS_COMPILE := riscv32-unknown-elf-
 GCC=$(CROSS_COMPILE)gcc
 CFLAGS_RV32=-mabi=ilp32 -march=rv32im
 CFLAGS_RV64=-mabi=lp64 -march=rv64im
