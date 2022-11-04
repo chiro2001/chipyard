@@ -4,6 +4,7 @@
 #include "encoding.h"
 
 #define __STACKSIZE__ 0x400
+#define CLIT_ADDR 0x2000000
 
 // #include "firmware.h"
 .section .text
@@ -11,19 +12,31 @@
 _start:
 	.global main
 
+	// for sifive uart
   lui a0,0x54000000>>12
+	// disable interrupts
+	li a1,0
+	sw a1,16(a0)
+	// enable tx
+	li a1,1
+	sw a1,8(a0)
+	// enable rx
+	li a1,1
+	sw a1,12(a0)
+
+	// print START\n
 	addi a1,zero,'S'
 	addi a2,zero,'T'
 	addi a3,zero,'A'
 	addi a4,zero,'R'
 	addi a5,zero,'T'
 	addi a6,zero,'\n'
-  sb a1,0(a0)
-	sb a2,0(a0)
-	sb a3,0(a0)
-	sb a4,0(a0)
-	sb a5,0(a0)
-	sb a6,0(a0)
+  sw a1,0(a0)
+	sw a2,0(a0)
+	sw a3,0(a0)
+	sw a4,0(a0)
+	sw a5,0(a0)
+	sw a6,0(a0)
   # j _start
   li  x1, 0
   li  x2, 0
@@ -85,6 +98,7 @@ _start:
   add  sp, sp, t0
   csrw SRC_XSCRATCH, sp
   jal main
+	j park
 
 reset_vec:
 	j _start

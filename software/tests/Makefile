@@ -1,5 +1,7 @@
-bootrom_img = start.rv32.img start.rv64.img
-bootrom_dump = start.rv32.dump start.rv64.dump
+# bootrom_img = start.rv32.img start.rv64.img
+# bootrom_dump = start.rv32.dump start.rv64.dump
+bootrom_img = start.rv32.img
+bootrom_dump = start.rv32.dump
 
 CROSS_COMPILE := riscv32-unknown-elf-
 GCC=$(CROSS_COMPILE)gcc

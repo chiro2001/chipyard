@@ -1,22 +1,34 @@
+/*
+ * Copyright (c) 2006-2020, RT-Thread Development Team
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2020/12/12     bernard      The first version
+ */
+
+INCLUDE "link_stacksize.lds"
+
 OUTPUT_ARCH( "riscv" )
 
-/*
- * Memory layout:
- * 0x10000 - : bootrom
- * 0x80000000 - : mem
- */
-__MEMSIZE__ = 0xD000;
-__MEMBASE_ADDR__ = 0x80000000;
+MEMORY
+{
+   FLASH : ORIGIN = __START_ADDR__, LENGTH = 0x4000
+   RAM   : ORIGIN = __STACK_ADDR__, LENGTH = 0xD000
+}
 
 ENTRY(_start)
 SECTIONS
 {
-    . = 0x10000 ;
+    . = __START_ADDR__ ;
+
+    /* __STACKSIZE__ = 4096; */
 
     .start :
     {
         *(.start);
-    }
+    } > FLASH
 
     . = ALIGN(4);
 
@@ -54,16 +66,16 @@ SECTIONS
 
         . = ALIGN(4);
         _etext = .;
-    }
+    } > FLASH
 
-    /* .eh_frame_hdr : 
+    .eh_frame_hdr : 
     { 
          *(.eh_frame_hdr) 
          *(.eh_frame_entry)
-    }
-    .eh_frame : ONLY_IF_RO { KEEP (*(.eh_frame)) } */
+    } > FLASH
+    .eh_frame : ONLY_IF_RO { KEEP (*(.eh_frame)) } > FLASH
 
-    . = __MEMBASE_ADDR__;
+    . = ALIGN(4);
 
     .data : 
     {
@@ -78,16 +90,20 @@ SECTIONS
 
         *(.sdata)
         *(.sdata.*)
-    }
+    } > FLASH
+
+    /* stack */
+
+    . = __STACK_ADDR__;
 
     .stack :
     {
         . = ALIGN(64);
         __stack_start__ = .;
 
-        . += __MEMSIZE__;
+        . += __STACKSIZE__;
         __stack_cpu0 = .;
-    }
+    } > RAM
 
     .sbss : 
     {
@@ -96,7 +112,7 @@ SECTIONS
         *(.sbss.*)
         *(.dynsbss)
         *(.scommon)
-    }
+    } > RAM
 
     .bss :
     {
@@ -105,7 +121,7 @@ SECTIONS
         *(.dynbss)
         *(COMMON)
     __bss_end = .;
-    }
+    } > RAM
 
     _end = .;
 
