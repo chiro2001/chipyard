@@ -141,3 +141,6 @@
 [submodule "software/rt-thread"]
 	path = software/rt-thread
 	url = https://github.com/criwits/rt-thread
+[submodule "software/opensbi"]
+	path = software/opensbi
+	url = https://github.com/chiro2001/opensbi
