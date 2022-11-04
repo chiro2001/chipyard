@@ -54,7 +54,7 @@
 	url = https://github.com/ucb-bar/spec2017-workload.git
 [submodule "software/coremark"]
 	path = software/coremark
-	url = https://github.com/ucb-bar/coremark-workload.git
+	url = https://github.com/chiro2001/coremark-workload
 [submodule "generators/gemmini"]
 	path = generators/gemmini
 	url = https://github.com/ucb-bar/gemmini
@@ -138,8 +138,6 @@
 	url = https://github.com/chiro2001/VexRiscv-chipyard
 [submodule "generators/testchipip"]
 	url = https://github.com/chiro2001/testchipip
-[submodule "coremark"]
-	url = https://github.com/chiro2001/coremark-workload
 [submodule "software/rt-thread"]
 	path = software/rt-thread
 	url = https://github.com/criwits/rt-thread
