@@ -27,3 +27,4 @@ env-esp-tools.sh
 /*.yaml
 /*.bin
 /tmp
+/simWorkspace/

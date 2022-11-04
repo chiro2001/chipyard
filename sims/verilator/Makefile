@@ -161,6 +161,8 @@ TIMESCALE_OPTS := $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1
 # see: https://github.com/ucb-bar/riscv-mini/issues/31
 MAX_WIDTH_OPTS = $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1 > 4.016) { print "--max-num-width 1048576"; }')
 
+VERILATOR_TIMING_OPTS := $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1 > 5.000) { print "--timing"; }')
+
 PREPROC_DEFINES := \
 	+define+PRINTF_COND=\$$c\(\"verbose\",\"\&\&\"\,\"done_reset\"\) \
 	+define+STOP_COND=\$$c\(\"done_reset\"\)
@@ -173,6 +175,7 @@ VERILATOR_NONCC_OPTS = \
 	-Wno-fatal \
 	$(TIMESCALE_OPTS) \
 	$(MAX_WIDTH_OPTS) \
+	$(VERILATOR_TIMING_OPTS) \
 	$(PREPROC_DEFINES) \
 	--top-module $(VLOG_MODEL) \
 	--vpi \
