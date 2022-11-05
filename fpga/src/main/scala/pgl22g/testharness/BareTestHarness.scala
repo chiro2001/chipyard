@@ -11,7 +11,7 @@ import sifive.fpgashells.clocks.{ClockGroup, ClockSinkNode, PLLNode, ResetWrangl
 import sifive.fpgashells.ip.pango.{GTP_INBUF, PowerOnResetFPGAOnly}
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDRBase
 import sifive.fpgashells.shell.{ClockInputDesignInput, ClockInputOverlayKey, UARTDesignInput, UARTOverlayKey}
-import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellDDROverlays}
+import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellDDROverlays, SPIFlashIO}
 
 class PGL22GBareTestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
   def dp = designParameters
@@ -39,9 +39,11 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
   extends LazyRawModuleImp(_outer)
     with HasHarnessSignalReferences
     with PGL22GTestHarnessDDRImp
-    with PGL22GTestHarnessUartImp {
+    with PGL22GTestHarnessUartImp
+    with PGL22GTestHarnessSPIFlashImpl {
   val pgl22gOuter = _outer
   override val uart = _outer.io_uart_bb.bundle
+  override val qspi = IO(new SPIFlashIO)
   // is resetN
   val reset = IO(Input(Bool()))
   _outer.fdc.addPackagePin(reset, "L19")

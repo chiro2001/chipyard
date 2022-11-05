@@ -49,6 +49,7 @@ object CoreMarkBootROM {
 
 class WithVexRiscvBootROM extends Config((site, here, up) => {
   case BootROMLocated(x) => {
+    require(site(XLen) == 32)
     val baseDir = "./generators/vex-riscv/src/main/resources/bootrom"
     val chipyardBootROM = new File(s"$baseDir/bootrom.rv${site(XLen)}.simple.img")
     val clean = s"make -C $baseDir clean"

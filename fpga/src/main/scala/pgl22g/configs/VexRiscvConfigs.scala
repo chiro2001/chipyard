@@ -1,11 +1,28 @@
 package pgl22g.configs
 
 import chipsalliance.rocketchip.config.Config
-import chipyard.config.WithL2TLBs
 import freechips.rocketchip.subsystem._
 import pgl22g._
 import vexriscv.chipyard.{WithNVexRiscvCores, WithVexConfig}
 import vexriscv.demo.VexOnChipConfig
+
+class PGL22GVexRiscvBaseConfig extends Config(
+  new WithUARTHarnessBinder ++
+    // new WithDebugPeripherals ++
+    // new WithJTAGHarnessBinder ++
+    // new WithInternalJTAGIOCells ++
+    // new WithInternalJTAGHarnessBinder ++
+    // new WithInternalJTAGIOCells ++
+    new WithNoDebug ++
+    new WithSPIFlash ++
+    new WithSPIFlashHarnessBinder ++
+    new WithTestsBootROM ++
+    new WithFPGAFrequency(5.0) ++
+    new WithPGL22GTweaks ++
+    new WithPGL22GAXIMem ++
+    new WithNMemoryChannels(1) ++
+    new WithBufferlessBroadcastHub ++
+    new ModifiedAbstractConfig)
 
 class PGL22GVexRiscvConfig extends Config(
   new WithNVexRiscvCores(1, onChipRAM = false) ++
@@ -19,16 +36,7 @@ class PGL22GVexRiscvConfig extends Config(
       resetVector = 0x10040L,
       onChipRamSize = 0
     )) ++
-    new WithBareCoreMarkBootROM ++
-    new WithPGL22GTweaks ++
-    new WithPGL22GAXIMem ++
-    new WithoutFPU ++
-    new WithL2TLBs(0) ++
-    new WithL1ICacheSets(64 * 2) ++
-    new WithL1DCacheSets(64 * 2) ++
-    new WithNMemoryChannels(1) ++
-    new WithBufferlessBroadcastHub ++
-    new ModifiedAbstractConfig)
+    new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscv2Config extends Config(
   new WithNVexRiscvCores(2, onChipRAM = false) ++
@@ -42,15 +50,7 @@ class PGL22GVexRiscv2Config extends Config(
       resetVector = 0x10040L,
       onChipRamSize = 0
     )) ++
-    new WithPGL22GTweaks ++
-    new WithPGL22GAXIMem ++
-    new WithoutFPU ++
-    new WithL2TLBs(0) ++
-    new WithL1ICacheSets(64 * 2) ++
-    new WithL1DCacheSets(64 * 2) ++
-    new WithNMemoryChannels(1) ++
-    new WithBufferlessBroadcastHub ++
-    new ModifiedAbstractConfig)
+    new PGL22GVexRiscvBaseConfig)
 
 class SimPGL22GVexRiscvConfig extends Config(
   // new WithVexDefaultConfig ++
