@@ -4,7 +4,6 @@
 #include "encoding.h"
 
 #define __STACKSIZE__ 0x400
-#define CLIT_ADDR 0x2000000
 
 // #include "firmware.h"
 .section .text
