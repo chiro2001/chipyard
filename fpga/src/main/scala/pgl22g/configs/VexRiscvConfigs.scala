@@ -8,7 +8,18 @@ import vexriscv.chipyard.{WithNVexRiscvCores, WithVexConfig}
 import vexriscv.demo.VexOnChipConfig
 
 class PGL22GVexRiscvConfig extends Config(
-  new WithNVexRiscvCores(1) ++
+  new WithNVexRiscvCores(1, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      iCacheSize = 16384,
+      dCacheSize = 16384,
+      // iCacheSize = 4096,
+      // dCacheSize = 4096,
+      // iCacheSize = 0,
+      // dCacheSize = 0,
+      resetVector = 0x10040L,
+      onChipRamSize = 0
+    )) ++
+    new WithBareCoreMarkBootROM ++
     new WithPGL22GTweaks ++
     new WithPGL22GAXIMem ++
     new WithoutFPU ++
@@ -20,7 +31,17 @@ class PGL22GVexRiscvConfig extends Config(
     new ModifiedAbstractConfig)
 
 class PGL22GVexRiscv2Config extends Config(
-  new WithNVexRiscvCores(2) ++
+  new WithNVexRiscvCores(2, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      // iCacheSize = 16384,
+      // dCacheSize = 16384,
+      // iCacheSize = 4096,
+      // dCacheSize = 4096,
+      iCacheSize = 0,
+      dCacheSize = 0,
+      resetVector = 0x10040L,
+      onChipRamSize = 0
+    )) ++
     new WithPGL22GTweaks ++
     new WithPGL22GAXIMem ++
     new WithoutFPU ++
@@ -42,10 +63,10 @@ class SimPGL22GVexRiscvConfig extends Config(
     new WithVexConfig(VexOnChipConfig.default.copy(
       // iCacheSize = 16384,
       // dCacheSize = 16384,
-      iCacheSize = 4096,
-      dCacheSize = 4096,
-      // iCacheSize = 0,
-      // dCacheSize = 0,
+      // iCacheSize = 4096,
+      // dCacheSize = 4096,
+      iCacheSize = 0,
+      dCacheSize = 0,
       resetVector = 0x10040L,
       onChipRamSize = 0
     )) ++
