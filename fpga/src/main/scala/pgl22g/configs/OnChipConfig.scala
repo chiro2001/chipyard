@@ -7,7 +7,8 @@ import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import pgl22g._
 import pgl22g.onchip.WithOnChipSystem
-import vexriscv.chipyard.{WithCoreInternalJTAGDebug, WithNVexRiscvCores, WithVexDefaultConfig, WithVexICacheSize, WithVexOnChipCoreMark, WithVexOnChipMemSize}
+import vexriscv.chipyard.{WithCoreInternalJTAGDebug, WithNVexRiscvCores, WithVexConfig, WithVexDefaultConfig, WithVexICacheSize, WithVexOnChipCoreMark, WithVexOnChipMemSize, WithVexResetVector}
+import vexriscv.demo.VexOnChipConfig
 
 class WithTinyScratchpadsTinyCore extends Config((site, here, up) => {
   case XLen => 32
@@ -131,10 +132,22 @@ class SimPGL22GOnChipRocketSmallConfig extends Config(
     new chipyard.config.AbstractConfig
 )
 
+// class PGL22GOnChipVexRiscvTestsConfig extends Config(
+//   new WithVexOnChipMemSize(64 * 1024) ++
+//     // new WithVexICacheSize(16 * 1024) ++
+//     new WithVexOnChipCoreMark ++
+//     new WithVexDefaultConfig ++
+//     new WithVexResetVector ++
+//     new WithNVexRiscvCores(1, onChipRAM = true) ++
+//     new PGL22GOnChipRocketTestsBaseConfig
+// )
+
 class PGL22GOnChipVexRiscvTestsConfig extends Config(
-  new WithVexOnChipMemSize(64 * 1024) ++
-    // new WithVexICacheSize(16 * 1024) ++
-    new WithVexOnChipCoreMark ++
+  new WithVexConfig(VexOnChipConfig.default.copy(
+    onChipRamSize = 64 * 1024,
+    onChipRamBinaryFile = BootRoms.onChipCoreMark
+  )) ++
+    // new WithVexOnChipCoreMark ++
     new WithVexDefaultConfig ++
     new WithNVexRiscvCores(1, onChipRAM = true) ++
     new PGL22GOnChipRocketTestsBaseConfig

@@ -7,6 +7,16 @@ import freechips.rocketchip.tile.XLen
 import sys.process._
 import java.io.File
 import pgl22g._
+object BootRoms {
+  def onChipCoreMark: String = {
+    val binaryFile = new File("./software/coremark/overlay/coremark.perf.bin")
+    // val clean = s"make -C ./software/coremark/riscv-coremark/perf clean"
+    // require(clean.! == 0 && !binaryFile.exists(), "failed to clean coremark for vex-riscv!")
+    val make = s"make -C ./software/coremark/riscv-coremark/perf"
+    if (!binaryFile.exists()) require(make.! == 0, "failed to make coremark for vex-riscv!")
+    binaryFile.getAbsolutePath
+  }
+}
 
 class WithoutBootROM extends Config((site, here, up) => {
   case BootROMLocated(x) => None
