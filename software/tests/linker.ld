@@ -77,6 +77,8 @@ SECTIONS
 
     . = ALIGN(4);
 
+    . = __STACK_ADDR__;
+
     .data : 
     {
         *(.data)
@@ -90,11 +92,9 @@ SECTIONS
 
         *(.sdata)
         *(.sdata.*)
-    } > FLASH
+    } > RAM
 
     /* stack */
-
-    . = __STACK_ADDR__;
 
     .stack :
     {
