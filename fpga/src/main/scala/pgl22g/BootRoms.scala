@@ -51,13 +51,13 @@ class WithVexRiscvBootROM extends Config((site, here, up) => {
   case BootROMLocated(x) => {
     require(site(XLen) == 32)
     val baseDir = "./generators/vex-riscv/src/main/resources/bootrom"
-    val chipyardBootROM = new File(s"$baseDir/bootrom.rv${site(XLen)}.simple.img")
-    val clean = s"make -C $baseDir clean"
-    require(clean.! == 0 && !chipyardBootROM.exists(), "Failed to clean bootrom!")
+    val binary = new File(s"$baseDir/bootrom.rv${site(XLen)}.img")
+    // val clean = s"make -C $baseDir clean"
+    // require(clean.! == 0 && !binary.exists(), "Failed to clean bootrom!")
     val make = s"make -C $baseDir"
-    require(make.! == 0 && chipyardBootROM.exists(), "Failed to build bootrom!")
+    require(make.! == 0 && binary.exists(), "Failed to build bootrom!")
     up(BootROMLocated(x), site)
-      .map(_.copy(contentFileName = chipyardBootROM.getAbsolutePath))
+      .map(_.copy(contentFileName = binary.getAbsolutePath))
   }
 })
 
