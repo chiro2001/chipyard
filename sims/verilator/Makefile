@@ -1,7 +1,7 @@
 base_dir ?= $(abspath ../..)
 
 # BINARY ?= $(RISCV)/riscv64-unknown-elf/share/riscv-tests/isa/rv32ui-p-add
-BINARY ?= $(base_dir)/software/coremark/overlay/coremark.bare.riscv
+BINARY ?= $(base_dir)/software/coremark/overlay/coremark.perf.riscv
 SUB_PROJECT ?= pgl22g
 
 include $(base_dir)/models-sim.mk
@@ -354,3 +354,17 @@ vex-run-debug: vex-debug
 vex-openocd:
 	file ./generators/vex-riscv/src/test/openocd/vexchip_sim.cfg
 	cd $(base_dir) && openocd -c "set VEXRISCV_YAML VexChip.yaml" -f ./generators/vex-riscv/src/test/openocd/vexchip_sim.cfg
+
+FLASH_IMG ?= $(sim_dir)/flash.img
+FLASH_BINARY ?= $(subst .riscv,.bin,$(BINARY))
+
+.PHONY: $(FLASH_IMG) flash-img flash-run
+$(FLASH_IMG):
+	dd if=/dev/zero of=$(FLASH_IMG) bs=1MiB count=16
+	dd if=$(FLASH_BINARY) of=$(FLASH_IMG) bs=1MiB seek=1 conv=notrunc
+flash-img: $(FLASH_IMG)
+
+run-flash: flash-img
+	(set -o pipefail && $(NUMA_PREFIX) $(sim) $(PERMISSIVE_ON) $(SIM_FLAGS) $(EXTRA_SIM_FLAGS) +spiflash0=$(FLASH_IMG) $(SEED_FLAG) $(VERBOSE_FLAGS) $(PERMISSIVE_OFF) $(BINARY) </dev/null 2> >(spike-dasm > $(sim_out_name).out) | tee $(sim_out_name).log)
+run-flash-debug: flash-img
+	(set -o pipefail && $(NUMA_PREFIX) $(sim_debug) $(PERMISSIVE_ON) $(SIM_FLAGS) $(EXTRA_SIM_FLAGS) +spiflash0=$(FLASH_IMG) $(SEED_FLAG) $(VERBOSE_FLAGS) $(WAVEFORM_FLAG) $(PERMISSIVE_OFF) $(BINARY) </dev/null 2> >(spike-dasm > $(sim_out_name).out) | tee $(sim_out_name).log)

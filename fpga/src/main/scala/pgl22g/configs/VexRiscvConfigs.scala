@@ -54,12 +54,6 @@ class PGL22GVexRiscv2Config extends Config(
     new PGL22GVexRiscvBaseConfig)
 
 class SimPGL22GVexRiscvConfig extends Config(
-  // new WithVexDefaultConfig ++
-  //   new WithVexICacheSize(16384) ++
-  //   new WithVexDCacheSize(16384) ++
-  //   new WithVexResetVector(0x10040L) ++
-  //   // new WithTestsBootROM ++
-  //   new WithVexOnChipMemSize(0) ++
   new WithNVexRiscvCores(1, onChipRAM = false) ++
     new WithVexConfig(VexOnChipConfig.default.copy(
       // iCacheSize = 16384,
@@ -73,6 +67,26 @@ class SimPGL22GVexRiscvConfig extends Config(
     )) ++
     new WithMemoryBusWidth(32) ++
     new WithPGL22GSimTinyTweaks ++
-    // new WithVexRiscvBootROM ++
+    new WithFPGAFrequency(5.0) ++
+    new ModifiedAbstractConfig
+)
+
+class SimPGL22GVexRiscvSpiConfig extends Config(
+  new WithNVexRiscvCores(1, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      // iCacheSize = 16384,
+      // dCacheSize = 16384,
+      iCacheSize = 4096,
+      dCacheSize = 4096,
+      // iCacheSize = 0,
+      // dCacheSize = 0,
+      resetVector = 0x10080L,
+      onChipRamSize = 0
+    )) ++
+    new WithMemoryBusWidth(32) ++
+    new WithPGL22GSimTinyTweaks ++
+    new WithFPGAFrequency(5.0) ++
+    new WithSPIFlash ++
+    new WithVexRiscvBootROM(true) ++
     new ModifiedAbstractConfig
 )

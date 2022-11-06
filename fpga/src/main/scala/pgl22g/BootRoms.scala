@@ -47,11 +47,11 @@ object CoreMarkBootROM {
   }
 }
 
-class WithVexRiscvBootROM extends Config((site, here, up) => {
+class WithVexRiscvBootROM(simulate: Boolean = false) extends Config((site, here, up) => {
   case BootROMLocated(x) => {
     require(site(XLen) == 32)
     val baseDir = "./generators/vex-riscv/src/main/resources/bootrom"
-    val binary = new File(s"$baseDir/bootrom.rv${site(XLen)}.img")
+    val binary = new File(if (simulate) s"$baseDir/bootrom.sim.rv${site(XLen)}.img" else s"$baseDir/bootrom.rv${site(XLen)}.img")
     // val clean = s"make -C $baseDir clean"
     // require(clean.! == 0 && !binary.exists(), "Failed to clean bootrom!")
     val make = s"make -C $baseDir"
