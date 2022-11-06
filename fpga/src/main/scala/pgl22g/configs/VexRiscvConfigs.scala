@@ -16,7 +16,8 @@ class PGL22GVexRiscvBaseConfig extends Config(
     new WithNoDebug ++
     new WithSPIFlash ++
     new WithSPIFlashHarnessBinder ++
-    new WithTestsBootROM ++
+    // new WithTestsBootROM ++
+    new WithVexRiscvBootROM ++
     new WithFPGAFrequency(5.0) ++
     new WithPGL22GTweaks ++
     new WithPGL22GAXIMem ++
