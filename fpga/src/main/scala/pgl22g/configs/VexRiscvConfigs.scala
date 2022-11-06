@@ -34,7 +34,7 @@ class PGL22GVexRiscvConfig extends Config(
       // dCacheSize = 4096,
       // iCacheSize = 0,
       // dCacheSize = 0,
-      resetVector = 0x10040L,
+      resetVector = 0x10000L,
       onChipRamSize = 0
     )) ++
     new PGL22GVexRiscvBaseConfig)
@@ -64,10 +64,10 @@ class SimPGL22GVexRiscvConfig extends Config(
     new WithVexConfig(VexOnChipConfig.default.copy(
       // iCacheSize = 16384,
       // dCacheSize = 16384,
-      // iCacheSize = 4096,
-      // dCacheSize = 4096,
-      iCacheSize = 0,
-      dCacheSize = 0,
+      iCacheSize = 4096,
+      dCacheSize = 4096,
+      // iCacheSize = 0,
+      // dCacheSize = 0,
       resetVector = 0x10040L,
       onChipRamSize = 0
     )) ++
