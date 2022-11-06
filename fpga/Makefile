@@ -122,6 +122,7 @@ EDA_ARGS_DEBUG := -nojournal -mode batch \
 			$(fpga_common_script_dir)
 endif
 $(BIT_FILE): $(synth_list_f)
+	$(MAKE) -C $(abspath .) keep-rvfi
 	cd $(build_dir) && $(EDA) $(EDA_ARGS)
 
 .PHONY: bitstream
@@ -145,6 +146,10 @@ test:
 .PHONY: show
 show:
 	python scripts/show_graph.py $(abspath $(build_dir)/$(long_name).graphml)
+
+.PHONY: keep-rvfi
+keep-rvfi:
+	cd $(build_dir) && sed -i 's#^\s\+wire.\+rvfi.\+;#/* synthesis syn_keep=1 */&#g' *.v
 
 include $(base_dir)/vex.mk
 
