@@ -35,8 +35,8 @@ class WithPGL22GTLMem extends Config(
     new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2)
 )
 
-class WithPGL22GAXIMem(base: BigInt = BigInt(0x80000000L)) extends Config(
-  new WithMemoryBusWidth(128) ++
+class WithPGL22GAXIMem(base: BigInt = BigInt(0x80000000L), width: Int = 128) extends Config(
+  new WithMemoryBusWidth(width) ++
     new WithPGL22GMemPort(base = base) ++
     // new WithNBanks(0) ++ // Disable L2 Cache
     // new WithNBanks(1) ++

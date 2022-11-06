@@ -20,7 +20,7 @@ class PGL22GVexRiscvBaseConfig extends Config(
     new WithVexRiscvBootROM ++
     new WithFPGAFrequency(5.0) ++
     new WithPGL22GTweaks ++
-    new WithPGL22GAXIMem ++
+    new WithPGL22GAXIMem(width = 64) ++
     new WithNMemoryChannels(1) ++
     new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig)

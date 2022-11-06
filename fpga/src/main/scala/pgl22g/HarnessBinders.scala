@@ -16,7 +16,7 @@ import freechips.rocketchip.util.HeterogeneousBag
 import pgl22g.testharness._
 import sifive.blocks.devices.spi.HasPeripherySPIFlashModuleImp
 import sifive.blocks.devices.uart.{HasPeripheryUARTModuleImp, UARTPortIO}
-import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, ddr3_core}
+import sifive.fpgashells.ip.pango.ddr3.{PGL22GMIGIOClocksResetBundle, PGL22GMIGIODDR, PGL22GMIGIODDRIO, PGL22GMIGIODDRIO64, ddr3_core, ddr3_core_64}
 import testchipip.{ClockedAndResetIO, SPIChipIO}
 import vexriscv.chipyard.{HasCoreInternalDebug, VexJTAGChipIO}
 
@@ -147,45 +147,84 @@ class WithAXI4DDRMem extends OverrideHarnessBinder({
 })
 
 class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
+  println(s"DDR3 Interface WIDTH=${params.dataBits}")
   val axi = IO(Flipped(new AXI4Bundle(params)))
-  require(params.dataBits == 128, s"Only support 128bit width data! now is ${params.dataBits}")
-  val memInst = Module(new ddr3_core(memSize)).suggestName("ddr3_core_inst")
+  require(params.dataBits == 128 || params.dataBits == 64, s"Only support 128 or 64bit width data! now is ${params.dataBits}")
+  val memInst = Module(if (params.dataBits == 128) new ddr3_core(memSize) else new ddr3_core_64(memSize)).suggestName("ddr3_core_inst")
   val ddrIO = IO(new PGL22GMIGIODDR)
   val mio = memInst.io
   mio.csysreq_ddrc := false.B
   val ddrCtrl = IO(new PGL22GMIGIOClocksResetBundle)
-
-  axi.aw.bits.id <> mio.awid_0
-  axi.aw.bits.addr <> mio.awaddr_0
-  axi.aw.bits.len <> mio.awlen_0
-  axi.aw.bits.size <> mio.awsize_0
-  axi.aw.bits.burst <> mio.awburst_0
-  axi.aw.bits.lock <> mio.awlock_0
-  axi.aw.valid <> mio.awvalid_0
-  axi.aw.ready <> mio.awready_0
-  axi.w.bits.data <> mio.wdata_0
-  axi.w.bits.strb <> mio.wstrb_0
-  axi.w.bits.last <> mio.wlast_0
-  axi.w.valid <> mio.wvalid_0
-  axi.w.ready <> mio.wready_0
-  axi.b.ready <> mio.bready_0
-  axi.b.bits.id <> mio.bid_0
-  axi.b.bits.resp <> mio.bresp_0
-  axi.b.valid <> mio.bvalid_0
-  axi.ar.bits.id <> mio.arid_0
-  axi.ar.bits.addr <> mio.araddr_0
-  axi.ar.bits.len <> mio.arlen_0
-  axi.ar.bits.size <> mio.arsize_0
-  axi.ar.bits.burst <> mio.arburst_0
-  axi.ar.bits.lock <> mio.arlock_0
-  axi.ar.valid <> mio.arvalid_0
-  axi.ar.ready <> mio.arready_0
-  axi.r.ready <> mio.rready_0
-  axi.r.bits.id <> mio.rid_0
-  axi.r.bits.data <> mio.rdata_0
-  axi.r.bits.resp <> mio.rresp_0
-  axi.r.bits.last <> mio.rlast_0
-  axi.r.valid <> mio.rvalid_0
+  
+  mio match {
+    case mio: PGL22GMIGIODDRIO => {
+      axi.aw.bits.id <> mio.awid_0
+      axi.aw.bits.addr <> mio.awaddr_0
+      axi.aw.bits.len <> mio.awlen_0
+      axi.aw.bits.size <> mio.awsize_0
+      axi.aw.bits.burst <> mio.awburst_0
+      axi.aw.bits.lock <> mio.awlock_0
+      axi.aw.valid <> mio.awvalid_0
+      axi.aw.ready <> mio.awready_0
+      axi.w.bits.data <> mio.wdata_0
+      axi.w.bits.strb <> mio.wstrb_0
+      axi.w.bits.last <> mio.wlast_0
+      axi.w.valid <> mio.wvalid_0
+      axi.w.ready <> mio.wready_0
+      axi.b.ready <> mio.bready_0
+      axi.b.bits.id <> mio.bid_0
+      axi.b.bits.resp <> mio.bresp_0
+      axi.b.valid <> mio.bvalid_0
+      axi.ar.bits.id <> mio.arid_0
+      axi.ar.bits.addr <> mio.araddr_0
+      axi.ar.bits.len <> mio.arlen_0
+      axi.ar.bits.size <> mio.arsize_0
+      axi.ar.bits.burst <> mio.arburst_0
+      axi.ar.bits.lock <> mio.arlock_0
+      axi.ar.valid <> mio.arvalid_0
+      axi.ar.ready <> mio.arready_0
+      axi.r.ready <> mio.rready_0
+      axi.r.bits.id <> mio.rid_0
+      axi.r.bits.data <> mio.rdata_0
+      axi.r.bits.resp <> mio.rresp_0
+      axi.r.bits.last <> mio.rlast_0
+      axi.r.valid <> mio.rvalid_0
+    }
+    case mio: PGL22GMIGIODDRIO64 => {
+      axi.aw.bits.id <> mio.awid_1
+      axi.aw.bits.addr <> mio.awaddr_1
+      axi.aw.bits.len <> mio.awlen_1
+      axi.aw.bits.size <> mio.awsize_1
+      axi.aw.bits.burst <> mio.awburst_1
+      axi.aw.bits.lock <> mio.awlock_1
+      axi.aw.valid <> mio.awvalid_1
+      axi.aw.ready <> mio.awready_1
+      axi.w.bits.data <> mio.wdata_1
+      axi.w.bits.strb <> mio.wstrb_1
+      axi.w.bits.last <> mio.wlast_1
+      axi.w.valid <> mio.wvalid_1
+      axi.w.ready <> mio.wready_1
+      axi.b.ready <> mio.bready_1
+      axi.b.bits.id <> mio.bid_1
+      axi.b.bits.resp <> mio.bresp_1
+      axi.b.valid <> mio.bvalid_1
+      axi.ar.bits.id <> mio.arid_1
+      axi.ar.bits.addr <> mio.araddr_1
+      axi.ar.bits.len <> mio.arlen_1
+      axi.ar.bits.size <> mio.arsize_1
+      axi.ar.bits.burst <> mio.arburst_1
+      axi.ar.bits.lock <> mio.arlock_1
+      axi.ar.valid <> mio.arvalid_1
+      axi.ar.ready <> mio.arready_1
+      axi.r.ready <> mio.rready_1
+      axi.r.bits.id <> mio.rid_1
+      axi.r.bits.data <> mio.rdata_1
+      axi.r.bits.resp <> mio.rresp_1
+      axi.r.bits.last <> mio.rlast_1
+      axi.r.valid <> mio.rvalid_1
+    }
+  }
+  
   attach(mio.pad_dq_ch0, ddrIO.pad_dq_ch0)
   attach(mio.pad_dqsn_ch0, ddrIO.pad_dqsn_ch0)
   attach(mio.pad_dqs_ch0, ddrIO.pad_dqs_ch0)
