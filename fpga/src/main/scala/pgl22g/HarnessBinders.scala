@@ -153,7 +153,7 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   val memInst = Module(if (params.dataBits == 128) new ddr3_core(memSize) else new ddr3_core_64(memSize)).suggestName("ddr3_core_inst")
   val ddrIO = IO(new PGL22GMIGIODDR)
   val mio = memInst.io
-  mio.csysreq_ddrc := false.B
+  mio.csysreq_ddrc := true.B
   val ddrCtrl = IO(new PGL22GMIGIOClocksResetBundle)
   
   mio match {
@@ -313,8 +313,10 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
           pgl22gth.pll_clk_bus := mem.ddrCtrl.pll_aclk_2
           mem.ddrCtrl.pll_refclk_in := pgl22gth.sysclk
           mem.ddrCtrl.top_rst_n := pgl22gth.hardResetN
-          mem.ddrCtrl.ddrc_rst := pgl22gth.hardResetN
-          mem.ddrCtrl.csysreq_ddrc := false.B
+          // mem.ddrCtrl.ddrc_rst := pgl22gth.hardResetN
+          mem.ddrCtrl.ddrc_rst := false.B
+          // mem.ddrCtrl.csysreq_ddrc := false.B
+          mem.ddrCtrl.csysreq_ddrc := true.B
 
           // Bug in Chisel implementation. See https://github.com/chipsalliance/chisel3/pull/1781
           def Decoupled[T <: Data](irr: IrrevocableIO[T]): DecoupledIO[T] = {
