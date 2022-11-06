@@ -53,3 +53,8 @@ class WithSPIFlash(size: BigInt = 16 * 1024 * 1024) extends Config((site, here, 
   case PeripherySPIFlashKey => Seq(
     SPIFlashParams(rAddress = 0x10040000, fAddress = 0x20000000, fSize = size))
 })
+
+class WithSimSPIFlash(size: BigInt = 16 * 1024 * 1024) extends Config((site, here, up) => {
+  case PeripherySPIFlashKey => Seq(
+    SPIFlashParams(rAddress = 0x10040000, fAddress = 0x20000000, fSize = size, divisorBits = 2))
+})

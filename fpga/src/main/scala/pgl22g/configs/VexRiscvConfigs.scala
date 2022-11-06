@@ -86,7 +86,7 @@ class SimPGL22GVexRiscvSpiConfig extends Config(
     new WithMemoryBusWidth(32) ++
     new WithPGL22GSimTinyTweaks ++
     new WithFPGAFrequency(5.0) ++
-    new WithSPIFlash ++
+    new WithSimSPIFlash ++
     new WithVexRiscvBootROM(true) ++
     new ModifiedAbstractConfig
 )
