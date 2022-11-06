@@ -155,7 +155,7 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   val mio = memInst.io
   mio.csysreq_ddrc := true.B
   val ddrCtrl = IO(new PGL22GMIGIOClocksResetBundle)
-  
+
   mio match {
     case mio: PGL22GMIGIODDRIO => {
       axi.aw.bits.id <> mio.awid_0
@@ -224,7 +224,7 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
       axi.r.valid <> mio.rvalid_1
     }
   }
-  
+
   attach(mio.pad_dq_ch0, ddrIO.pad_dq_ch0)
   attach(mio.pad_dqsn_ch0, ddrIO.pad_dqsn_ch0)
   attach(mio.pad_dqs_ch0, ddrIO.pad_dqs_ch0)
@@ -272,7 +272,7 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
 //   }
 // }
 
-class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBinder({
+class WithBlackBoxDDRMem(additionalLatency: Int = 0, width: Int = 128) extends OverrideHarnessBinder({
   (system: CanHaveMasterAXI4MemPort, th: HasHarnessSignalReferences, ports: Seq[ClockedAndResetIO[AXI4Bundle]]) => {
     implicit val p: Parameters = chipyard.iobinders.GetSystemParameters(system)
     require(ports.size == 1)
@@ -310,7 +310,7 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0) extends OverrideHarnessBind
           pgl22gth.pll_lock := mem.ddrCtrl.pll_lock
           pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done
           pgl22gth.ddrc_init_done := mem.ddrCtrl.ddrc_init_done
-          pgl22gth.pll_clk_bus := mem.ddrCtrl.pll_aclk_2
+          pgl22gth.pll_clk_bus := (if (width == 64) mem.ddrCtrl.pll_aclk_1 else mem.ddrCtrl.pll_aclk_0)
           mem.ddrCtrl.pll_refclk_in := pgl22gth.sysclk
           mem.ddrCtrl.top_rst_n := pgl22gth.hardResetN
           // mem.ddrCtrl.ddrc_rst := pgl22gth.hardResetN

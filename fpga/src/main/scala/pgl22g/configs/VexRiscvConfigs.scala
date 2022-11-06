@@ -56,8 +56,10 @@ class PGL22GVexRiscv2Config extends Config(
 class SimPGL22GVexRiscvConfig extends Config(
   new WithNVexRiscvCores(1, onChipRAM = false) ++
     new WithVexConfig(VexOnChipConfig.default.copy(
-      iCacheSize = 16384,
-      dCacheSize = 16384,
+      // iCacheSize = 16384,
+      // dCacheSize = 16384,
+      iCacheSize = 8192,
+      dCacheSize = 8192,
       // iCacheSize = 4096,
       // dCacheSize = 4096,
       // iCacheSize = 0,

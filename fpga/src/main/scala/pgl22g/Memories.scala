@@ -48,7 +48,7 @@ class WithPGL22GAXIMem(base: BigInt = BigInt(0x80000000L), width: Int = 128) ext
     new WithBufferlessBroadcastHub ++
     // new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16, outerLatencyCycles = 3, subBankingFactor = 2) ++
     new WithAXI4MemPunchthrough ++
-    new WithBlackBoxDDRMem
+    new WithBlackBoxDDRMem(width = width)
 )
 
 class WithPGL22GAXIMemBare extends Config(
