@@ -156,10 +156,16 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   mio.csysreq_ddrc := true.B
   val ddrCtrl = IO(new PGL22GMIGIOClocksResetBundle)
 
+  val offset = 0x80000000L.U
+
+  val awaddr = axi.aw.bits.addr - offset
+  val araddr = axi.ar.bits.addr - offset
+
   mio match {
     case mio: PGL22GMIGIODDRIO => {
       axi.aw.bits.id <> mio.awid_0
-      axi.aw.bits.addr <> mio.awaddr_0
+      // axi.aw.bits.addr <> mio.awaddr_0
+      mio.awaddr_0 := awaddr
       axi.aw.bits.len <> mio.awlen_0
       axi.aw.bits.size <> mio.awsize_0
       axi.aw.bits.burst <> mio.awburst_0
@@ -176,7 +182,8 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
       axi.b.bits.resp <> mio.bresp_0
       axi.b.valid <> mio.bvalid_0
       axi.ar.bits.id <> mio.arid_0
-      axi.ar.bits.addr <> mio.araddr_0
+      // axi.ar.bits.addr <> mio.araddr_0
+      mio.araddr_0 := araddr
       axi.ar.bits.len <> mio.arlen_0
       axi.ar.bits.size <> mio.arsize_0
       axi.ar.bits.burst <> mio.arburst_0
@@ -192,7 +199,8 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
     }
     case mio: PGL22GMIGIODDRIO64 => {
       axi.aw.bits.id <> mio.awid_1
-      axi.aw.bits.addr <> mio.awaddr_1
+      // axi.aw.bits.addr <> mio.awaddr_1
+      mio.awaddr_1 := awaddr
       axi.aw.bits.len <> mio.awlen_1
       axi.aw.bits.size <> mio.awsize_1
       axi.aw.bits.burst <> mio.awburst_1
@@ -209,7 +217,8 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
       axi.b.bits.resp <> mio.bresp_1
       axi.b.valid <> mio.bvalid_1
       axi.ar.bits.id <> mio.arid_1
-      axi.ar.bits.addr <> mio.araddr_1
+      // axi.ar.bits.addr <> mio.araddr_1
+      mio.araddr_1 := araddr
       axi.ar.bits.len <> mio.arlen_1
       axi.ar.bits.size <> mio.arsize_1
       axi.ar.bits.burst <> mio.arburst_1

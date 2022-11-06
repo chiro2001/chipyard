@@ -67,7 +67,8 @@ class SimPGL22GVexRiscvConfig extends Config(
       resetVector = 0x10040L,
       onChipRamSize = 0
     )) ++
-    new WithMemoryBusWidth(32) ++
+    // new WithMemoryBusWidth(32) ++
+    new WithMemoryBusWidth(64) ++
     new WithPGL22GSimTinyTweaks ++
     new WithFPGAFrequency(5.0) ++
     new ModifiedAbstractConfig
