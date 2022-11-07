@@ -99,8 +99,9 @@ _start:
   csrw SRC_XSCRATCH, sp
   # jal main
 
-  li a0, BOOTADDR_REG
-  lw a0, 0(a0)
+  # li a0, BOOTADDR_REG
+  # lw a0, 0(a0)
+  li a0, 0x80000000
   csrw mepc, a0       // return from interrupt to start of user program
   csrr a0, mhartid    // hartid for next level bootloader
   la a1, _dtb         // dtb address for next level bootloader
