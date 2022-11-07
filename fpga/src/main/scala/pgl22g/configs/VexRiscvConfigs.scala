@@ -28,8 +28,10 @@ class PGL22GVexRiscvBaseConfig extends Config(
 class PGL22GVexRiscvConfig extends Config(
   new WithNVexRiscvCores(1, onChipRAM = false) ++
     new WithVexConfig(VexOnChipConfig.default.copy(
-      iCacheSize = 16384,
-      dCacheSize = 16384,
+      // iCacheSize = 16384,
+      // dCacheSize = 16384,
+      iCacheSize = 32 * 0x400,
+      dCacheSize = 32 * 0x400,
       // iCacheSize = 4096,
       // dCacheSize = 4096,
       // iCacheSize = 0,

@@ -118,6 +118,6 @@ trap_entry:
 	.global park
 	j park
 
-park:
-	wfi
-	j park
+# park:
+# 	wfi
+# 	j park

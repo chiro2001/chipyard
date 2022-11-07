@@ -8,8 +8,8 @@ void main(void) {
   uart_init();
   hello();
   print_str("jumping to BOOTADDR...\n");
-  (*(void (*)(void))(*((uint32_t*)(BOOTADDR_REG))))();
-  print_str("exec done\n");
+  // (*(void (*)(void))(*((uint32_t*)(BOOTADDR_REG))))();
+  // print_str("exec done\n");
 }
 
 void park(void) {

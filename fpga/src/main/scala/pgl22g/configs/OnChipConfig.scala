@@ -148,7 +148,7 @@ class PGL22GOnChipVexRiscvTestsConfig extends Config(
     onChipRamBinaryFile = BootRoms.onChipCoreMark
   )) ++
     // new WithVexOnChipCoreMark ++
-    new WithVexDefaultConfig ++
+    // new WithVexDefaultConfig ++
     new WithNVexRiscvCores(1, onChipRAM = true) ++
     new PGL22GOnChipRocketTestsBaseConfig
 )

@@ -159,7 +159,7 @@ FLASH_MAKE ?= $(base_dir)/generators/vex-riscv/src/main/resources/bootrom
 flash:
 	$(MAKE) -C $(FLASH_MAKE) clean
 	$(MAKE) -C $(FLASH_MAKE)
-	echo "cfg_gen_sfc -device_name W25Q128M -opcode 11 -sbit_start_address 0 \
+	echo "cfg_gen_sfc -device_name W25Q128Q -opcode 11 -sbit_start_address 0 \
 		-sbit $(build_dir)/generate_bitstream/$(MODEL).sbit -user_address_list { 00100000 } -file_list { $(FLASH_BINARY) } \
 		-sfc $(build_dir)/generate_bitstream/$(MODEL).sfc; exit; " \
 		| cdt_cfg_shell
