@@ -127,6 +127,14 @@ class WithDDRMem extends OverrideHarnessBinder({
         bundles.zip(ddrClientBundle).foreach { case (bundle, io) => bundle <> io }
         ddrClientBundle <> ports.head
       }
+      case pgl22gth: PGL22GTLTestHarnessImp => {
+        require(ports.size == 1)
+
+        val bundles = pgl22gth.pgl22gOuter.ddrClient.out.map(_._1)
+        val ddrClientBundle = Wire(new HeterogeneousBag(bundles.map(_.cloneType)))
+        bundles.zip(ddrClientBundle).foreach { case (bundle, io) => bundle <> io }
+        ddrClientBundle <> ports.head
+      }
     }
   }
 })

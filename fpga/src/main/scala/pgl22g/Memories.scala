@@ -25,9 +25,9 @@ class WithMemoryBusWidth(bitWidth: Int) extends Config((site, here, up) => {
   case MemoryBusKey => up(MemoryBusKey, site).copy(beatBytes = bitWidth / 8)
 })
 
-class WithPGL22GTLMem extends Config(
+class WithPGL22GTLMem(width: Int = 128) extends Config(
   new WithTLIOPassthrough ++
-    new WithMemoryBusWidth(128) ++
+    new WithMemoryBusWidth(width) ++
     new chipyard.config.WithTLBackingMemory ++ // use TL backing memory
     new WithDDRMem ++
     // new WithBroadcastManager

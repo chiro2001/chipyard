@@ -12,9 +12,9 @@ import sifive.blocks.devices.uart._
 import sifive.fpgashells.clocks._
 import sifive.fpgashells.ip.pango.{GTP_INBUF, PowerOnResetFPGAOnly}
 import sifive.fpgashells.shell._
-import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellDDROverlays}
+import sifive.fpgashells.shell.pango.{ChipLinkPGL22GPlacedOverlay, PGL22GShellDDROverlays, PGL22GShellTLDDROverlays, SPIFlashIO}
 
-class PGL22GTLTestHarness(override implicit val p: Parameters) extends PGL22GShellDDROverlays {
+class PGL22GTLTestHarness(override implicit val p: Parameters) extends PGL22GShellTLDDROverlays {
 
   def dp = designParameters
 
@@ -97,9 +97,11 @@ class PGL22GTLTestHarness(override implicit val p: Parameters) extends PGL22GShe
 class PGL22GTLTestHarnessImp(_outer: PGL22GTLTestHarness)
   extends LazyRawModuleImp(_outer)
     with HasHarnessSignalReferences
-    with PGL22GTestHarnessUartImp {
+    with PGL22GTestHarnessUartImp
+    with PGL22GTestHarnessSPIFlashImpl {
   val pgl22gOuter = _outer
   override val uart = _outer.io_uart_bb.bundle
+  override val qspi = IO(new SPIFlashIO)
   // is resetN
   val reset = IO(Input(Bool()))
   _outer.fdc.addPackagePin(reset, "L19")
