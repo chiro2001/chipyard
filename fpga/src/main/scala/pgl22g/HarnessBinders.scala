@@ -316,8 +316,22 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0, width: Int = 128) extends O
           attach(ddr.pad_dqsn_ch0, mem.ddrIO.pad_dqsn_ch0)
           attach(ddr.pad_dqs_ch0, mem.ddrIO.pad_dqs_ch0)
 
+          val awStarted = RegInit(false.B)
+          val arStarted = RegInit(false.B)
+          val wStarted = RegInit(false.B)
+          when(mem.axi.ar.ready && !RegNext(mem.axi.ar.ready)) {
+            arStarted := true.B
+          }
+          when(mem.axi.aw.ready && !RegNext(mem.axi.aw.ready)) {
+            awStarted := true.B
+          }
+          when(mem.axi.w.ready && !RegNext(mem.axi.w.ready)) {
+            wStarted := true.B
+          }
+
           pgl22gth.pll_lock := mem.ddrCtrl.pll_lock
-          pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done
+          // pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done
+          pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done && awStarted && arStarted && wStarted
           pgl22gth.ddrc_init_done := mem.ddrCtrl.ddrc_init_done
           pgl22gth.pll_clk_bus := (if (width == 64) mem.ddrCtrl.pll_aclk_1 else mem.ddrCtrl.pll_aclk_0)
           mem.ddrCtrl.pll_refclk_in := pgl22gth.sysclk

@@ -45,14 +45,16 @@ class PGL22GBareTestHarnessImp(_outer: PGL22GBareTestHarness)
   override val uart = _outer.io_uart_bb.bundle
   override val qspi = IO(new SPIFlashIO)
   // is resetN
-  val reset = IO(Input(Bool()))
+  val reset = IO(Input(Bool())).suggestName("reset")
   _outer.fdc.addPackagePin(reset, "L19")
   _outer.fdc.addIOStandard(reset, "LVCMOS12")
-  val resetIBUF = Module(new GTP_INBUF)
-  resetIBUF.io.I := reset
-  val hardResetN = (resetIBUF.io.O).asBool
+  // val resetIBUF = Module(new GTP_INBUF)
+  // resetIBUF.io.I := reset
+  // val hardResetN = (resetIBUF.io.O).asBool
+  val hardResetN = reset
   val sysclk: Clock = _outer.sysClkNode.out.head._1.clock
-  val powerOnReset: Bool = PowerOnResetFPGAOnly(sysclk)
+  // val powerOnReset: Bool = PowerOnResetFPGAOnly(sysclk)
+  val powerOnReset: Bool = false.B
   _outer.sdc.addAsyncPath(Seq(powerOnReset))
   val ereset: Bool = _outer.chiplink.get() match {
     case Some(x: ChipLinkPGL22GPlacedOverlay) => !x.ereset_n
