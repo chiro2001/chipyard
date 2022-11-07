@@ -339,13 +339,15 @@ vex-$(sim): debug_info model_mk_vex
 vex-$(sim_debug): model_mk_debug_vex
 	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir_debug) -f V$(VLOG_MODEL).mk
 
+copy-vex-binaries:
+	-cp $(build_dir)/*.bin .
+	-cp $(base_dir)/*.yaml .
+
 .PHONY: vex-default vex-debug
 vex-default: vex-$(sim)
-	-cp $(build_dir)/*.bin .
-	-cp $(base_dir)/*.yaml .
+	$(MAKE) -C $(abspath .) copy-vex-binaries
 vex-debug: vex-$(sim_debug)
-	-cp $(build_dir)/*.bin .
-	-cp $(base_dir)/*.yaml .
+	$(MAKE) -C $(abspath .) copy-vex-binaries
 
 vex-run: vex-default
 	$(sim)
