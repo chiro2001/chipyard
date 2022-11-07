@@ -158,8 +158,8 @@ class SimPGL22GVexRiscvConfig extends Config(
 class SimPGL22GVexRiscvNConfig extends Config(
   new WithNVexRiscvCores(2, onChipRAM = false) ++
     new WithVexConfig(VexOnChipConfig.default.copy(
-      iCacheSize = 1024,
-      dCacheSize = 1024,
+      iCacheSize = 4096,
+      dCacheSize = 4096,
       resetVector = 0x10040L,
       onChipRamSize = 0
     )) ++
