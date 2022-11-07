@@ -22,8 +22,8 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-multiclock)
-	MODEL             ?= PGL22GClockingTestHarness
-	VLOG_MODEL        ?= PGL22GClockingTestHarness
+	MODEL             ?= PGL22GTLTestHarness
+	VLOG_MODEL        ?= PGL22GTLTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= PGL22GVexRiscvMultiClockConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs

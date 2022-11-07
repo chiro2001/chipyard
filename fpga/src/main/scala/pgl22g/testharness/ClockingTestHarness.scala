@@ -16,21 +16,28 @@ class PGL22GClockingTestHarness(override implicit val p: Parameters) extends PGL
   def dp = designParameters
 
   val topDesign = LazyModule(p(BuildTop)(dp)).suggestName("chiptop")
-  require(dp(ClockInputOverlayKey).size >= 1)
-  val sysClkNode = dp(ClockInputOverlayKey)(0).place(ClockInputDesignInput()).overlayOutput.node
-  val migUIClock = PLLNode(feedback = false)
+  require(dp(ClockInputOverlayKey).nonEmpty)
+  val sysClkNode = dp(ClockInputOverlayKey).head.place(ClockInputDesignInput()).overlayOutput.node
+  // val migUIClock = PLLNode(feedback = false)
   val harnessSysPLL = dp(PLLFactoryKey)()
-
-  // harnessSysPLL := sysClkNode
+  // harnessSysPLL.out.head._1.member.head.reset :=
+  // harnessSysPLL.out.head._1.member.head.clock := pll_clk_bus
+  harnessSysPLL := sysClkNode
+  // migUIClock := sysClkNode
   // harnessSysPLL := migUIClock
-  migUIClock := sysClkNode
   // migUIClock := harnessSysPLL
   println(s"PGL22G FPGA Base Clock Freq: ${dp(DefaultClockFrequencyKey)} MHz")
   val dutClock = ClockSinkNode(freqMHz = dp(DefaultClockFrequencyKey))
+  // val pllInputClock = ClockSinkNode(freqMHz = 50.0)
   val dutWrangler = LazyModule(new ResetWrangler)
+  // val dutWranglerPLL = LazyModule(new ResetWrangler)
   val dutGroup = ClockGroup()
+  // val migGroup = ClockGroup()
   dutClock := dutWrangler.node := dutGroup := harnessSysPLL
-  // dutClock := dutWrangler.node := dutGroup := migUIClock
+  // pllInputClock := dutWranglerPLL.node := migGroup := migUIClock
+  // harnessSysPLL := dutWranglerPLL.node := migGroup := migUIClock
+  // harnessSysPLL := pllInputClock
+  // harnessSysPLL.out.head._1.member.head <> migUIClock.in.head._1
   val io_uart_bb = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
   dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
   // val innerDDRIO = new PGL22GMIGIODDRBase
@@ -80,14 +87,13 @@ class PGL22GClockingTestHarnessImp(_outer: PGL22GClockingTestHarness)
   val ddrc_init_done = WireInit(false.B)
   val pll_lock = WireInit(false.B)
   val pll_clk_bus = WireInit(sysclk)
-  _outer.migUIClock.out.head._1.member.head.reset := (!(pll_lock & ddrc_init_done & ddrphy_rst_done)) || _outer.pllReset
-  _outer.migUIClock.out.head._1.member.head.clock := pll_clk_bus
+  // _outer.migUIClock.out.head._1.member.head.reset := (!(pll_lock & ddrc_init_done & ddrphy_rst_done)) || _outer.pllReset
+  // _outer.migUIClock.out.head._1.member.head.clock := pll_clk_bus
+  // _outer.harnessSysPLL.out.head._1.member.head <> _outer.migUIClock.in.head._1
   // harness binders are non-lazy
   _outer.topDesign match {
     case d: HasIOBinders =>
       ApplyHarnessBinders(this, d.lazySystem, d.portMap)
   }
-  // _outer.harnessSysPLL.out.head._1.member.head.reset := (!(pll_lock & ddrc_init_done & ddrphy_rst_done)) || _outer.pllReset
-  // _outer.harnessSysPLL.out.head._1.member.head.clock := pll_clk_bus
   require(getRefClockFreq == p(DefaultClockFrequencyKey), s"require freq: ${p(DefaultClockFrequencyKey)}")
 }
