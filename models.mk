@@ -21,6 +21,18 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	FPGA_BRAND        ?= pango
 endif
 
+ifeq ($(SUB_PROJECT),pgl22g-vexriscv-multiclock)
+	MODEL             ?= PGL22GClockingTestHarness
+	VLOG_MODEL        ?= PGL22GClockingTestHarness
+	MODEL_PACKAGE     ?= pgl22g.testharness
+	CONFIG            ?= PGL22GVexRiscvMultiClockConfig
+	CONFIG_PACKAGE    ?= pgl22g.configs
+	GENERATOR_PACKAGE ?= chipyard
+	BOARD             ?= pgl22g
+	CONSTRAINTS       ?= ddr-spi
+	FPGA_BRAND        ?= pango
+endif
+
 ifeq ($(SUB_PROJECT),vexchip)
 	MODEL             ?= VexChip
 	MODEL_PACKAGE     ?= vexriscv.demo

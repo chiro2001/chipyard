@@ -1,6 +1,7 @@
 package pgl22g.configs
 
 import chipsalliance.rocketchip.config.Config
+import freechips.rocketchip.diplomacy.AsynchronousCrossing
 import freechips.rocketchip.subsystem._
 import pgl22g._
 import vexriscv.chipyard.{WithNVexRiscvCores, WithVexConfig}
@@ -39,6 +40,32 @@ class PGL22GVexRiscvConfig extends Config(
       resetVector = 0x10000L,
       onChipRamSize = 0
     )) ++
+    new PGL22GVexRiscvBaseConfig)
+
+class PGL22GVexRiscvMultiClockConfig extends Config(
+  new WithNVexRiscvCores(1, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      // iCacheSize = 16384,
+      // dCacheSize = 16384,
+      iCacheSize = 32 * 0x400,
+      dCacheSize = 32 * 0x400,
+      // iCacheSize = 4096,
+      // dCacheSize = 4096,
+      // iCacheSize = 0,
+      // dCacheSize = 0,
+      resetVector = 0x10000L,
+      onChipRamSize = 0
+    )) ++
+    // Frequency specifications
+    new chipyard.config.WithTileFrequency(100.0) ++ // Matches the maximum frequency of U540
+    new chipyard.config.WithSystemBusFrequency(50.0) ++ // Ditto
+    new chipyard.config.WithMemoryBusFrequency(50.0) ++ // 2x the U540 freq (appropriate for a 128b Mbus)
+    new chipyard.config.WithPeripheryBusFrequency(50) ++ // Retains the default pbus frequency
+    new chipyard.config.WithSystemBusFrequencyAsDefault ++ // All unspecified clock frequencies, notably the implicit clock, will use the sbus freq (800 MHz)
+    //  Crossing specifications
+    new chipyard.config.WithCbusToPbusCrossingType(AsynchronousCrossing()) ++ // Add Async crossing between PBUS and CBUS
+    new chipyard.config.WithSbusToMbusCrossingType(AsynchronousCrossing()) ++ // Add Async crossings between backside of L2 and MBUS
+    new freechips.rocketchip.subsystem.WithRationalRocketTiles ++ // Add rational crossings between RocketTile and uncore
     new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscv2Config extends Config(

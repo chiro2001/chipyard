@@ -339,11 +339,7 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0, width: Int = 128) extends O
           // pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done && awStarted && arStarted && wStarted
           pgl22gth.ddrc_init_done := mem.ddrCtrl.ddrc_init_done
           pgl22gth.pll_clk_bus := (if (width == 64) mem.ddrCtrl.pll_aclk_1 else mem.ddrCtrl.pll_aclk_0)
-          // Seq(mem.ddrCtrl.aclk_0, mem.ddrCtrl.aclk_1, mem.ddrCtrl.aclk_2).foreach {
-          //   case Some(aclk) => aclk := pgl22gth.pll_clk_bus
-          //   case None => _
-          // }
-          mem.ddrCtrl.aclk_1.get := pgl22gth.pll_clk_bus
+          Seq(mem.ddrCtrl.aclk_0, mem.ddrCtrl.aclk_1, mem.ddrCtrl.aclk_2).foreach(_.foreach(_ := pgl22gth.pll_clk_bus))
           mem.ddrCtrl.pll_refclk_in := pgl22gth.sysclk
           mem.ddrCtrl.top_rst_n := pgl22gth.hardResetN
           // mem.ddrCtrl.ddrc_rst := pgl22gth.hardResetN
