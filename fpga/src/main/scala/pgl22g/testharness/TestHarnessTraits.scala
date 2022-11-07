@@ -33,7 +33,8 @@ trait PGL22GTestHarnessDDRImp {
   val pll_lock: Bool
   val pll_clk_bus: Clock
   val sysclk: Clock
-  val hardResetN: Bool
+
+  def hardResetN: Bool
 }
 
 trait PGL22GTestHarnessSPIFlashImpl {
