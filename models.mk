@@ -127,11 +127,11 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-test-med)
 	CONSTRAINTS	 			?= onchip
 endif
 
-ifeq ($(SUB_PROJECT),pgl22g-vexriscv2)
+ifeq ($(SUB_PROJECT),pgl22g-vexriscv-n)
 	MODEL             ?= PGL22GBareTestHarness
 	VLOG_MODEL        ?= PGL22GBareTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
-	CONFIG            ?= PGL22GVexRiscv2Config
+	CONFIG            ?= PGL22GVexRiscvNConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g

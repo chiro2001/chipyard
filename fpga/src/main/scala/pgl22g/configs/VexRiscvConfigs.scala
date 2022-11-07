@@ -92,7 +92,7 @@ class PGL22GVexRiscvTLBaseConfig extends Config(
     new WithVexRiscvBootROM ++
     // new WithFPGAFrequency(5.0) ++
     new WithPGL22GTweaks ++
-    new WithPGL22GTLMem(width = 64) ++
+    new WithVexTLMem(width = 64) ++
     new WithMemoryBusWidth(64) ++
     new WithNMemoryChannels(1) ++
     new WithBufferlessBroadcastHub ++
@@ -124,16 +124,12 @@ class PGL22GVexRiscvTLConfig extends Config(
     new freechips.rocketchip.subsystem.WithRationalRocketTiles ++ // Add rational crossings between RocketTile and uncore
     new PGL22GVexRiscvTLBaseConfig)
 
-class PGL22GVexRiscv2Config extends Config(
+class PGL22GVexRiscvNConfig extends Config(
   new WithNVexRiscvCores(2, onChipRAM = false) ++
     new WithVexConfig(VexOnChipConfig.default.copy(
-      // iCacheSize = 16384,
-      // dCacheSize = 16384,
-      // iCacheSize = 4096,
-      // dCacheSize = 4096,
-      iCacheSize = 0,
-      dCacheSize = 0,
-      resetVector = 0x10040L,
+      iCacheSize = 4096,
+      dCacheSize = 4096,
+      resetVector = 0x10000L,
       onChipRamSize = 0
     )) ++
     new PGL22GVexRiscvBaseConfig)
@@ -153,6 +149,20 @@ class SimPGL22GVexRiscvConfig extends Config(
       onChipRamSize = 0
     )) ++
     // new WithMemoryBusWidth(32) ++
+    new WithMemoryBusWidth(64) ++
+    new WithPGL22GSimTinyTweaks ++
+    new WithFPGAFrequency(5.0) ++
+    new ModifiedAbstractConfig
+)
+
+class SimPGL22GVexRiscvNConfig extends Config(
+  new WithNVexRiscvCores(2, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      iCacheSize = 4096,
+      dCacheSize = 4096,
+      resetVector = 0x10040L,
+      onChipRamSize = 0
+    )) ++
     new WithMemoryBusWidth(64) ++
     new WithPGL22GSimTinyTweaks ++
     new WithFPGAFrequency(5.0) ++
