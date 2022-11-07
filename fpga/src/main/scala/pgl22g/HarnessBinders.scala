@@ -264,9 +264,9 @@ class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
   mio.pll_aclk_0 <> ddrCtrl.pll_aclk_0
   mio.pll_aclk_1 <> ddrCtrl.pll_aclk_1
   mio.pll_aclk_2 <> ddrCtrl.pll_aclk_2
-  mio.aclk_0 <> ddrCtrl.aclk_0
-  mio.aclk_1 <> ddrCtrl.aclk_1
-  mio.aclk_2 <> ddrCtrl.aclk_2
+  if (mio.aclk_0.nonEmpty && ddrCtrl.aclk_0.nonEmpty) mio.aclk_0.get <> ddrCtrl.aclk_0.get
+  if (mio.aclk_1.nonEmpty && ddrCtrl.aclk_1.nonEmpty) mio.aclk_1.get <> ddrCtrl.aclk_1.get
+  if (mio.aclk_2.nonEmpty && ddrCtrl.aclk_2.nonEmpty) mio.aclk_2.get <> ddrCtrl.aclk_2.get
   // mio.pll_pclk <> ddrCtrl.pll_pclk
   mio.csysreq_ddrc <> ddrCtrl.csysreq_ddrc
   mio.csysreq_1 <> ddrCtrl.csysreq_1
@@ -321,29 +321,29 @@ class WithBlackBoxDDRMem(additionalLatency: Int = 0, width: Int = 128) extends O
           attach(ddr.pad_dqsn_ch0, mem.ddrIO.pad_dqsn_ch0)
           attach(ddr.pad_dqs_ch0, mem.ddrIO.pad_dqs_ch0)
 
-          val awStarted = RegInit(false.B)
-          val arStarted = RegInit(false.B)
-          val wStarted = RegInit(false.B)
-          when(mem.axi.ar.ready && !RegNext(mem.axi.ar.ready)) {
-            arStarted := true.B
-          }
-          when(mem.axi.aw.ready && !RegNext(mem.axi.aw.ready)) {
-            awStarted := true.B
-          }
-          when(mem.axi.w.ready && !RegNext(mem.axi.w.ready)) {
-            wStarted := true.B
-          }
+          // val awStarted = RegInit(false.B)
+          // val arStarted = RegInit(false.B)
+          // val wStarted = RegInit(false.B)
+          // when(mem.axi.ar.ready && !RegNext(mem.axi.ar.ready)) {
+          //   arStarted := true.B
+          // }
+          // when(mem.axi.aw.ready && !RegNext(mem.axi.aw.ready)) {
+          //   awStarted := true.B
+          // }
+          // when(mem.axi.w.ready && !RegNext(mem.axi.w.ready)) {
+          //   wStarted := true.B
+          // }
 
           pgl22gth.pll_lock := mem.ddrCtrl.pll_lock
-          // pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done
-          pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done && awStarted && arStarted && wStarted
+          pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done
+          // pgl22gth.ddrphy_rst_done := mem.ddrCtrl.ddrphy_rst_done && awStarted && arStarted && wStarted
           pgl22gth.ddrc_init_done := mem.ddrCtrl.ddrc_init_done
           pgl22gth.pll_clk_bus := (if (width == 64) mem.ddrCtrl.pll_aclk_1 else mem.ddrCtrl.pll_aclk_0)
-          if (width == 64) {
-            mem.ddrCtrl.aclk_1 := pgl22gth.pll_clk_bus
-          } else {
-            mem.ddrCtrl.aclk_0 := pgl22gth.pll_clk_bus
-          }
+          // Seq(mem.ddrCtrl.aclk_0, mem.ddrCtrl.aclk_1, mem.ddrCtrl.aclk_2).foreach {
+          //   case Some(aclk) => aclk := pgl22gth.pll_clk_bus
+          //   case None => _
+          // }
+          mem.ddrCtrl.aclk_1.get := pgl22gth.pll_clk_bus
           mem.ddrCtrl.pll_refclk_in := pgl22gth.sysclk
           mem.ddrCtrl.top_rst_n := pgl22gth.hardResetN
           // mem.ddrCtrl.ddrc_rst := pgl22gth.hardResetN
