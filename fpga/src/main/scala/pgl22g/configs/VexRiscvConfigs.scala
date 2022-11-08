@@ -130,7 +130,8 @@ class PGL22GVexRiscvNConfig extends Config(
       iCacheSize = 4096,
       dCacheSize = 4096,
       resetVector = 0x10000L,
-      onChipRamSize = 0
+      onChipRamSize = 0,
+      debug = false
     )) ++
     new PGL22GVexRiscvBaseConfig)
 
