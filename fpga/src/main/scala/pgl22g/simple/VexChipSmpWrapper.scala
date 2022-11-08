@@ -2,16 +2,16 @@ package pgl22g.simple
 
 import chipsalliance.rocketchip.config.{Config, Field, Parameters}
 import chisel3._
-import freechips.rocketchip.amba.axi4.{AXI4Fragmenter, AXI4MasterNode, AXI4MasterParameters, AXI4MasterPortParameters, AXI4RAM, AXI4SlaveNode, AXI4SlaveParameters, AXI4SlavePortParameters, AXI4ToTL, AXI4UserYanker, AXI4Xbar}
-import freechips.rocketchip.diplomacy.{AddressSet, LazyModule, LazyModuleImp, LazyModuleImpLike, LazyRawModuleImp, TransferSizes}
-import freechips.rocketchip.tilelink.{TLBuffer, TLFIFOFixer, TLIdentityNode, TLWidthWidget}
+import chisel3.util.experimental.loadMemoryFromFileInline
+import freechips.rocketchip.amba.axi4.{AXI4Fragmenter, AXI4MasterNode, AXI4MasterParameters, AXI4MasterPortParameters, AXI4RAM, AXI4SlaveNode, AXI4SlaveParameters, AXI4SlavePortParameters, AXI4Xbar}
+import freechips.rocketchip.diplomacy.{AddressSet, LazyModule, LazyRawModuleImp, TransferSizes}
 import pgl22g.DDR3Mem
-import sifive.blocks.devices.uart.{UART, UARTParams}
 import sifive.fpgashells.ip.pango.ddr3.PGL22GMIGIODDR
 import vexriscv.chipyard._
+import vexriscv.demo.VexChipUtils.generateFromBinaryFile
 import vexriscv.demo.VexOnChipConfig
 
-import java.io.{File, PrintWriter}
+import sys.process._
 
 case class VexChipSmpWrapperConfig
 (cpuCount: Int = 2,
@@ -42,11 +42,11 @@ class VexChipSmpWrapper(implicit p: Parameters) extends LazyModule {
       supportsRead = TransferSizes(1, 256 * 8))),
     beatBytes = 8)))
   axiDeviceMem := xbar
-  val rom = AXI4RAM(
+  val rom = LazyModule(new AXI4RAM(
     AddressSet(0x10000L, 0xffffL),
     beatBytes = 8
-  )
-  rom := AXI4Fragmenter() := xbar
+  ))
+  rom.node := AXI4Fragmenter() := xbar
   axiMasters.foreach(master => xbar := master)
 
   // val slaveNode = TLIdentityNode()
@@ -133,6 +133,13 @@ class VexChipSmpWrapperImpl(_outer: VexChipSmpWrapper) extends LazyRawModuleImp(
 
     val scores = IO(Output(UInt(64.W))).suggestName("scores")
     scores := generateMemWatcher(0x85000000L, "scoresReg")
+
+    val bootromPath = "./generators/vex-riscv/src/main/resources/bootrom"
+    val binary = s"$bootromPath/bootrom.rom.rv32.img"
+    val make = s"make -C $bootromPath"
+    require(make.! == 0, "Failed to make bootrom!")
+    loadMemoryFromFileInline(_outer.rom.module.mem, binary)
+    generateFromBinaryFile(binary)
   }
 }
 

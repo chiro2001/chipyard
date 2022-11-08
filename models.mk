@@ -89,6 +89,7 @@ ifeq ($(SUB_PROJECT),vexsmp)
 	VEXCHIP_VERILOG ?= $(build_dir)/$(long_name).top.v
 	VEXCHIP_DEBUG_VERILOG ?= $(VEXCHIP_VERILOG)
 	TOP 							?= VexChipSmpWrapper
+	MEM               ?= mem_vexsmp.v
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-sim)
