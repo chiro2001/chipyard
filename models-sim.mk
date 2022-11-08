@@ -62,6 +62,15 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	CONFIG            ?= SimPGL22GVexRiscvConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
+ifeq ($(SUB_PROJECT),vexsmp)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= VexChipSmpWrapper
+	VLOG_MODEL        ?= VexChipSmpWrapper
+	MODEL_PACKAGE     ?= pgl22g.simple
+	CONFIG            ?= VexChipSmpConfig
+	CONFIG_PACKAGE    ?= pgl22g.simple
+	TOP 							?= VexChipSmpWrapper
+endif
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-n)
 	SBT_PROJECT       ?= fpga_platforms
 	MODEL             ?= PGL22GSimTestHarness
