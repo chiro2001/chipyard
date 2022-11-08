@@ -86,6 +86,7 @@ $(sim_files): $(SIM_FILE_REQS) | $(build_dir)
 # import other necessary rules and variables
 #########################################################################################
 include $(base_dir)/common.mk
+include $(base_dir)/extra.mk
 
 #########################################################################################
 # verilator-specific user-interface variables and commands

@@ -51,6 +51,7 @@ $(sim_files): $(SIM_FILE_REQS) | $(build_dir)
 # import other necessary rules and variables
 #########################################################################################
 include $(base_dir)/common.mk
+include $(base_dir)/extra.mk
 
 #########################################################################################
 # copy from other directory
@@ -163,3 +164,8 @@ flash:
 		-sbit $(build_dir)/generate_bitstream/$(MODEL).sbit -user_address_list { 00100000 } -file_list { $(FLASH_BINARY) } \
 		-sfc $(build_dir)/generate_bitstream/$(MODEL).sfc; exit; " \
 		| cdt_cfg_shell
+
+.PHONY: vexsmp
+vexsmp:
+	-$(MAKE) -C $(abspath .)  SUB_PROJECT=vexsmp verilog
+	cd $(build_dir) && $(EDA) $(EDA_ARGS)

@@ -1,5 +1,5 @@
-VEXCHIP_VERILOG := $(base_dir)/VexChip.v
-VEXCHIP_DEBUG_VERILOG := $(base_dir)/VexChip.v
+VEXCHIP_VERILOG ?= $(base_dir)/VexChip.v
+VEXCHIP_DEBUG_VERILOG ?= $(base_dir)/VexChip.v
 fpga_dir ?= $(base_dir)/fpga/fpga-shells/$(FPGA_BRAND)
 
 .PHONY: build_dir_mk
@@ -10,7 +10,7 @@ build_dir_mk:
 $(VEXCHIP_VERILOG): build_dir_mk
 	cd $(base_dir) && sbt -v "project VexRiscv; runMain vexriscv.demo.GenVexChip"
 	cp $(VEXCHIP_VERILOG) $(build_dir)
-	cp $(fpga_dir)/$(BOARD)/vsrc/VexChipTop.v $(build_dir)
+	cp $(fpga_dir)/$(BOARD)/vsrc/$(SYN_TOP).v $(build_dir)
 	-touch $(build_dir)/empty.sv
 	-mv $(base_dir)/*.bin $(build_dir)
 
@@ -18,7 +18,7 @@ $(VEXCHIP_VERILOG): build_dir_mk
 $(VEXCHIP_DEBUG_VERILOG)_DEBUG: build_dir_mk
 	cd $(base_dir) && sbt -v "project VexRiscv; runMain vexriscv.demo.GenVexChipDebug"
 	cp $(VEXCHIP_DEBUG_VERILOG) $(build_dir)
-	cp $(fpga_dir)/$(BOARD)/vsrc/VexChipTopDebug.v $(build_dir)
+	cp $(fpga_dir)/$(BOARD)/vsrc/$(SYN_TOP)Debug.v $(build_dir)
 	-touch $(build_dir)/empty.sv
 	-mv $(base_dir)/*.bin $(build_dir)
 
@@ -26,7 +26,7 @@ $(VEXCHIP_DEBUG_VERILOG)_DEBUG: build_dir_mk
 vexchip-verilog-synth: build_dir_mk
 	cd $(base_dir) && sbt -v "project VexRiscv; runMain vexriscv.demo.GenVexChipSynth"
 	cp $(VEXCHIP_VERILOG) $(build_dir)
-	cp $(fpga_dir)/$(BOARD)/vsrc/VexChipTop.v $(build_dir)
+	cp $(fpga_dir)/$(BOARD)/vsrc/$(SYN_TOP).v $(build_dir)
 	-touch $(build_dir)/empty.sv
 	-mv $(base_dir)/*.bin $(build_dir)
 

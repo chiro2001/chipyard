@@ -154,9 +154,9 @@ class WithAXI4DDRMem extends OverrideHarnessBinder({
   }
 })
 
-class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters) extends RawModule {
+class DDR3Mem(memSize: BigInt, params: AXI4BundleParameters, flipped: Boolean = true) extends RawModule {
   println(s"DDR3 Interface WIDTH=${params.dataBits}")
-  val axi = IO(Flipped(new AXI4Bundle(params)))
+  val axi = IO(if (flipped) Flipped(new AXI4Bundle(params)) else new AXI4Bundle(params))
   require(params.dataBits == 128 || params.dataBits == 64, s"Only support 128 or 64bit width data! now is ${params.dataBits}")
   val memInst = Module(if (params.dataBits == 128) new ddr3_core(memSize) else new ddr3_core_64(memSize)).suggestName("ddr3_core_inst")
   val ddrIO = IO(new PGL22GMIGIODDR)

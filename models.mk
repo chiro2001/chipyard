@@ -56,6 +56,8 @@ ifeq ($(SUB_PROJECT),vexchip)
 	FPGA_BRAND        ?= pango
 	CONSTRAINTS       ?= vexchip
 	SYN_TOP           ?= VexChipTop
+	VEXCHIP_VERILOG ?= $(base_dir)/VexChip.v
+	VEXCHIP_DEBUG_VERILOG ?= $(base_dir)/VexChip.v
 endif
 
 ifeq ($(SUB_PROJECT),vexchip-debug)
@@ -69,6 +71,24 @@ ifeq ($(SUB_PROJECT),vexchip-debug)
 	FPGA_BRAND        ?= pango
 	CONSTRAINTS       ?= vexchip
 	SYN_TOP           ?= VexChipTop
+	VEXCHIP_VERILOG ?= $(base_dir)/VexChip.v
+	VEXCHIP_DEBUG_VERILOG ?= $(base_dir)/VexChip.v
+endif
+
+ifeq ($(SUB_PROJECT),vexsmp)
+	MODEL             ?= VexChipSmpWrapper
+	MODEL_PACKAGE     ?= pgl22g.simple
+	CONFIG            ?= VexChipSmpConfig
+	CONFIG_PACKAGE    ?= pgl22g.simple
+	GENERATOR_PACKAGE ?= chipyard
+	VLOG_MODEL        ?= VexChipSmpWrapper
+	BOARD             ?= pgl22g
+	FPGA_BRAND        ?= pango
+	CONSTRAINTS       ?= vexsmp
+	SYN_TOP           ?= VexChipSmpWrapper
+	VEXCHIP_VERILOG ?= $(build_dir)/$(long_name).top.v
+	VEXCHIP_DEBUG_VERILOG ?= $(VEXCHIP_VERILOG)
+	TOP 							?= VexChipSmpWrapper
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-sim)
