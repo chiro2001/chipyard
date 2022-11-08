@@ -90,48 +90,50 @@ class VexChipSmpWrapperImpl(_outer: VexChipSmpWrapper) extends LazyRawModuleImp(
   DDR3Mem.ddrCtrl.top_rst_n := reset
   DDR3Mem.ddrCtrl.pll_refclk_in := sys_clock
 
-  require(cpuCount <= 4)
-  val cpus = (0 until cpuCount).zip(Seq(
-    () => new VexCore0(false, optionalConfig = Some(cpuConfig)),
-    () => new VexCore1(false, optionalConfig = Some(cpuConfig)),
-    () => new VexCore2(false, optionalConfig = Some(cpuConfig)),
-    () => new VexCore3(false, optionalConfig = Some(cpuConfig)),
-  )).map(c => {
-    Module(c._2())
-  })
-  val externalInterrupt = false.B
-  val timerInterrupt = false.B
-  cpus.foreach(cpu => {
-    cpu.io.externalInterrupt := externalInterrupt
-    cpu.io.timerInterrupt := timerInterrupt
-    cpu.io.clk := mainClock
-    cpu.io.reset := mainReset
-  })
-  cpus.zip(_outer.axiMasters.grouped(2).toSeq).foreach(x => {
-    x._1.io.connectIMem(x._2.head.out.head._1)
-    x._1.io.connectDMem(x._2(1).out.head._1)
-  })
+  withClockAndReset(mainClock, mainReset) {
+    require(cpuCount <= 4)
+    val cpus = (0 until cpuCount).zip(Seq(
+      () => new VexCore0(false, optionalConfig = Some(cpuConfig)),
+      () => new VexCore1(false, optionalConfig = Some(cpuConfig)),
+      () => new VexCore2(false, optionalConfig = Some(cpuConfig)),
+      () => new VexCore3(false, optionalConfig = Some(cpuConfig)),
+    )).map(c => {
+      Module(c._2())
+    })
+    val externalInterrupt = false.B
+    val timerInterrupt = false.B
+    cpus.foreach(cpu => {
+      cpu.io.externalInterrupt := externalInterrupt
+      cpu.io.timerInterrupt := timerInterrupt
+      cpu.io.clk := mainClock
+      cpu.io.reset := mainReset
+    })
+    cpus.zip(_outer.axiMasters.grouped(2).toSeq).foreach(x => {
+      x._1.io.connectIMem(x._2.head.out.head._1)
+      x._1.io.connectDMem(x._2(1).out.head._1)
+    })
 
-  def generateMemWatcher(address: Long, name: String = "resultReg"): UInt = {
-    val resultReg = RegInit(0.U(64.W)).suggestName(name)
-    val resultAddress = address.U
-    val validToResult = DDR3Mem.axi.aw.bits.addr === resultAddress && DDR3Mem.axi.aw.ready && DDR3Mem.axi.aw.valid
-    val readyToResult = RegInit(false.B)
-    val writtenResult = RegInit(false.B)
-    val writingResult = (validToResult || readyToResult) && DDR3Mem.axi.w.valid && DDR3Mem.axi.w.ready &&
-      DDR3Mem.axi.w.bits.last && writtenResult
-    when(validToResult) {
-      readyToResult := true.B
+    def generateMemWatcher(address: Long, name: String = "resultReg"): UInt = {
+      val resultReg = RegInit(0.U(64.W)).suggestName(name)
+      val resultAddress = address.U
+      val validToResult = DDR3Mem.axi.aw.bits.addr === resultAddress && DDR3Mem.axi.aw.ready && DDR3Mem.axi.aw.valid
+      val readyToResult = RegInit(false.B)
+      val writtenResult = RegInit(false.B)
+      val writingResult = (validToResult || readyToResult) && DDR3Mem.axi.w.valid && DDR3Mem.axi.w.ready &&
+        DDR3Mem.axi.w.bits.last && writtenResult
+      when(validToResult) {
+        readyToResult := true.B
+      }
+      when(writingResult) {
+        writtenResult := true.B
+        resultReg := DDR3Mem.axi.w.bits.data
+      }
+      resultReg
     }
-    when(writingResult) {
-      writtenResult := true.B
-      resultReg := DDR3Mem.axi.w.bits.data
-    }
-    resultReg
+
+    val scores = IO(Output(UInt(64.W))).suggestName("scores")
+    scores := generateMemWatcher(0x85000000L, "scoresReg")
   }
-
-  val scores = IO(Output(UInt(64.W)))
-  scores := generateMemWatcher(0x85000000L, "scoresReg")
 }
 
 case object VexChipSmpKey extends Field[VexChipSmpWrapperConfig]
