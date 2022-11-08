@@ -166,6 +166,8 @@ flash:
 		| cdt_cfg_shell
 
 .PHONY: vexsmp
-vexsmp:
+vexsmp: tcl_files
 	-$(MAKE) -C $(abspath .)  SUB_PROJECT=vexsmp verilog
+	-touch $(build_dir)/$(long_name).top.mems.v
+	-touch $(build_dir)/empty.sv
 	cd $(build_dir) && $(EDA) $(EDA_ARGS)
