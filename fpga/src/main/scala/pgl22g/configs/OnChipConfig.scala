@@ -184,6 +184,12 @@ class SimPGL22GOnChipRocketSpiConfig extends Config(
     new WithNoDebug ++
     // new WithSPIFlash ++
     new WithSPIFlashHarnessBinder ++
+    new chipyard.config.WithTLSerialLocation(
+      freechips.rocketchip.subsystem.FBUS,
+      freechips.rocketchip.subsystem.PBUS) ++ // attach TL serial adapter to f/p busses
+    new freechips.rocketchip.subsystem.WithIncoherentBusTopology ++ // use incoherent bus topology
+    new freechips.rocketchip.subsystem.WithNBanks(0) ++ // remove L2$
+    new freechips.rocketchip.subsystem.WithNoMemPort ++ // remove backing memory
     new WithFPGAFrequency(5.0) ++
     new ModifiedAbstractConfig
 )

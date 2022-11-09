@@ -146,6 +146,12 @@ class PGL22GVexRiscvClockingConfig extends Config(
     new chipyard.config.WithSystemBusFrequency((100.0 * 1 / 3)) ++
     new chipyard.config.WithMemoryBusFrequency((100.0 * 1 / 3)) ++
     new chipyard.config.WithPeripheryBusFrequency((100.0 * 1 / 3)) ++
+    new chipyard.config.WithSystemBusFrequencyAsDefault ++ // All unspecified clock frequencies, notably the implicit clock, will use the sbus freq (800 MHz)
+    //  Crossing specifications
+    new chipyard.config.WithCbusToPbusCrossingType(AsynchronousCrossing()) ++ // Add Async crossing between PBUS and CBUS
+    new chipyard.config.WithSbusToMbusCrossingType(AsynchronousCrossing()) ++ // Add Async crossings between backside of L2 and MBUS
+    new freechips.rocketchip.subsystem.WithRationalRocketTiles ++ // Add rational crossings between RocketTile and uncore
+    new testchipip.WithAsynchronousSerialSlaveCrossing ++ // Add Async crossing between serial and MBUS. Its master-side is tied to the FBUS
     new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscvNConfig extends Config(
@@ -217,7 +223,8 @@ class SimPGL22GVexRiscvMultiClockConfig extends Config(
       // iCacheSize = 0,
       // dCacheSize = 0,
       resetVector = 0x10040L,
-      onChipRamSize = 0
+      onChipRamSize = 0,
+      freq = 100 MHz,
     )) ++
     // new WithMemoryBusWidth(32) ++
     new WithMemoryBusWidth(64) ++
