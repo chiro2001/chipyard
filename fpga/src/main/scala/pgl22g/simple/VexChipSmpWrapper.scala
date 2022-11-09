@@ -14,7 +14,7 @@ import vexriscv.demo.VexOnChipConfig
 import sys.process._
 
 case class VexChipSmpWrapperConfig
-(cpuCount: Int = 2,
+(cpuCount: Int = 4,
  cpuConfig: VexOnChipConfig = VexOnChipConfig.default)
 
 object VexChipSmpWrapperConfig {
