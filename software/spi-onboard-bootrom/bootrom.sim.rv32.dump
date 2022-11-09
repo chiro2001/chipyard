@@ -1,0 +1,118 @@
+
+bootrom.sim.rv32.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .start:
+
+00010000 <_start>:
+   10000:	54000ab7          	lui	s5,0x54000
+   10004:	f1402573          	csrr	a0,mhartid
+   10008:	00050463          	beqz	a0,10010 <_start+0x10>
+   1000c:	1740006f          	j	10180 <_dtb>
+   10010:	00000593          	li	a1,0
+   10014:	00baa823          	sw	a1,16(s5) # 54000010 <__bss_end+0x53feee50>
+   10018:	00100593          	li	a1,1
+   1001c:	00baa423          	sw	a1,8(s5)
+   10020:	00100593          	li	a1,1
+   10024:	00baa623          	sw	a1,12(s5)
+   10028:	05300593          	li	a1,83
+   1002c:	05400613          	li	a2,84
+   10030:	04100693          	li	a3,65
+   10034:	05200713          	li	a4,82
+   10038:	05400793          	li	a5,84
+   1003c:	00a00813          	li	a6,10
+   10040:	00baa023          	sw	a1,0(s5)
+   10044:	00caa023          	sw	a2,0(s5)
+   10048:	00daa023          	sw	a3,0(s5)
+   1004c:	00eaa023          	sw	a4,0(s5)
+   10050:	00faa023          	sw	a5,0(s5)
+   10054:	010aa023          	sw	a6,0(s5)
+   10058:	0940006f          	j	100ec <start_copy>
+
+Disassembly of section .text.hang:
+
+00010080 <_hang>:
+   10080:	00000517          	auipc	a0,0x0
+   10084:	f8050513          	addi	a0,a0,-128 # 10000 <ROM_BASE>
+   10088:	30551073          	csrw	mtvec,a0
+   1008c:	301022f3          	csrr	t0,misa
+   10090:	4122d293          	srai	t0,t0,0x12
+   10094:	0012f293          	andi	t0,t0,1
+   10098:	00028463          	beqz	t0,100a0 <_hang+0x20>
+   1009c:	30301073          	csrw	mideleg,zero
+   100a0:	00800513          	li	a0,8
+   100a4:	30451073          	csrw	mie,a0
+   100a8:	30052073          	csrs	mstatus,a0
+   100ac:	54000ab7          	lui	s5,0x54000
+   100b0:	f1402573          	csrr	a0,mhartid
+   100b4:	0c051663          	bnez	a0,10180 <_dtb>
+
+000100b8 <wfi_loop>:
+   100b8:	10500073          	wfi
+   100bc:	ffdff06f          	j	100b8 <wfi_loop>
+
+000100c0 <_copy_flash>:
+   100c0:	201005b7          	lui	a1,0x20100
+   100c4:	80000637          	lui	a2,0x80000
+   100c8:	0000a6b7          	lui	a3,0xa
+   100cc:	ffc68693          	addi	a3,a3,-4 # 9ffc <__STACKSIZE__+0x8ffc>
+
+000100d0 <_copy_flash_loop>:
+   100d0:	0005a283          	lw	t0,0(a1) # 20100000 <__bss_end+0x200eee40>
+   100d4:	00562023          	sw	t0,0(a2) # 80000000 <__bss_end+0x7ffeee40>
+   100d8:	00458593          	addi	a1,a1,4
+   100dc:	00460613          	addi	a2,a2,4
+   100e0:	ffc68693          	addi	a3,a3,-4
+   100e4:	fe0696e3          	bnez	a3,100d0 <_copy_flash_loop>
+   100e8:	00008067          	ret
+
+000100ec <start_copy>:
+   100ec:	fd5ff0ef          	jal	ra,100c0 <_copy_flash>
+
+000100f0 <copy_done>:
+   100f0:	f1402573          	csrr	a0,mhartid
+   100f4:	02051c63          	bnez	a0,1012c <attach>
+   100f8:	04300593          	li	a1,67
+   100fc:	04f00613          	li	a2,79
+   10100:	05000693          	li	a3,80
+   10104:	05900713          	li	a4,89
+   10108:	02e00793          	li	a5,46
+   1010c:	00a00813          	li	a6,10
+   10110:	00baa023          	sw	a1,0(s5) # 54000000 <__bss_end+0x53feee40>
+   10114:	00caa023          	sw	a2,0(s5)
+   10118:	00daa023          	sw	a3,0(s5)
+   1011c:	00eaa023          	sw	a4,0(s5)
+   10120:	00faa023          	sw	a5,0(s5)
+   10124:	010aa023          	sw	a6,0(s5)
+   10128:	0340006f          	j	1015c <attach_done>
+
+0001012c <attach>:
+   1012c:	04100593          	li	a1,65
+   10130:	05400613          	li	a2,84
+   10134:	04100693          	li	a3,65
+   10138:	04300713          	li	a4,67
+   1013c:	04800793          	li	a5,72
+   10140:	00a00813          	li	a6,10
+   10144:	00baa023          	sw	a1,0(s5)
+   10148:	00caa023          	sw	a2,0(s5)
+   1014c:	00daa023          	sw	a3,0(s5)
+   10150:	00eaa023          	sw	a4,0(s5)
+   10154:	00faa023          	sw	a5,0(s5)
+   10158:	010aa023          	sw	a6,0(s5)
+
+0001015c <attach_done>:
+   1015c:	00004537          	lui	a0,0x4
+   10160:	00052503          	lw	a0,0(a0) # 4000 <__STACKSIZE__+0x3000>
+   10164:	34151073          	csrw	mepc,a0
+   10168:	f1402573          	csrr	a0,mhartid
+   1016c:	00000597          	auipc	a1,0x0
+   10170:	01458593          	addi	a1,a1,20 # 10180 <_dtb>
+   10174:	08000613          	li	a2,128
+   10178:	30063073          	csrc	mstatus,a2
+   1017c:	30200073          	mret
+
+00010180 <_dtb>:
+   10180:	10500073          	wfi
+   10184:	ffdff06f          	j	10180 <_dtb>
+   10188:	0000                	unimp
+	...

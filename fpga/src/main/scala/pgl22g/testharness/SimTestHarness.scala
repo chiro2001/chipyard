@@ -7,6 +7,7 @@ import chipyard.iobinders.HasIOBinders
 import chisel3._
 import freechips.rocketchip.diplomacy.{LazyModule, LazyRawModuleImp}
 import freechips.rocketchip.prci.{ClockBundle, ClockBundleParameters}
+import sifive.fpgashells.shell.pango.SPIFlashIO
 import sifive.fpgashells.shell.{FlippedJTAGIO, IOShell, SDC}
 
 class PGL22GSimShell(implicit p: Parameters) extends IOShell {
@@ -26,9 +27,12 @@ class PGL22GSimTestHarness(implicit p: Parameters) extends PGL22GSimShell {
 
 class PGL22GSimTestHarnessImpl(_outer: PGL22GSimTestHarness)
   extends LazyRawModuleImp(_outer)
-    with HasHarnessSignalReferences {
+    with HasHarnessSignalReferences
+    with PGL22GTestHarnessSPIFlashImpl {
   val io_success = IO(Output(Bool()))
   io_success := false.B
+
+  override val qspi = IO(new SPIFlashIO)
 
   val reset = IO(Input(Bool()))
   val clock = IO(Input(Clock()))

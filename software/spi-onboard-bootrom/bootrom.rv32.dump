@@ -1,0 +1,55 @@
+
+bootrom.rv32.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .start:
+
+00010000 <_start>:
+   10000:	54000ab7          	lui	s5,0x54000
+   10004:	f1402573          	csrr	a0,mhartid
+   10008:	08051463          	bnez	a0,10090 <_dtb>
+   1000c:	00000593          	li	a1,0
+   10010:	00baa823          	sw	a1,16(s5) # 54000010 <__bss_end+0x53feef50>
+   10014:	00100593          	li	a1,1
+   10018:	00baa423          	sw	a1,8(s5)
+   1001c:	00100593          	li	a1,1
+   10020:	00baa623          	sw	a1,12(s5)
+   10024:	04200993          	li	s3,66
+   10028:	013aa023          	sw	s3,0(s5)
+   1002c:	0300006f          	j	1005c <start_copy>
+
+00010030 <_copy_flash>:
+   10030:	201005b7          	lui	a1,0x20100
+   10034:	80000637          	lui	a2,0x80000
+   10038:	000106b7          	lui	a3,0x10
+   1003c:	ffc68693          	addi	a3,a3,-4 # fffc <__STACKSIZE__+0xeffc>
+
+00010040 <_copy_flash_loop>:
+   10040:	0005a283          	lw	t0,0(a1) # 20100000 <__bss_end+0x200eef40>
+   10044:	00562023          	sw	t0,0(a2) # 80000000 <__bss_end+0x7ffeef40>
+   10048:	00458593          	addi	a1,a1,4
+   1004c:	00460613          	addi	a2,a2,4
+   10050:	ffc68693          	addi	a3,a3,-4
+   10054:	fe0696e3          	bnez	a3,10040 <_copy_flash_loop>
+   10058:	00008067          	ret
+
+0001005c <start_copy>:
+   1005c:	fd5ff0ef          	jal	ra,10030 <_copy_flash>
+
+00010060 <copy_done>:
+   10060:	04400593          	li	a1,68
+   10064:	00baa023          	sw	a1,0(s5)
+   10068:	00004537          	lui	a0,0x4
+   1006c:	00052503          	lw	a0,0(a0) # 4000 <__STACKSIZE__+0x3000>
+   10070:	34151073          	csrw	mepc,a0
+   10074:	f1402573          	csrr	a0,mhartid
+   10078:	00000597          	auipc	a1,0x0
+   1007c:	01858593          	addi	a1,a1,24 # 10090 <_dtb>
+   10080:	08000613          	li	a2,128
+   10084:	30063073          	csrc	mstatus,a2
+   10088:	30200073          	mret
+   1008c:	00000013          	nop
+
+00010090 <_dtb>:
+   10090:	10500073          	wfi
+   10094:	ffdff06f          	j	10090 <_dtb>

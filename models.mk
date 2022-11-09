@@ -82,9 +82,9 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv-multiclock2)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
-	CONSTRAINTS       ?= ddr-spi-50
+	CONSTRAINTS       ?= ddr-spi-100
 	FPGA_BRAND        ?= pango
-	IPCORES						?= ipcores-n1-clk
+	IPCORES						?= ipcores-100
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-tl)

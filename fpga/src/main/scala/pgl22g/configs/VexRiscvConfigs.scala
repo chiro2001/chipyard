@@ -43,9 +43,9 @@ class PGL22GVexRiscvMultiClockConfig extends Config(
       onChipRamSize = 0
     )) ++
     // Frequency specifications
-    new chipyard.config.WithTileFrequency(80.0) ++ // Matches the maximum frequency of U540
-    new chipyard.config.WithSystemBusFrequency(40.0) ++ // Ditto
-    new chipyard.config.WithMemoryBusFrequency(40.0) ++ // 2x the U540 freq (appropriate for a 128b Mbus)
+    new chipyard.config.WithTileFrequency(100.0) ++ // Matches the maximum frequency of U540
+    new chipyard.config.WithSystemBusFrequency(50.0) ++ // Ditto
+    new chipyard.config.WithMemoryBusFrequency(50.0) ++ // 2x the U540 freq (appropriate for a 128b Mbus)
     new chipyard.config.WithPeripheryBusFrequency(10) ++ // Retains the default pbus frequency
     new chipyard.config.WithSystemBusFrequencyAsDefault ++ // All unspecified clock frequencies, notably the implicit clock, will use the sbus freq (800 MHz)
     //  Crossing specifications
@@ -139,13 +139,13 @@ class PGL22GVexRiscvClockingConfig extends Config(
       dCacheSize = 32 * 0x400,
       resetVector = 0x10000L,
       onChipRamSize = 0,
-      freq = 80 MHz
+      freq = (100.0 * 2 / 3) MHz
     )) ++
     // new WithFPGAFrequency(50.0) ++
-    new chipyard.config.WithTileFrequency(80.0) ++
-    new chipyard.config.WithSystemBusFrequency(50.0) ++
-    new chipyard.config.WithMemoryBusFrequency(50.0) ++
-    new chipyard.config.WithPeripheryBusFrequency(50) ++
+    new chipyard.config.WithTileFrequency((100.0 * 2 / 3)) ++
+    new chipyard.config.WithSystemBusFrequency((100.0 * 1 / 3)) ++
+    new chipyard.config.WithMemoryBusFrequency((100.0 * 1 / 3)) ++
+    new chipyard.config.WithPeripheryBusFrequency((100.0 * 1 / 3)) ++
     new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscvNConfig extends Config(

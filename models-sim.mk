@@ -140,7 +140,7 @@ ifeq ($(SUB_PROJECT),pgl22g-onchip-rocket-spi)
 	MODEL             ?= PGL22GSimTestHarness
 	VLOG_MODEL        ?= PGL22GSimTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
-	CONFIG            ?= PGL22GOnChipRocketSpiConfig
+	CONFIG            ?= SimPGL22GOnChipRocketSpiConfig
 	CONFIG_PACKAGE    ?= pgl22g.configs
 endif
 ifeq ($(SUB_PROJECT),pgl22g-onchip-vexriscv-test)

@@ -74,6 +74,36 @@ class WithTestsBootROM extends Config((site, here, up) => {
   }
 })
 
+class WithSpiBootROM extends Config((site, here, up) => {
+  case BootROMLocated(x) => {
+    val baseDir = "./software/spi-onboard-bootrom"
+    val bootrom = new File(s"$baseDir/bootrom.rv${site(XLen)}.img")
+    val clean = s"make -C $baseDir clean"
+    require(clean.! == 0 && !bootrom.exists(), "Failed to clean bootrom!")
+    val make = s"make -C $baseDir"
+    require(make.! == 0 && bootrom.exists(), "Failed to build bootrom!")
+    up(BootROMLocated(x), site)
+      .map(_.copy(contentFileName = bootrom.getAbsolutePath, hang = 0x10000))
+  }
+})
+
+class WithSimSpiBootROM extends Config((site, here, up) => {
+  case BootROMLocated(x) => {
+    println(s"Bootrom: WithSimSpiBootROM")
+    val baseDir = "./software/spi-onboard-bootrom"
+    val bootrom = new File(s"$baseDir/bootrom.sim.rv${site(XLen)}.img")
+    val clean = s"make -C $baseDir clean"
+    require(clean.! == 0 && !bootrom.exists(), "Failed to clean bootrom!")
+    val make = s"make -C $baseDir"
+    require(make.! == 0 && bootrom.exists(), "Failed to build bootrom!")
+    up(BootROMLocated(x), site)
+      .map(_.copy(contentFileName = bootrom.getAbsolutePath,
+        // hang = 0x10080
+        hang = 0x10000
+      ))
+  }
+})
+
 class WithBareCoreMarkBootROM
 (address: BigInt = 0x10000,
  size: Int = 0x10000,

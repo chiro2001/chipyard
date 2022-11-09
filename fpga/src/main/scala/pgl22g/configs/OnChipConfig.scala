@@ -153,3 +153,44 @@ class PGL22GOnChipVexRiscvTestsConfig extends Config(
     new PGL22GOnChipRocketTestsBaseConfig
 )
 
+class PGL22GOnChipRocketSpiBaseConfig extends Config(
+  new PGL22GOnChipBaseConfig ++
+    new WithScratchpadsSize(startAddress = 0x80000000L, sizeKB = 64) ++ // use rocket l1 DCache scratchpad as base phys mem
+    new freechips.rocketchip.subsystem.WithoutTLMonitors ++
+    new WithDefaultPeripherals ++
+    new WithoutFPU ++
+    new WithRV32 ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
+    // new chipyard.harness.WithSimSerial ++
+    new WithUARTHarnessBinder ++
+    new WithNoDebug ++
+    new WithSPIFlash ++
+    new WithSPIFlashHarnessBinder ++
+    new WithFPGAFrequency(5.0) ++
+    new ModifiedAbstractConfig)
+
+class SimPGL22GOnChipRocketSpiConfig extends Config(
+  new WithScratchpadsSize(startAddress = 0x80000000L, sizeKB = 64 * 4) ++
+    new WithSimSpiBootROM ++
+    new WithSimSPIFlash ++
+    new WithTinyScratchpadsTinyCore ++
+    new freechips.rocketchip.subsystem.WithoutTLMonitors ++
+    new WithDefaultPeripherals ++
+    new WithoutFPU ++
+    new WithRV32 ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(2) ++
+    // new chipyard.harness.WithSimSerial ++
+    new WithUARTHarnessBinder ++
+    new WithNoDebug ++
+    // new WithSPIFlash ++
+    new WithSPIFlashHarnessBinder ++
+    new WithFPGAFrequency(5.0) ++
+    new ModifiedAbstractConfig
+)
+
+class PGL22GOnChipRocketSpiConfig extends Config(
+  new WithScratchpadsSize(startAddress = 0x80000000L, sizeKB = 64) ++
+    new WithSpiBootROM ++
+    new WithTinyScratchpadsTinyCore ++
+    new PGL22GOnChipRocketSpiBaseConfig
+)
