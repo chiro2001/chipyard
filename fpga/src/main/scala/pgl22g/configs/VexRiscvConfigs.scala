@@ -28,24 +28,6 @@ class PGL22GVexRiscvBaseConfig extends Config(
     new WithBufferlessBroadcastHub ++
     new ModifiedAbstractConfig)
 
-class PGL22GVexRiscvConfig extends Config(
-  new WithNVexRiscvCores(1, onChipRAM = false) ++
-    new WithVexConfig(VexOnChipConfig.default.copy(
-      // iCacheSize = 16384,
-      // dCacheSize = 16384,
-      iCacheSize = 32 * 0x400,
-      dCacheSize = 32 * 0x400,
-      // iCacheSize = 4096,
-      // dCacheSize = 4096,
-      // iCacheSize = 0,
-      // dCacheSize = 0,
-      resetVector = 0x10000L,
-      onChipRamSize = 0,
-      freq = 55 MHz
-    )) ++
-    new WithFPGAFrequency(55.0) ++
-    new PGL22GVexRiscvBaseConfig)
-
 class PGL22GVexRiscvMultiClockConfig extends Config(
   new WithNVexRiscvCores(1, onChipRAM = false) ++
     new WithVexConfig(VexOnChipConfig.default.copy(
@@ -61,10 +43,10 @@ class PGL22GVexRiscvMultiClockConfig extends Config(
       onChipRamSize = 0
     )) ++
     // Frequency specifications
-    new chipyard.config.WithTileFrequency(100.0) ++ // Matches the maximum frequency of U540
-    new chipyard.config.WithSystemBusFrequency(50.0) ++ // Ditto
-    new chipyard.config.WithMemoryBusFrequency(50.0) ++ // 2x the U540 freq (appropriate for a 128b Mbus)
-    new chipyard.config.WithPeripheryBusFrequency(50) ++ // Retains the default pbus frequency
+    new chipyard.config.WithTileFrequency(80.0) ++ // Matches the maximum frequency of U540
+    new chipyard.config.WithSystemBusFrequency(40.0) ++ // Ditto
+    new chipyard.config.WithMemoryBusFrequency(40.0) ++ // 2x the U540 freq (appropriate for a 128b Mbus)
+    new chipyard.config.WithPeripheryBusFrequency(10) ++ // Retains the default pbus frequency
     new chipyard.config.WithSystemBusFrequencyAsDefault ++ // All unspecified clock frequencies, notably the implicit clock, will use the sbus freq (800 MHz)
     //  Crossing specifications
     new chipyard.config.WithCbusToPbusCrossingType(AsynchronousCrossing()) ++ // Add Async crossing between PBUS and CBUS
@@ -77,9 +59,9 @@ class WithVexTLMem(width: Int = 64) extends Config(
     new WithMemoryBusWidth(width) ++
     new chipyard.config.WithTLBackingMemory ++ // use TL backing memory
     new WithDDRMem
-    // new WithBroadcastManager
-    // Total 48 Kbit
-    // new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2)
+  // new WithBroadcastManager
+  // Total 48 Kbit
+  // new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 32, outerLatencyCycles = 3, subBankingFactor = 2)
 )
 
 class PGL22GVexRiscvTLBaseConfig extends Config(
@@ -128,7 +110,58 @@ class PGL22GVexRiscvTLConfig extends Config(
     new freechips.rocketchip.subsystem.WithRationalRocketTiles ++ // Add rational crossings between RocketTile and uncore
     new PGL22GVexRiscvTLBaseConfig)
 
+class PGL22GVexRiscvL2Config extends Config(
+  new WithNVexRiscvCores(1, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      iCacheSize = 8 * 0x400,
+      dCacheSize = 8 * 0x400,
+      resetVector = 0x10000L,
+      onChipRamSize = 0,
+      freq = 55 MHz
+    )) ++
+    new WithFPGAFrequency(55.0) ++
+    new WithUARTHarnessBinder ++
+    new WithNoDebug ++
+    new WithSPIFlash ++
+    new WithSPIFlashHarnessBinder ++
+    new WithVexRiscvBootROM ++
+    new WithPGL22GTweaks ++
+    new WithPGL22GAXIMem(width = 64) ++
+    new WithNMemoryChannels(1) ++
+    // new WithBufferlessBroadcastHub ++
+    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16, outerLatencyCycles = 3, subBankingFactor = 2) ++
+    new ModifiedAbstractConfig)
+
+class PGL22GVexRiscvClockingConfig extends Config(
+  new WithNVexRiscvCores(1, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      iCacheSize = 32 * 0x400,
+      dCacheSize = 32 * 0x400,
+      resetVector = 0x10000L,
+      onChipRamSize = 0,
+      freq = 80 MHz
+    )) ++
+    // new WithFPGAFrequency(50.0) ++
+    new chipyard.config.WithTileFrequency(80.0) ++
+    new chipyard.config.WithSystemBusFrequency(50.0) ++
+    new chipyard.config.WithMemoryBusFrequency(50.0) ++
+    new chipyard.config.WithPeripheryBusFrequency(50) ++
+    new PGL22GVexRiscvBaseConfig)
+
 class PGL22GVexRiscvNConfig extends Config(
+  new WithNVexRiscvCores(2, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      iCacheSize = 16 * 0x400,
+      dCacheSize = 16 * 0x400,
+      resetVector = 0x10000L,
+      onChipRamSize = 0,
+      debug = false,
+      freq = (100.0 / 3) MHz
+    )) ++
+    new WithFPGAFrequency(100.0 / 3) ++
+    new PGL22GVexRiscvBaseConfig)
+
+class PGL22GVexRiscvNL2Config extends Config(
   new WithNVexRiscvCores(2, onChipRAM = false) ++
     new WithVexConfig(VexOnChipConfig.default.copy(
       iCacheSize = 4096,
@@ -139,7 +172,17 @@ class PGL22GVexRiscvNConfig extends Config(
       freq = 25 MHz
     )) ++
     new WithFPGAFrequency(25.0) ++
-    new PGL22GVexRiscvBaseConfig)
+    new WithUARTHarnessBinder ++
+    new WithNoDebug ++
+    new WithSPIFlash ++
+    new WithSPIFlashHarnessBinder ++
+    new WithVexRiscvBootROM ++
+    new WithPGL22GTweaks ++
+    new WithPGL22GAXIMem(width = 64) ++
+    new WithNMemoryChannels(1) ++
+    // new WithBufferlessBroadcastHub ++
+    new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16, outerLatencyCycles = 3, subBankingFactor = 2) ++
+    new ModifiedAbstractConfig)
 
 class SimPGL22GVexRiscvConfig extends Config(
   new WithNVexRiscvCores(1, onChipRAM = false) ++
@@ -159,6 +202,36 @@ class SimPGL22GVexRiscvConfig extends Config(
     new WithMemoryBusWidth(64) ++
     new WithPGL22GSimTinyTweaks ++
     new WithFPGAFrequency(5.0) ++
+    new ModifiedAbstractConfig
+)
+
+class SimPGL22GVexRiscvMultiClockConfig extends Config(
+  new WithNVexRiscvCores(1, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      // iCacheSize = 16384,
+      // dCacheSize = 16384,
+      iCacheSize = 8192,
+      dCacheSize = 8192,
+      // iCacheSize = 4096,
+      // dCacheSize = 4096,
+      // iCacheSize = 0,
+      // dCacheSize = 0,
+      resetVector = 0x10040L,
+      onChipRamSize = 0
+    )) ++
+    // new WithMemoryBusWidth(32) ++
+    new WithMemoryBusWidth(64) ++
+    new WithPGL22GSimTinyTweaks ++
+    // new WithFPGAFrequency(5.0) ++
+    new chipyard.config.WithTileFrequency(100.0) ++ // Matches the maximum frequency of U540
+    new chipyard.config.WithSystemBusFrequency(10.0) ++ // Ditto
+    new chipyard.config.WithMemoryBusFrequency(10.0) ++ // 2x the U540 freq (appropriate for a 128b Mbus)
+    new chipyard.config.WithPeripheryBusFrequency(10) ++ // Retains the default pbus frequency
+    new chipyard.config.WithSystemBusFrequencyAsDefault ++ // All unspecified clock frequencies, notably the implicit clock, will use the sbus freq (800 MHz)
+    //  Crossing specifications
+    new chipyard.config.WithCbusToPbusCrossingType(AsynchronousCrossing()) ++ // Add Async crossing between PBUS and CBUS
+    new chipyard.config.WithSbusToMbusCrossingType(AsynchronousCrossing()) ++ // Add Async crossings between backside of L2 and MBUS
+    new freechips.rocketchip.subsystem.WithRationalRocketTiles ++ // Add rational crossings between RocketTile and uncore
     new ModifiedAbstractConfig
 )
 

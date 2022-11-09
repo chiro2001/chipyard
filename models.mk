@@ -22,11 +22,37 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv-n)
 	IPCORES						?= ipcores-n2
 endif
 
+ifeq ($(SUB_PROJECT),pgl22g-vexriscv-n-l2)
+	MODEL             ?= PGL22GBareTestHarness
+	VLOG_MODEL        ?= PGL22GBareTestHarness
+	MODEL_PACKAGE     ?= pgl22g.testharness
+	CONFIG            ?= PGL22GVexRiscvNL2Config
+	CONFIG_PACKAGE    ?= pgl22g.configs
+	GENERATOR_PACKAGE ?= chipyard
+	BOARD             ?= pgl22g
+	CONSTRAINTS       ?= ddr-spi-n-l2
+	FPGA_BRAND        ?= pango
+	IPCORES						?= ipcores-n2-l2
+endif
+
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	MODEL             ?= PGL22GBareTestHarness
 	VLOG_MODEL        ?= PGL22GBareTestHarness
 	MODEL_PACKAGE     ?= pgl22g.testharness
 	CONFIG            ?= PGL22GVexRiscvConfig
+	CONFIG_PACKAGE    ?= pgl22g.configs
+	GENERATOR_PACKAGE ?= chipyard
+	BOARD             ?= pgl22g
+	CONSTRAINTS       ?= ddr-spi
+	FPGA_BRAND        ?= pango
+	IPCORES						?= ipcores-n1
+endif
+
+ifeq ($(SUB_PROJECT),pgl22g-vexriscv-l2)
+	MODEL             ?= PGL22GBareTestHarness
+	VLOG_MODEL        ?= PGL22GBareTestHarness
+	MODEL_PACKAGE     ?= pgl22g.testharness
+	CONFIG            ?= PGL22GVexRiscvL2Config
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
@@ -43,8 +69,22 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv-multiclock)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
-	CONSTRAINTS       ?= ddr-spi
+	CONSTRAINTS       ?= ddr-spi-50
 	FPGA_BRAND        ?= pango
+	IPCORES						?= ipcores-n1-clk
+endif
+
+ifeq ($(SUB_PROJECT),pgl22g-vexriscv-multiclock2)
+	MODEL             ?= PGL22GBareTestHarness
+	VLOG_MODEL        ?= PGL22GBareTestHarness
+	MODEL_PACKAGE     ?= pgl22g.testharness
+	CONFIG            ?= PGL22GVexRiscvMultiClockConfig
+	CONFIG_PACKAGE    ?= pgl22g.configs
+	GENERATOR_PACKAGE ?= chipyard
+	BOARD             ?= pgl22g
+	CONSTRAINTS       ?= ddr-spi-50
+	FPGA_BRAND        ?= pango
+	IPCORES						?= ipcores-n1-clk
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-tl)
