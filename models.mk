@@ -17,8 +17,9 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv-n)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
-	CONSTRAINTS       ?= ddr-spi
+	CONSTRAINTS       ?= ddr-spi-n
 	FPGA_BRAND        ?= pango
+	IPCORES						?= ipcores-n2
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
@@ -31,6 +32,7 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	BOARD             ?= pgl22g
 	CONSTRAINTS       ?= ddr-spi
 	FPGA_BRAND        ?= pango
+	IPCORES						?= ipcores-n1
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-multiclock)
@@ -314,3 +316,4 @@ TOP ?= ChipTop
 SYN_TOP ?= $(MODEL)
 MEM ?= mem.v
 CONSTRAINTS ?= ddr
+IPCORES	?= ipcores-none

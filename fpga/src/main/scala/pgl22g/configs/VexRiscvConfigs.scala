@@ -41,9 +41,9 @@ class PGL22GVexRiscvConfig extends Config(
       // dCacheSize = 0,
       resetVector = 0x10000L,
       onChipRamSize = 0,
-      freq = 50 MHz
+      freq = 55 MHz
     )) ++
-    new WithFPGAFrequency(50.0) ++
+    new WithFPGAFrequency(55.0) ++
     new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscvMultiClockConfig extends Config(
