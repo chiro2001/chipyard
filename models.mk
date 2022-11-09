@@ -43,9 +43,9 @@ ifeq ($(SUB_PROJECT),pgl22g-vexriscv)
 	CONFIG_PACKAGE    ?= pgl22g.configs
 	GENERATOR_PACKAGE ?= chipyard
 	BOARD             ?= pgl22g
-	CONSTRAINTS       ?= ddr-spi
+	CONSTRAINTS       ?= ddr-spi-main
 	FPGA_BRAND        ?= pango
-	IPCORES						?= ipcores-n1
+	IPCORES						?= ipcores-n1-main
 endif
 
 ifeq ($(SUB_PROJECT),pgl22g-vexriscv-l2)

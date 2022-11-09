@@ -162,9 +162,22 @@ class PGL22GVexRiscvNConfig extends Config(
       resetVector = 0x10000L,
       onChipRamSize = 0,
       debug = false,
-      freq = (100.0 / 3) MHz
+      freq = (50.0 * 4 / 3) MHz
     )) ++
-    new WithFPGAFrequency(100.0 / 3) ++
+    new WithFPGAFrequency(50.0 * 4 / 3) ++
+    new PGL22GVexRiscvBaseConfig)
+
+class PGL22GVexRiscvConfig extends Config(
+  new WithNVexRiscvCores(1, onChipRAM = false) ++
+    new WithVexConfig(VexOnChipConfig.default.copy(
+      iCacheSize = 32 * 0x400,
+      dCacheSize = 32 * 0x400,
+      resetVector = 0x10000L,
+      onChipRamSize = 0,
+      debug = false,
+      freq = (50.0 * 4 / 3) MHz
+    )) ++
+    new WithFPGAFrequency(50.0 * 4 / 3) ++
     new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscvNL2Config extends Config(
