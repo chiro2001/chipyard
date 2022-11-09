@@ -7,6 +7,9 @@ import pgl22g._
 import vexriscv.chipyard.{WithNVexRiscvCores, WithVexConfig}
 import vexriscv.demo.VexOnChipConfig
 
+import scala.language.postfixOps
+import spinal.core._
+
 class PGL22GVexRiscvBaseConfig extends Config(
   new WithUARTHarnessBinder ++
     // new WithDebugPeripherals ++
@@ -19,7 +22,6 @@ class PGL22GVexRiscvBaseConfig extends Config(
     new WithSPIFlashHarnessBinder ++
     // new WithTestsBootROM ++
     new WithVexRiscvBootROM ++
-    new WithFPGAFrequency(40.0) ++
     new WithPGL22GTweaks ++
     new WithPGL22GAXIMem(width = 64) ++
     new WithNMemoryChannels(1) ++
@@ -38,8 +40,10 @@ class PGL22GVexRiscvConfig extends Config(
       // iCacheSize = 0,
       // dCacheSize = 0,
       resetVector = 0x10000L,
-      onChipRamSize = 0
+      onChipRamSize = 0,
+      freq = 50 MHz
     )) ++
+    new WithFPGAFrequency(50.0) ++
     new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscvMultiClockConfig extends Config(
@@ -131,8 +135,10 @@ class PGL22GVexRiscvNConfig extends Config(
       dCacheSize = 4096,
       resetVector = 0x10000L,
       onChipRamSize = 0,
-      debug = false
+      debug = false,
+      freq = 25 MHz
     )) ++
+    new WithFPGAFrequency(25.0) ++
     new PGL22GVexRiscvBaseConfig)
 
 class SimPGL22GVexRiscvConfig extends Config(
