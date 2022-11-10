@@ -162,9 +162,9 @@ class PGL22GVexRiscvNConfig extends Config(
       resetVector = 0x10000L,
       onChipRamSize = 0,
       debug = false,
-      freq = (50.0 * 4 / 3) MHz
+      freq = 50.0 MHz
     )) ++
-    new WithFPGAFrequency(50.0 * 4 / 3) ++
+    new WithFPGAFrequency(50.0) ++
     new PGL22GVexRiscvBaseConfig)
 
 class PGL22GVexRiscvConfig extends Config(
