@@ -1,3 +1,11 @@
+base_dir ?= $(abspath ../..)
+
+# BINARY ?= $(RISCV)/riscv64-unknown-elf/share/riscv-tests/isa/rv32ui-p-add
+BINARY ?= $(base_dir)/software/coremark/overlay/coremark.perf.riscv
+SUB_PROJECT ?= pgl22g
+
+include $(base_dir)/models-sim.mk
+
 #########################################################################################
 # verilator makefile
 #########################################################################################
@@ -78,6 +86,7 @@ $(sim_files): $(SIM_FILE_REQS) | $(build_dir)
 # import other necessary rules and variables
 #########################################################################################
 include $(base_dir)/common.mk
+include $(base_dir)/extra.mk
 
 #########################################################################################
 # verilator-specific user-interface variables and commands
@@ -153,6 +162,8 @@ TIMESCALE_OPTS := $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1
 # see: https://github.com/ucb-bar/riscv-mini/issues/31
 MAX_WIDTH_OPTS = $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1 > 4.016) { print "--max-num-width 1048576"; }')
 
+VERILATOR_TIMING_OPTS := $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1 > 5.000) { print "--timing"; }')
+
 PREPROC_DEFINES := \
 	+define+PRINTF_COND=\$$c\(\"verbose\",\"\&\&\"\,\"done_reset\"\) \
 	+define+STOP_COND=\$$c\(\"done_reset\"\)
@@ -165,6 +176,7 @@ VERILATOR_NONCC_OPTS = \
 	-Wno-fatal \
 	$(TIMESCALE_OPTS) \
 	$(MAX_WIDTH_OPTS) \
+	$(VERILATOR_TIMING_OPTS) \
 	$(PREPROC_DEFINES) \
 	--top-module $(VLOG_MODEL) \
 	--vpi \
@@ -178,7 +190,6 @@ VERILATOR_CXXFLAGS = \
 	$(SIM_CXXFLAGS) \
 	$(RUNTIME_PROFILING_CFLAGS) \
 	$(TRACING_CFLAGS) \
-	-D__STDC_FORMAT_MACROS \
 	-DTEST_HARNESS=V$(VLOG_MODEL) \
 	-DVERILATOR \
 	-include $(build_dir)/$(long_name).plusArgs \
@@ -210,22 +221,42 @@ model_mk_debug = $(model_dir_debug)/V$(VLOG_MODEL).mk
 #########################################################################################
 # build makefile fragment that builds the verilator sim rules
 #########################################################################################
-$(model_mk): $(sim_vsrcs) $(sim_common_files) $(EXTRA_SIM_REQS)
+model_mk_deps := $(sim_common_files) $(EXTRA_SIM_REQS)
+ifndef IGNORE_VSRCS
+model_mk_deps += $(sim_vsrcs)
+endif
+
+$(model_mk): $(model_mk_deps)
 	rm -rf $(model_dir)
 	mkdir -p $(model_dir)
 	$(VERILATOR) $(VERILATOR_OPTS) $(EXTRA_SIM_SOURCES) -o $(sim) -Mdir $(model_dir) -CFLAGS "-include $(model_header)"
 	touch $@
 
-$(model_mk_debug): $(sim_vsrcs) $(sim_common_files) $(EXTRA_SIM_REQS)
+$(model_mk_debug): $(model_mk_deps)
 	rm -rf $(model_dir_debug)
 	mkdir -p $(model_dir_debug)
 	$(VERILATOR) $(VERILATOR_OPTS) $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(TRACING_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
 	touch $@
 
+# SBT_PROJECT       ?= fpga_platforms
+# MODEL             ?= PGL22GFPGATestHarness
+# VLOG_MODEL        ?= PGL22GFPGATestHarness
+# MODEL_PACKAGE     ?= chipyard.fpga.pgl22g
+# CONFIG            ?= TinyRocketPGL22GConfig
+# CONFIG_PACKAGE    ?= chipyard.fpga.pgl22g
+# GENERATOR_PACKAGE ?= chipyard
+# TB                ?= none # unused
+# TOP               ?= ChipTop
+# BOARD             ?= pgl22g
+# FPGA_BRAND        ?= pango
+
+debug_info:
+	@echo SBT_PROJECT=$(SBT_PROJECT) MODEL=$(MODEL) VLOG_MODEL=$(VLOG_MODEL) MODEL_PACKAGE=$(MODEL_PACKAGE) CONFIG=$(CONFIG) CONFIG_PACKAGE=$(CONFIG_PACKAGE) GENERATOR_PACKAGE=$(GENERATOR_PACKAGE) TB=$(TB) TOP=$(TOP) BOARD=$(BOARD) FPGA_BRAND=$(FPGA_BRAND)
+
 #########################################################################################
 # invoke make to make verilator sim rules
 #########################################################################################
-$(sim): $(model_mk) $(dramsim_lib)
+$(sim): debug_info $(model_mk) $(dramsim_lib)
 	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(VLOG_MODEL).mk
 
 $(sim_debug): $(model_mk_debug) $(dramsim_lib)
@@ -252,3 +283,91 @@ clean-sim:
 
 clean-sim-debug:
 	rm -rf $(model_dir_debug) $(sim_debug)
+
+include $(base_dir)/vex.mk
+
+VEX_VERILATOR_NONCC_OPTS = \
+	$(RUNTIME_PROFILING_VFLAGS) \
+	$(RUNTIME_THREADS) \
+	$(VERILATOR_OPT_FLAGS) \
+	$(PLATFORM_OPTS) \
+	-Wno-fatal \
+	$(TIMESCALE_OPTS) \
+	$(MAX_WIDTH_OPTS) \
+	$(PREPROC_DEFINES) \
+	--top-module $(VLOG_MODEL) \
+	--vpi
+
+VEX_VERILATOR_CXXFLAGS = \
+	$(SIM_CXXFLAGS) \
+	$(RUNTIME_PROFILING_CFLAGS) \
+	$(TRACING_CFLAGS) \
+	-DTEST_HARNESS=V$(VLOG_MODEL) \
+	-DVERILATOR
+
+VEX_VERILATOR_LDFLAGS = $(SIM_LDFLAGS)
+
+VEX_VERILATOR_CC_OPTS = \
+	-CFLAGS "$(VEX_VERILATOR_CXXFLAGS)" \
+	-LDFLAGS "$(VEX_VERILATOR_LDFLAGS)"
+
+VEX_CPP_DIR := $(base_dir)/generators/vex-riscv/src/test/cpp/vexchip
+VEX_MAIN := $(VEX_CPP_DIR)/main.cpp
+VEX_MAIN_DEBUG := $(VEX_CPP_DIR)/main_debug.cpp
+VEX_INCLUDE := $(VEX_CPP_DIR)/../
+
+VEX_VERILATOR_OPTS = $(VEX_VERILATOR_NONCC_OPTS) -I$(VEX_INCLUDE)
+
+VEX_TRACE_OPTS := --trace --trace-fst
+
+.PHONY: model_mk_vex
+model_mk_vex: $(VEXCHIP_VERILOG) #$(model_mk_deps)
+	rm -rf $(model_dir)
+	mkdir -p $(model_dir)
+	cd $(build_dir) && $(VERILATOR) $(VEX_VERILATOR_CC_OPTS) $(VEX_VERILATOR_OPTS) $(VEXCHIP_VERILOG) $(VEX_MAIN) $(EXTRA_SIM_SOURCES) -o $(sim) -Mdir $(model_dir) -CFLAGS "-include $(model_header)"
+
+.PHONY: model_mk_debug_vex
+model_mk_debug_vex: $(VEXCHIP_DEBUG_VERILOG)_DEBUG build_dir_mk #$(model_mk_deps)
+	rm -rf $(model_dir_debug)
+	mkdir -p $(model_dir_debug)
+	cd $(build_dir) && $(VERILATOR) \
+		-CFLAGS "$(VEX_VERILATOR_CXXFLAGS) -DTRACE=1 -DTRACE_START=0" -LDFLAGS "$(VEX_VERILATOR_LDFLAGS)" \
+		$(VEX_VERILATOR_OPTS) $(VEXCHIP_DEBUG_VERILOG) $(VEX_MAIN_DEBUG) $(EXTRA_SIM_SOURCES) -o $(sim_debug) $(VEX_TRACE_OPTS) -Mdir $(model_dir_debug) -CFLAGS "-include $(model_header_debug)"
+
+vex-$(sim): debug_info model_mk_vex
+	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(VLOG_MODEL).mk
+
+vex-$(sim_debug): model_mk_debug_vex
+	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir_debug) -f V$(VLOG_MODEL).mk
+
+copy-vex-binaries:
+	-cp $(build_dir)/*.bin .
+	-cp $(base_dir)/*.yaml .
+
+.PHONY: vex-default vex-debug
+vex-default: vex-$(sim)
+	$(MAKE) -C $(abspath .) copy-vex-binaries
+vex-debug: vex-$(sim_debug)
+	$(MAKE) -C $(abspath .) copy-vex-binaries
+
+vex-run: vex-default
+	$(sim)
+vex-run-debug: vex-debug
+	$(sim_debug)
+vex-openocd:
+	file ./generators/vex-riscv/src/test/openocd/vexchip_sim.cfg
+	cd $(base_dir) && openocd -c "set VEXRISCV_YAML VexChip.yaml" -f ./generators/vex-riscv/src/test/openocd/vexchip_sim.cfg
+
+FLASH_IMG ?= $(sim_dir)/flash.img
+FLASH_BINARY ?= $(subst .riscv,.bin,$(BINARY))
+
+.PHONY: $(FLASH_IMG) flash-img flash-run
+$(FLASH_IMG):
+	dd if=/dev/zero of=$(FLASH_IMG) bs=1MiB count=16
+	dd if=$(FLASH_BINARY) of=$(FLASH_IMG) bs=1MiB seek=1 conv=notrunc
+flash-img: $(FLASH_IMG)
+
+run-flash: flash-img
+	(set -o pipefail && $(NUMA_PREFIX) $(sim) $(PERMISSIVE_ON) $(SIM_FLAGS) $(EXTRA_SIM_FLAGS) +spiflash0=$(FLASH_IMG) $(SEED_FLAG) $(VERBOSE_FLAGS) $(PERMISSIVE_OFF) $(BINARY) </dev/null 2> >(spike-dasm > $(sim_out_name).out) | tee $(sim_out_name).log)
+run-flash-debug: flash-img
+	(set -o pipefail && $(NUMA_PREFIX) $(sim_debug) $(PERMISSIVE_ON) $(SIM_FLAGS) $(EXTRA_SIM_FLAGS) +spiflash0=$(FLASH_IMG) $(SEED_FLAG) $(VERBOSE_FLAGS) $(WAVEFORM_FLAG) $(PERMISSIVE_OFF) $(BINARY) </dev/null 2> >(spike-dasm > $(sim_out_name).out) | tee $(sim_out_name).log)

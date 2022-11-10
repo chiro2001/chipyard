@@ -1,1 +1,3 @@
-generated-src
+generated-src*
+temp/
+archive/

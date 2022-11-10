@@ -7,7 +7,7 @@
 
 module ClockDividerN #(parameter DIV = 1)(output logic clk_out = 1'b0, input clk_in);
 
-    localparam CWIDTH = $clog2(DIV);
+    localparam CWIDTH = $clog2(DIV+1);
     localparam LOW_CYCLES = DIV / 2;
     localparam HIGH_TRANSITION = LOW_CYCLES - 1;
     localparam LOW_TRANSITION = DIV - 1;

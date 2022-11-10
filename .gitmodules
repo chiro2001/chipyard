@@ -37,9 +37,6 @@
 [submodule "tools/chisel-testers"]
 	path = tools/chisel-testers
 	url = https://github.com/freechipsproject/chisel-testers.git
-[submodule "generators/sha3"]
-	path = generators/sha3
-	url = https://github.com/ucb-bar/sha3.git
 [submodule "vlsi/hammer-cadence-plugins"]
 	path = vlsi/hammer-cadence-plugins
 	url = https://github.com/ucb-bar/hammer-cadence-plugins.git
@@ -57,13 +54,13 @@
 	url = https://github.com/ucb-bar/spec2017-workload.git
 [submodule "software/coremark"]
 	path = software/coremark
-	url = https://github.com/ucb-bar/coremark-workload.git
+	url = https://github.com/chiro2001/coremark-workload
 [submodule "generators/gemmini"]
 	path = generators/gemmini
 	url = https://github.com/ucb-bar/gemmini
 [submodule "software/firemarshal"]
 	path = software/firemarshal
-	url = https://github.com/firesim/FireMarshal.git
+	url = https://github.com/chiro2001/FireMarshal
 [submodule "generators/cva6"]
 	path = generators/cva6
 	url = https://github.com/ucb-bar/cva6-wrapper.git
@@ -81,7 +78,7 @@
 	url = https://github.com/riscv-boom/dromajo.git
 [submodule "generators/riscv-sodor"]
 	path = generators/riscv-sodor
-	url = https://github.com/ucb-bar/riscv-sodor.git
+	url = https://github.com/chiro2001/riscv-sodor
 [submodule "fpga/fpga-shells"]
 	path = fpga/fpga-shells
 	url = https://github.com/chipsalliance/rocket-chip-fpga-shells.git
@@ -130,3 +127,20 @@
 [submodule "generators/constellation"]
 	path = generators/constellation
 	url = https://github.com/ucb-bar/constellation.git
+[submodule "generators/picorv"]
+	path = generators/picorv
+	url = https://github.com/chiro2001/picorv-chipyard
+[submodule "generators/ssrv"]
+	path = generators/ssrv
+	url = https://github.com/chiro2001/ssrv-chipyard
+[submodule "generators/vex-riscv"]
+	path = generators/vex-riscv
+	url = https://github.com/chiro2001/VexRiscv-chipyard
+[submodule "generators/testchipip"]
+	url = https://github.com/chiro2001/testchipip
+[submodule "software/rt-thread"]
+	path = software/rt-thread
+	url = https://github.com/criwits/rt-thread
+[submodule "software/opensbi"]
+	path = software/opensbi
+	url = https://github.com/chiro2001/opensbi

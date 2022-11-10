@@ -18,3 +18,9 @@ tags
 .bsp/
 .conda-env/
 .#*
+
+/*.v
+/*.yaml
+/*.bin
+/tmp
+/simWorkspace/

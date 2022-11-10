@@ -1,0 +1,20 @@
+{
+  // 使用 IntelliSense 了解相关属性。 
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "gdb",
+      "request": "attach",
+      "name": "Attach to gdbserver",
+      "executable": "${workspaceRoot}/software/coremark/overlay/coremark.bare.riscv",
+      // "gdbpath": "/opt/riscv/bin/riscv64-unknown-elf-gdb",
+      // "gdbpath": "gdb-multiarch",
+      "gdbpath": "/opt/xpack/riscv-none-embed-gcc/bin/riscv-none-embed-gdb",
+      "remote": true,
+      "target": "127.0.0.1:3333",
+      "cwd": "${workspaceRoot}",
+    }
+  ]
+}

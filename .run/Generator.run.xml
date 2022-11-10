@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Generator" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="chipyard.Generator" />
+    <module name="fpga_platforms" />
+    <option name="PROGRAM_PARAMETERS" value="--target-dir $PROJECT_DIR$/fpga/generated-src/chipyard.fpga.pgl22g.PGL22GFPGATestHarness.RocketPGL22GConfig --name chipyard.fpga.pgl22g.PGL22GFPGATestHarness.RocketPGL22GConfig --top-module chipyard.fpga.pgl22g.PGL22GFPGATestHarness --legacy-configs chipyard.fpga.pgl22g:RocketPGL22GConfig" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="chipyard.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

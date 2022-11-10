@@ -24,6 +24,8 @@ libgloss := $(libgloss_lib) $(libgloss_specs) htif.ld
 
 LDFLAGS += -L libgloss
 
+TARGET := $(CROSS_COMPILE)
+
 $(libgloss_builddir)/Makefile: $(libgloss_srcdir)/configure
 	mkdir -p $(dir $@)
 	cd $(dir $@) && $(realpath $<) \
